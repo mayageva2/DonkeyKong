@@ -22,6 +22,7 @@ Welcome to **Donkey Kong** - the classic arcade game brought to life in **C++**!
 | Be Careful! falling 5 rows or hitting a barrel will cost you a heart,     |
 | lose all 3 hearts, and the game will end!                                 |
 |                                                           GOOD LUCK MARIO!|
+|---------------------------------------------------------------------------|
 ```
 
 ---
