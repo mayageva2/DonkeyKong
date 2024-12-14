@@ -16,7 +16,7 @@ void Mario::draw(const Point& pos) const  //this func draws mario in the locatio
 	cout << this->ch;
 }
 
-void Mario::move(GameConfig::eKeys key,GameConfig& currBoard, int& moveCounter) //this func moves mario according to user's key
+void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter) //this func moves mario according to user's key
 {
 	bool sideJump = false;
 	checkCollide(currBoard);
@@ -83,13 +83,13 @@ void Mario::left(GameConfig& currBoard, int& moveCounter)  //moves mario to the 
 	{
 		p.draw('H', this->location);
 		isH = true;
-	}	
+	}
 	else
 	{
 		p.draw(' ', this->location);
 		isH = false;
 	}
-	
+
 	if (checkMove(currBoard, p.x + this->location.diff_x, p.y + this->location.diff_y))
 	{
 		if (isInBoard(currBoard, p.x + this->location.diff_x))
@@ -104,7 +104,7 @@ void Mario::left(GameConfig& currBoard, int& moveCounter)  //moves mario to the 
 	}
 	else
 		stay(currBoard);
-	
+
 	moveCounter = 0;
 }
 
@@ -150,7 +150,7 @@ void Mario::up(GameConfig& currBoard, int& moveCounter, bool& sideJump)  //makes
 {
 	Point p(this->location);
 	bool isH = false;
-	
+
 	if ((currBoard.GetChar(p.x, p.y) == 'H') || (!checkMove(currBoard, p.x, p.y) && currBoard.GetChar(p.x, p.y + 1) == 'H'))  //going up a ladder 
 		isH = true;
 	else    //jump
@@ -164,7 +164,7 @@ void Mario::up(GameConfig& currBoard, int& moveCounter, bool& sideJump)  //makes
 		}
 		else if (moveCounter >= 2 && moveCounter < 4)
 			falling(moveCounter, currBoard, sideJump);
-		
+
 		if (moveCounter == 4)
 			moveCounter = -1;
 	}
@@ -214,19 +214,19 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump)
 		stay(currBoard);
 		if (moveCounter > 4)
 		{
-				Sleep(100);
-				p.draw(' ', this->location);
-				gotoxy(this->location.x, this->location.y);
-				cout << "BOOM";
-				this->num_of_hearts--;
-				Sleep(1000);
-				didMarioLose(currBoard);
-				this->location = start;
-				Game game;
-				game.startGame(*this);
+			Sleep(100);
+			p.draw(' ', this->location);
+			gotoxy(this->location.x, this->location.y);
+			cout << "BOOM";
+			this->num_of_hearts--;
+			Sleep(1000);
+			didMarioLose(currBoard);
+			this->location = start;
+			Game game;
+			game.startGame(*this);
 		}
 		sideJump = false;
-		moveCounter = 0; 
+		moveCounter = 0;
 	}
 	didMarioWin(currBoard);
 }
@@ -260,7 +260,7 @@ void Mario::climbUpAladder(int& moveCounter, GameConfig& currBoard)
 void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump)   //makes mario climb down by ladder
 {
 	Point p(this->location);
-	
+
 	if (currBoard.GetChar(p.x, p.y) == 'H')
 	{
 		if (!isMarioOnFloor(currBoard))
@@ -319,16 +319,31 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 	Point p(this->location);
 	bool isH = false;
 	Game game;
-	
+
 	if (key == GameConfig::eKeys::LEFT || key == GameConfig::eKeys::LEFT2) //check if after jump mario should move left
 	{
 		this->location.diff_x = -2;
 		this->location.diff_y = -2;
+<<<<<<< Updated upstream
+=======
+
+		if (currBoard.GetChar(p.x, p.y) == 'H')
+		{
+			moveCounter = 3;
+		}
+>>>>>>> Stashed changes
 	}
 	else if (key == GameConfig::eKeys::RIGHT || key == GameConfig::eKeys::RIGHT2)  //check if after jump mario should move right
 	{
 		this->location.diff_x = 2;
 		this->location.diff_y = -2;
+<<<<<<< Updated upstream
+=======
+		if (currBoard.GetChar(p.x, p.y) == 'H')
+		{
+			moveCounter = 3;
+		}
+>>>>>>> Stashed changes
 	}
 	else if (key == GameConfig::eKeys::STAY || key == GameConfig::eKeys::STAY2)
 	{
@@ -428,7 +443,7 @@ void Mario::checkCollide(GameConfig& currBoard)
 		cout << "BOOM";
 		this->num_of_hearts--;
 		Sleep(1000);
-		didMarioLose(currBoard);		
+		didMarioLose(currBoard);
 		this->location = start;
 		Game game;
 		game.startGame(*this);
