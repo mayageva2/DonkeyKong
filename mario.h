@@ -2,13 +2,13 @@
 #define _MARIO_H
 #include "point.h"
 #include "general.h"
+#include "gameConfig.h"
 
 #include <conio.h>
 #include<iostream>
 
 const Point start = { 77, 23 };
-const Point hearts = { 72,2 };
-//const Point heartsPro = { 72,2 };//BETTER GAME
+const Point hearts = { 64,1 };
 enum class MarioState { moving, jumping , standing, falling }; //chat GPT solution
 
 class Mario
@@ -45,5 +45,6 @@ public:
 	void checkCollide(GameConfig& currBoard); 
 	void didMarioLose(GameConfig& currBoard);
 	void didMarioWin(GameConfig& currBoard);
+	void printHearts();
 };
 #endif

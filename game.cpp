@@ -2,7 +2,9 @@
 #include "mario.h"
 #include "barrel.h"
 #include "general.h"
+#include "gameConfig.h"
 #include "menu.h"
+
 #include <conio.h>
 #include <Windows.h>
 
@@ -14,10 +16,12 @@ void Game::startGame(Mario& mario)
 	GameConfig board;
 	board.resetBoard();
 	board.PrintBoard();
+	mario.printHearts();
+	Barrel* barrels[Barrel::maxBarrels] = { nullptr };
+	int numBarrels = 0;
 	int interval = 0;
-	vector<Barrel>barrels;
-	Barrel b(board);
 	int moveCounter = 0;
+	int barrelMoveCounter = 2;
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
 	Menu menu;
@@ -27,7 +31,11 @@ void Game::startGame(Mario& mario)
 
 	while (true)
 	{
-		barrelsMovement(barrels, board, interval);
+		if (barrelMoveCounter == 2)
+		{
+			barrelsMovement(barrels, numBarrels, board, interval, mario);
+			barrelMoveCounter = 0;
+		}
 
 		if (moveCounter == 0)
 		{
@@ -53,17 +61,18 @@ void Game::startGame(Mario& mario)
 		else
 			marioMovement(mario, board, lastKey, key, moveCounter, sideJump);
 
-		if (mario.state == MarioState::standing) // In case key wasn't prased
+		if (mario.state == MarioState::standing) 
 		{
-			mario.checkCollide(board);
+			if (board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == 'O')
+				mario.checkCollide(board);
 			Sleep(200);
 		}
 		++interval;
+		++barrelMoveCounter;
 
 	}
 	gotoxy(0, GameConfig::MAX_Y + 2);
-	barrels.clear(); //Clear barrels array
-
+	deleteArray(barrels, numBarrels); //Clear barrels array
 }
 
 
@@ -130,31 +139,41 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 
 }
 
-void Game::barrelsMovement(std::vector<Barrel>& barrels, GameConfig& board, int& interval)
+void Game::barrelsMovement(Barrel** barrels, int& numBarrels, GameConfig& board, int& interval, Mario& mario)
 {
-	if (interval % 20 == 0)
+	if (interval % 20 == 0 && numBarrels < Barrel::maxBarrels)
 	{
-		barrels.emplace_back(board); //Create new Barrel
+		barrels[numBarrels] = new Barrel();
+		barrels[numBarrels]->activate();
 		if (interval % 40 == 0)
 		{
-			barrels.back().dropDirection = false; // Change drop direction
+			barrels[numBarrels]->dropDirection = false;
 		}
+		numBarrels++;
 	}
 
-	for (size_t i = 0; i < barrels.size();)
+	for (int i = 0; i < numBarrels;)
 	{
-		barrels[i].moveBarrel(board); // Move new barrel
-
-		//Clean barrels that got to the end of screen
-		if (barrels[i].getLocation().x >= 75 || barrels[i].getLocation().x <= 1 || (barrels[i].isBarrelActive() == false))
+		if (barrels[i]->isBarrelActive())
 		{
-			barrels[i].clearFromScreen(board);
-			barrels.erase(barrels.begin() + i);
-		}
-		i++;
-	}
+			barrels[i]->moveBarrel(board);
 
-	
+			if (barrels[i]->getLocation().x >= 78 || barrels[i]->getLocation().x <= 1 || !barrels[i]->isBarrelActive())
+			{
+				barrels[i]->clearFromScreen(board);
+				barrels[i]->deactivate();
+				deleteFromArray(barrels, i, numBarrels);
+			}
+			else
+			{
+				i++;
+			}
+		}
+		else
+		{
+			deleteFromArray(barrels, i, numBarrels);
+		}
+	}
 }
 
 void Game::pauseGame(GameConfig& board, Mario& mario)
@@ -177,5 +196,27 @@ void Game::pauseGame(GameConfig& board, Mario& mario)
 	}
 	clrscr();
 	board.PrintBoard();
+	mario.printHearts();
 	mario.draw(mario.findMarioLocation());
+}
+
+void Game::deleteFromArray(Barrel** barrels, int index, int& numBarrels)
+{
+	delete barrels[index];
+	barrels[index] = barrels[numBarrels - 1];
+	barrels[numBarrels - 1] = nullptr;
+	numBarrels--;
+}
+
+void Game::deleteArray(Barrel** barrels, int& numBarrels)
+{
+	for (int i = 0; i < numBarrels; ++i)
+	{
+		if (barrels[i] != nullptr)
+		{
+			delete barrels[i];
+			barrels[i] = nullptr;
+		}
+	}
+	numBarrels = 0;
 }

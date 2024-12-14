@@ -19,7 +19,8 @@ void Mario::draw(const Point& pos) const  //this func draws mario in the locatio
 void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter) //this func moves mario according to user's key
 {
 	bool sideJump = false;
-	checkCollide(currBoard);
+	if (currBoard.GetChar(this->location.x, this->location.y) == 'O')
+		checkCollide(currBoard);
 	currBoard.SetChar(this->location.x, this->location.y, ' '); //resets mario's previous location
 
 	switch (key)
@@ -52,7 +53,8 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter)
 		break;
 	}
 
-	checkCollide(currBoard);
+	if (currBoard.GetChar(this->location.x, this->location.y) == 'O')
+		checkCollide(currBoard);
 	currBoard.SetChar(this->location.x, this->location.y, this->ch);
 }
 
@@ -214,18 +216,7 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump)
 			moveCounter -= 4;
 		stay(currBoard);
 		if (moveCounter > 4)
-		{
-			Sleep(100);
-			p.draw(' ', this->location);
-			gotoxy(this->location.x, this->location.y);
-			cout << "BOOM";
-			this->num_of_hearts--;
-			Sleep(1000);
-			didMarioLose(currBoard);
-			this->location = start;
-			Game game;
-			game.startGame(*this);
-		}
+			checkCollide(currBoard);
 		sideJump = false;
 		moveCounter = 0;
 	}
@@ -427,6 +418,11 @@ void Mario::printLessHearts()
 	cout << this->num_of_hearts;
 }
 
+void Mario::printHearts()
+{
+	gotoxy(hearts.x, hearts.y);
+	cout << this->num_of_hearts;
+}
 
 /*/void Mario::printLessHearts()//BETTER GAME
 {
@@ -436,8 +432,6 @@ void Mario::printLessHearts()
 
 void Mario::checkCollide(GameConfig& currBoard)
 {
-	if (currBoard.GetChar(this->location.x, this->location.y) == 'O')
-	{
 		gotoxy(this->location.x, this->location.y);
 		cout << "BOOM";
 		this->num_of_hearts--;
@@ -446,7 +440,7 @@ void Mario::checkCollide(GameConfig& currBoard)
 		this->location = start;
 		Game game;
 		game.startGame(*this);
-	}
+		printHearts();
 }
 
 void Mario::didMarioLose(GameConfig& currBoard)

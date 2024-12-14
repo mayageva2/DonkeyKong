@@ -1,14 +1,17 @@
 #include "barrel.h"
-#include "barrel.h"
-
 
 void Barrel::clearFromScreen(GameConfig& board)
 {
 	board.SetChar(location.x, location.y, ' '); //resets barrel's previous location
-	gotoxy(location.x, location.y);
 	//cout << "\xF0\x9F\x92\xA5";  // // BETTER VERSION
+
+	if (location.x == 78)
+	{
+		location.x = 75;
+	}
+	gotoxy(location.x, location.y);
 	cout << "BOOM";
-	Sleep(600);
+	Sleep(200);
 	for (int i = 3; i >= 0; i--) // CLEANS 'BOOM' from screen
 	{
 		gotoxy(location.x + i, location.y);
@@ -18,10 +21,8 @@ void Barrel::clearFromScreen(GameConfig& board)
 
 void Barrel::Print(int x, int y)
 {
-	cout << this->barrelCh;
-	Sleep(100);
-	gotoxy(x, y);
-	cout << " ";
+	gotoxy(location.x, location.y);
+	cout << barrelCh;
 }
 
 void Barrel::PrintLadder()
@@ -32,113 +33,51 @@ void Barrel::PrintLadder()
 void Barrel::moveBarrel(GameConfig& board)
 {
 	board.SetChar(this->location.x, this->location.y, ' '); //resets barrel's previous location
-	gotoxy(location.x, location.y);
+	
+	char originalChar = board.GetChar(location.x, location.y);
+	board.SetChar(location.x, location.y, originalChar);     
+	gotoxy(location.x, location.y);                          
+	cout << originalChar;                                    
+
+	char floor = board.GetChar(location.x, location.y + 1);
 
 	if ((dropDirection == false)) // Drop barrel down else drop barrel forward
 	{
-		location = downstart;
-		gotoxy(location.x, location.y);
+		location.y++;
 		dropDirection = true;
 	}
 
-
-	if (pBoard->GetChar(location.x, location.y + 1) != '>' && pBoard->GetChar(location.x, location.y + 1) != '<'
-		&& pBoard->GetChar(location.x, location.y + 1) != '=' && pBoard->GetChar(location.x, location.y + 1) != '-')
+	if (floor != '>' && floor != '<' && floor != '=' && floor != '-')
 	{
-		Print(location.x, location.y);
 		++location.y;
 		++fallCount;
 	}
-	else if (pBoard->GetChar(location.x, location.y + 1) == '>')
+	else if (floor == '>')
 	{
 		direction = true;
-		if (fallCount >= 8)
-		{
-			barrelNotActive(); //Unactivate barrel
-		}
-		else
-		{
-			fallCount = 0;
-			if (pBoard->GetChar(location.x, location.y) == 'H')
-			{
-				Print(location.x, location.y);
-				gotoxy(location.x, location.y);
-				PrintLadder();
-			}
-			else
-			{
-				Print(location.x, location.y);
-			}
-			++location.x;
-		}
+		fallCount = 0;
+		++location.x;
 	}
-	else if (pBoard->GetChar(location.x, location.y + 1) == '<')
+	else if (floor == '<')
 	{
 		direction = false;
-		if (fallCount >= 8)
-		{
-			barrelNotActive(); //Unactivate barrel
-		}
-		else
-		{
-			fallCount = 0;
-			if (pBoard->GetChar(location.x, location.y) == 'H')
-			{
-				Print(location.x, location.y);
-				gotoxy(location.x, location.y);
-				PrintLadder();
-			}
-			else
-			{
-				Print(location.x, location.y);
-			}
-			--location.x;
-		}
+		fallCount = 0;
+		--location.x;
 	}
-	else if (pBoard->GetChar(location.x, location.y + 1) == '=' || pBoard->GetChar(location.x, location.y + 1) == '-')
+	else if (floor == '=' || floor == '-')
 	{
-		if (fallCount >= 8)
-		{
-			barrelNotActive(); //Unactivate barrel
-		}
-		else
-		{
-			fallCount = 0;
-			if (direction == true)
-			{
-				if (pBoard->GetChar(location.x, location.y) == 'H')
-				{
-					Print(location.x, location.y);
-					gotoxy(location.x, location.y);
-					PrintLadder();
-				}
-				else
-				{
-					Print(location.x, location.y);
-				}
-				++location.x;
-			}
-			else
-			{
-				if (pBoard->GetChar(location.x, location.y) == 'H')
-				{
-					Print(location.x, location.y);
-					gotoxy(location.x, location.y);
-					PrintLadder();
-				}
-				else
-				{
-					Print(location.x, location.y);
-				}
-				--location.x;
-			}
-		}
+		fallCount = 0;
+		++location.x;
 	}
-	if (isActive)
+	if (fallCount >= 8)
 	{
-		gotoxy(location.x, location.y);
-		cout << this->barrelCh;
+		deactivate();
+	}
+	else
+	{
+		board.SetChar(location.x, location.y, this->barrelCh);
+		Print(location.x, location.y);
 	}
 
-	board.SetChar(this->location.x, this->location.y, this->barrelCh);
+	//board.SetChar(this->location.x, this->location.y, this->barrelCh);
 }
