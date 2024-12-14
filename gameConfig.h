@@ -2,6 +2,7 @@
 #define _GAMECONFIG_H
 #include <iostream>
 
+
 class GameConfig
 {
 public:
@@ -11,7 +12,7 @@ public:
 	const char* originalBoard[MAX_Y] = {
 		// 012345678901a23456789012345678901234567890123456789012345678901234567890123456789
 		   "|------------------------------------------------------------------------------|", // 0
-		   "|                                  SCORE:0                                     |", // 1
+		   "|                                  SCORE:0               HEARTS:               |", // 1
 		   "|               $                                                              |", // 2
 		   "|            >>>>>>>>                                                          |", // 3
 		   "|   &        H      H                                                          |", // 4
@@ -48,31 +49,17 @@ public:
 		return currentBoard[y][x];
 	}
 
-	void SetChar(int x, int y, char ch)// returns a char that is placed on given point on board
+	void SetChar(int x, int y, char ch)// Prints a char that is placed on given point on board
 	{
-		if (x >= 0 && x <= MAX_X && y >= 0 && y <= MAX_Y)
+		if (GetChar(x, y) == 'H')
 		{
-			if (GetChar(x, y) == 'H')
-			{
-				currentBoard[y][x] = ch;
-				currentBoard[y][x] = 'H';
-			}
-			else if (GetChar(x, y) == '<')
-			{
-				currentBoard[y][x] = ch;
-				currentBoard[y][x] = '<';
-			}
-			else if (GetChar(x, y) == '>')
-			{
-				currentBoard[y][x] = ch;
-				currentBoard[y][x] = '>';
-			}
-			else
-				currentBoard[y][x] = ch;
-		}
-	}
+			currentBoard[y][x] = ch;
 
-	void PrintKong();
+			currentBoard[y][x] = 'H';
+		}
+
+	}
+	//void PrintKong();  // BETTER VERSION
 };
 
 #endif

@@ -3,6 +3,8 @@
 #include "general.h"
 using namespace std;
 
+
+
 void GameConfig::PrintBoard()
 {
 	gotoxy(0, 0);
@@ -10,6 +12,9 @@ void GameConfig::PrintBoard()
 		cout << originalBoard[i] << '\n';
 	}
 	cout << originalBoard[MAX_Y - 1];
+	
+	
+	//PrintKong();
 }
 
 void GameConfig::resetBoard()
@@ -20,9 +25,9 @@ void GameConfig::resetBoard()
 	}
 }
 
-void GameConfig::PrintKong()
+/*/void GameConfig::PrintKong()  // BETTER VERSION
 {
-	gotoxy(4, 4);
+	gotoxy(3, 4);
 	std::cout << "\xF0\x9F\x99\x89";
-}
+}/*/
 

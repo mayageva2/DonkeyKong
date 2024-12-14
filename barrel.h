@@ -1,7 +1,6 @@
 #ifndef _BARREL_H
 #define _BARREL_H
 #include "gameConfig.h"
-#include <vector>
 #include <Windows.h>
 #include <iostream>
 #include "general.h"
@@ -12,40 +11,34 @@ using namespace std;
 const Point upstart = { 5,4 };
 const Point downstart = { 3,6 };
 
+
 class Barrel
 {
-	GameConfig* pBoard = nullptr;
 	const char ladderCh = 'H';
-	const char barrelCh = 'O';
+    const char barrelCh = 'O';
 	int fallCount;
 	Point location;
 	bool direction;
 	bool isActive;
-
+	
 public:
-	bool dropDirection;                                           //true = right ; false = left;
-	Barrel(GameConfig& board) :location(upstart), pBoard(&board), direction(true),
-		dropDirection(true), isActive(true), fallCount(0) {};
+	bool dropDirection;          
+	static const int maxBarrels = 100;
 
-	Barrel& operator=(const Barrel& other) {
-		if (this == &other) return *this;
-		pBoard = other.pBoard;
-		location = other.location;
-		direction = other.direction;
-		dropDirection = other.dropDirection;
-		isActive = other.isActive;
-		fallCount = other.fallCount;
+	                             //true = right ; false = left;
+	Barrel() :location(upstart), direction(true),dropDirection(true),isActive(false), fallCount(0) {};
 
-		return *this;
-	}
 
 	void moveBarrel(GameConfig& board);
 	void Print(int x, int y);
 	void PrintLadder();
 	Point getLocation() const { return location; }
-	void clearFromScreen(GameConfig& board);
+	void clearFromScreen() const;
+	void deactivate() { isActive = false; }
+	void activate() { isActive=true; }
 	bool isBarrelActive() const { return isActive; }
-	void barrelNotActive() { isActive = false; }
+	static int GetMaxBarrels() { return maxBarrels; }
+
 };
 
 #endif

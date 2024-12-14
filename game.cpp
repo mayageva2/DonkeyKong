@@ -14,76 +14,68 @@ void Game::startGame(Mario& mario)
 	GameConfig board;
 	board.resetBoard();
 	board.PrintBoard();
+	mario.printHearts();
+	Barrel* barrels[Barrel::maxBarrels] = { nullptr };
+	int numBarrels = 0;
 	int interval = 0;
-	vector<Barrel>barrels;
-	Barrel b(board);
-	int moveCounter = 0;
+	int marioMoveCounter = 0;
+	int barrelMoveCounter = 2;
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
 	Menu menu;
-
 	mario.draw(mario.findMarioLocation());
-	mario.state = MarioState::standing;
 
 	while (true)
 	{
-		barrelsMovement(barrels, board, interval);
-
-		if (moveCounter == 0)
+		if (marioMoveCounter == 0)
 		{
 			Sleep(100);
-			char inputKey = 0;
-
 			if (_kbhit())
 			{
-				char inputKey = _getch();
-				if ((GameConfig::eKeys)inputKey == GameConfig::eKeys::ESC)
+				key = _getch();
+				if ((GameConfig::eKeys)key == GameConfig::eKeys::ESC)
 				{
-					pauseGame(board, mario);
+					menu.displayPauseScreen(board, mario);
 				}
-				else
-				{
-					key = inputKey;
-					marioMovement(mario, board, lastKey, key, moveCounter, sideJump);
-				}
+				marioMovement(mario, board, lastKey, key, marioMoveCounter, sideJump);
 			}
 			else if (mario.state != MarioState::standing)
-				marioMovement(mario, board, lastKey, key, moveCounter, sideJump);
+				marioMovement(mario, board, lastKey, key, marioMoveCounter, sideJump);
 		}
 		else
-			marioMovement(mario, board, lastKey, key, moveCounter, sideJump);
+			marioMovement(mario, board, lastKey, key, marioMoveCounter, sideJump);
 
-		if (mario.state == MarioState::standing) // In case key wasn't prased
+		if (barrelMoveCounter ==2)
 		{
-			mario.checkCollide(board);
-			Sleep(200);
+			barrelsMovement(barrels,numBarrels, board, interval);
+			barrelMoveCounter = 0;
+		}
+
+		if (mario.state == MarioState::standing || mario.state == MarioState::falling) // In case key wasn't prased
+		{
+			Sleep(100);
 		}
 		++interval;
+		++barrelMoveCounter;
+
 
 	}
 	gotoxy(0, GameConfig::MAX_Y + 2);
-	barrels.clear(); //Clear barrels array
-
+	deleteArray(barrels, numBarrels); //Clear barrels array
 }
+
 
 
 void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump)
 {
 	if (sideJump == true)
 	{
-		if (_kbhit())
-		{
-			char tmp = _getch();
-			if ((GameConfig::eKeys)tmp == GameConfig::eKeys::ESC)
-				pauseGame(board, mario);
-		}
-
 		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump);
 	}
-	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP || (GameConfig::eKeys)key == GameConfig::eKeys::UP2))
+	else if ((GameConfig::eKeys)key == GameConfig::eKeys::UP || (GameConfig::eKeys)key == GameConfig::eKeys::UP2)
 	{
 		Sleep(50);
-		if (_kbhit() && moveCounter != -1)
+		if (_kbhit())
 		{
 			char tmp = _getch();
 			if ((GameConfig::eKeys)tmp != GameConfig::eKeys::UP && (GameConfig::eKeys)tmp != GameConfig::eKeys::UP2)
@@ -92,11 +84,6 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 				lastKey = (GameConfig::eKeys)key;
 				key = tmp;
 				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump);
-				if ((GameConfig::eKeys)key == GameConfig::eKeys::ESC)
-				{
-					key = (char)GameConfig::eKeys::UP;
-					lastKey = GameConfig::eKeys::STAY;
-				}
 			}
 			else
 			{
@@ -110,11 +97,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 			mario.move((GameConfig::eKeys)key, board, moveCounter);
 		}
 		else
-		{
 			mario.move((GameConfig::eKeys)key, board, moveCounter);
-			if (mario.state == MarioState::standing)
-				lastKey = GameConfig::eKeys::STAY;
-		}
 	}
 	else if (mario.state != MarioState::jumping)
 	{
@@ -130,52 +113,63 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 
 }
 
-void Game::barrelsMovement(std::vector<Barrel>& barrels, GameConfig& board, int& interval)
+
+
+void Game::barrelsMovement(Barrel** barrels,int& numBarrels, GameConfig& board, int& interval)
 {
-	if (interval % 20 == 0)
+	if (interval % 20 == 0 && numBarrels < Barrel::maxBarrels)
 	{
-		barrels.emplace_back(board); //Create new Barrel
+		barrels[numBarrels] = new Barrel();
+		barrels[numBarrels]->activate();
 		if (interval % 40 == 0)
 		{
-			barrels.back().dropDirection = false; // Change drop direction
+			barrels[numBarrels]->dropDirection = false;
 		}
+		numBarrels++;
 	}
 
-	for (size_t i = 0; i < barrels.size();)
+	for (int i = 0; i < numBarrels;)
 	{
-		barrels[i].moveBarrel(board); // Move new barrel
-
-		//Clean barrels that got to the end of screen
-		if (barrels[i].getLocation().x >= 75 || barrels[i].getLocation().x <= 1 || (barrels[i].isBarrelActive() == false))
+		if (barrels[i]->isBarrelActive())
 		{
-			barrels[i].clearFromScreen(board);
-			barrels.erase(barrels.begin() + i);
-		}
-		i++;
-	}
+			barrels[i]->moveBarrel(board);
 
-	
-}
-
-void Game::pauseGame(GameConfig& board, Mario& mario)
-{
-	Menu menu;
-	clrscr();
-	menu.displayPause();
-
-	char inputKey2 = 0;
-	while (true)
-	{
-		if (_kbhit())
-		{
-			inputKey2 = _getch();
-			if ((GameConfig::eKeys)inputKey2 == GameConfig::eKeys::ESC)
+			if (barrels[i]->getLocation().x >= 79 || barrels[i]->getLocation().x <= 1 || !barrels[i]->isBarrelActive())
 			{
-				break;
+				barrels[i]->clearFromScreen();
+				barrels[i]->deactivate();
+				deleteFromArray(barrels, i, numBarrels);
+			}
+			else
+			{
+				i++;
 			}
 		}
+		else
+		{
+			deleteFromArray(barrels, i, numBarrels);
+		}
 	}
-	clrscr();
-	board.PrintBoard();
-	mario.draw(mario.findMarioLocation());
+}
+
+void Game::deleteFromArray(Barrel** barrels, int index, int& numBarrels)
+{
+	delete barrels[index];
+	barrels[index] = barrels[numBarrels - 1];
+	barrels[numBarrels - 1] = nullptr;
+	numBarrels--;
+}
+
+void Game::deleteArray(Barrel** barrels, int& numBarrels)
+{
+	for (int i = 0; i < numBarrels; ++i)
+	{
+		if (barrels[i] != nullptr)
+		{
+			delete barrels[i];  
+			barrels[i] = nullptr; 
+		}
+	}
+
+	numBarrels = 0;
 }
