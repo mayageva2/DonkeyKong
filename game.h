@@ -8,7 +8,7 @@ class Game
 public:
 	void startGame(Mario& mario);
 	void marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump);
-	void barrelsMovement(std::vector<Barrel>& barrels, GameConfig& board, int& interval);
+	void barrelsMovement(std::vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario);
 	void pauseGame(GameConfig& board, Mario& mario);
 };
 

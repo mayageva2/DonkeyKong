@@ -79,7 +79,7 @@ void Mario::left(GameConfig& currBoard, int& moveCounter)  //moves mario to the 
 	this->location.diff_x = -1;
 	this->location.diff_y = 0;
 
-	if (currBoard.GetChar(p.x, p.y) == 'H')  //checks if therews a ledder
+	if (currBoard.GetChar(p.x, p.y) == 'H')  //checks if there's a ladder
 	{
 		p.draw('H', this->location);
 		isH = true;
@@ -191,6 +191,7 @@ void Mario::jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump)
 		falling(moveCounter, currBoard, sideJump);
 		this->state = MarioState::falling;
 		moveCounter = 4;
+		sideJump = false;
 	}
 
 }
@@ -296,11 +297,15 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump)   //ma
 	{
 		this->location.y -= 1;
 		char key = _getch();
-		if (((GameConfig::eKeys)key == GameConfig::eKeys::STAY || (GameConfig::eKeys)key == GameConfig::eKeys::STAY2) && (moveCounter != -1) && (this->state != MarioState::standing))
+		if ((key == (char)GameConfig::eKeys::STAY || key == (char)GameConfig::eKeys::STAY2) && (moveCounter != -1) && (this->state != MarioState::standing))
+		{
 			stay(currBoard);
-		else
-			this->location.y += 1;
-		moveCounter = 0;
+			moveCounter = 0;
+		}
+		else if (key == (char)GameConfig::eKeys::LEFT || key == (char)GameConfig::eKeys::LEFT2)
+			left(currBoard, moveCounter);
+		else if (key == (char)GameConfig::eKeys::RIGHT || key == (char)GameConfig::eKeys::RIGHT2)
+			right(currBoard, moveCounter);
 	}
 }
 
@@ -324,11 +329,21 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 	{
 		this->location.diff_x = -2;
 		this->location.diff_y = -2;
+		
+		if (currBoard.GetChar(p.x, p.y) == 'H')
+		{
+			moveCounter = 3;
+		}
 	}
 	else if (key == GameConfig::eKeys::RIGHT || key == GameConfig::eKeys::RIGHT2)  //check if after jump mario should move right
 	{
 		this->location.diff_x = 2;
 		this->location.diff_y = -2;
+
+		if (currBoard.GetChar(p.x, p.y) == 'H')
+		{
+			moveCounter = 3;
+		}
 	}
 	else if (key == GameConfig::eKeys::STAY || key == GameConfig::eKeys::STAY2)
 	{
@@ -336,7 +351,8 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 		{
 			stay(currBoard);
 			moveCounter = 0;
-			sideJump = false;
+			if(!isMarioOnLadder(currBoard))
+				sideJump = false;
 			return;
 		}
 	}
@@ -443,7 +459,7 @@ void Mario::didMarioLose(GameConfig& currBoard)
 		clrscr();
 		Menu menu;
 		menu.printScreen(menu.end_game);
-		Sleep(1000);
+		Sleep(2000);
 		menu.displayMenu(*this);
 		return;
 	}
@@ -459,7 +475,7 @@ void Mario::didMarioWin(GameConfig& currBoard)
 		clrscr();
 		Menu menu;
 		menu.printScreen(menu.win);
-		Sleep(1000);
+		Sleep(2000);
 		menu.displayMenu(*this);
 		return;
 	}

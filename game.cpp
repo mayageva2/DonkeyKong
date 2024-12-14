@@ -2,7 +2,9 @@
 #include "mario.h"
 #include "barrel.h"
 #include "general.h"
+#include "gameConfig.h"
 #include "menu.h"
+
 #include <conio.h>
 #include <Windows.h>
 
@@ -27,7 +29,7 @@ void Game::startGame(Mario& mario)
 
 	while (true)
 	{
-		barrelsMovement(barrels, board, interval);
+		barrelsMovement(barrels, board, interval, mario);
 
 		if (moveCounter == 0)
 		{
@@ -53,7 +55,7 @@ void Game::startGame(Mario& mario)
 		else
 			marioMovement(mario, board, lastKey, key, moveCounter, sideJump);
 
-		if (mario.state == MarioState::standing) // In case key wasn't prased
+		if (mario.state == MarioState::standing) 
 		{
 			mario.checkCollide(board);
 			Sleep(200);
@@ -125,12 +127,12 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 			//moveCounter = 0;
 		}
 		else
-			mario.move(GameConfig::eKeys::DOWN, board, moveCounter);
+				mario.move(GameConfig::eKeys::DOWN, board, moveCounter);
 	}
 
 }
 
-void Game::barrelsMovement(std::vector<Barrel>& barrels, GameConfig& board, int& interval)
+void Game::barrelsMovement(std::vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario)
 {
 	if (interval % 20 == 0)
 	{
@@ -148,8 +150,11 @@ void Game::barrelsMovement(std::vector<Barrel>& barrels, GameConfig& board, int&
 		//Clean barrels that got to the end of screen
 		if (barrels[i].getLocation().x >= 75 || barrels[i].getLocation().x <= 1 || (barrels[i].isBarrelActive() == false))
 		{
-			barrels[i].clearFromScreen(board);
-			barrels.erase(barrels.begin() + i);
+			if (board.GetChar(barrels[i].getLocation().x, barrels[i].getLocation().y) != '@')
+			{
+				barrels[i].clearFromScreen(board);
+				barrels.erase(barrels.begin() + i);
+			}
 		}
 		i++;
 	}
