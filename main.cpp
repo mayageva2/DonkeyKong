@@ -15,7 +15,5 @@ void main()
 	Menu menu;
 	Mario mario;
 	menu.displayMenu(mario);
-
+	
 }
- ///BUGS FOR MARIO
-// MARIO HEARTS TO FIX

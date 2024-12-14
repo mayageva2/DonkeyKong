@@ -2,7 +2,6 @@
 #define _GAMECONFIG_H
 #include <iostream>
 
-
 class GameConfig
 {
 public:
@@ -10,12 +9,12 @@ public:
 	static constexpr int MAX_X = 80;
 	static constexpr int MAX_Y = 25;
 	const char* originalBoard[MAX_Y] = {
-		// 012345678901a23456789012345678901234567890123456789012345678901234567890123456789
+		 // 012345678901a23456789012345678901234567890123456789012345678901234567890123456789
 		   "|------------------------------------------------------------------------------|", // 0
 		   "|                                  SCORE:0               HEARTS:               |", // 1
 		   "|               $                                                              |", // 2
 		   "|            >>>>>>>>                                                          |", // 3
-		   "|   &        H      H                                                          |", // 4
+		   "|     &      H      H                                                          |", // 4
 		   "|>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>                                      |", // 5
 		   "|                                       H              >>>>>>>>>>>>>>          |", // 6
 		   "|>>>>>>>>>                              H        >>>>>              H          |", // 7
@@ -30,11 +29,11 @@ public:
 		   "|    H            H      H                          H                     H    |", // 16
 		   "|    H        <<<<<<<<<<<<               >>>>>>>>>>>>                     H    |", // 17
 		   "|    H                   >>>>>>>>>>>>>>>                              >>>>>>>>>|", // 18
-		   "|    H                                 H                        <<<<<          |", // 19
-		   "|    H                                 H                   <<<<<               |", // 20
-		   "|>>>>>>>                               H               <<<<<                   |", // 21
-		   "|        <<<<<<<                       >>>>>           H                       |", // 22
-		   "|               >>>>>>                     H           H                       |", // 23
+		   "|    H                                 H                        <<<<<  H       |", // 19
+		   "|    H                                 H                   <<<<<       H       |", // 20
+		   "|>>>>>>>                               H               <<<<<           H       |", // 21
+		   "|        <<<<<<<                       >>>>>           H               H       |", // 22
+		   "|               >>>>>>                     H           H               H       |", // 23
 		   "|------------------------------------------------------------------------------|"  // 24
 	};
 	char currentBoard[MAX_Y][MAX_X];
@@ -51,14 +50,28 @@ public:
 
 	void SetChar(int x, int y, char ch)// Prints a char that is placed on given point on board
 	{
-		if (GetChar(x, y) == 'H')
+		if (x >= 0 && x <= MAX_X && y >= 0 && y <= MAX_Y)
 		{
-			currentBoard[y][x] = ch;
-
-			currentBoard[y][x] = 'H';
+			if (GetChar(x, y) == 'H')
+			{
+				currentBoard[y][x] = ch;
+				currentBoard[y][x] = 'H';
+			}
+			else if (GetChar(x, y) == '<')
+			{
+				currentBoard[y][x] = ch;
+				currentBoard[y][x] = '<';
+			}
+			else if (GetChar(x, y) == '>')
+			{
+				currentBoard[y][x] = ch;
+				currentBoard[y][x] = '>';
+			}
+			else
+				currentBoard[y][x] = ch;
 		}
-
 	}
+
 	//void PrintKong();  // BETTER VERSION
 };
 

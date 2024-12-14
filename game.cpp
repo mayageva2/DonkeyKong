@@ -2,7 +2,9 @@
 #include "mario.h"
 #include "barrel.h"
 #include "general.h"
+#include "gameConfig.h"
 #include "menu.h"
+
 #include <conio.h>
 #include <Windows.h>
 
@@ -18,46 +20,55 @@ void Game::startGame(Mario& mario)
 	Barrel* barrels[Barrel::maxBarrels] = { nullptr };
 	int numBarrels = 0;
 	int interval = 0;
-	int marioMoveCounter = 0;
+	int moveCounter = 0;
 	int barrelMoveCounter = 2;
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
 	Menu menu;
+
 	mario.draw(mario.findMarioLocation());
+	mario.state = MarioState::standing;
 
 	while (true)
 	{
-		if (marioMoveCounter == 0)
+		if (barrelMoveCounter == 2)
 		{
-			Sleep(100);
-			if (_kbhit())
-			{
-				key = _getch();
-				if ((GameConfig::eKeys)key == GameConfig::eKeys::ESC)
-				{
-					menu.displayPauseScreen(board, mario);
-				}
-				marioMovement(mario, board, lastKey, key, marioMoveCounter, sideJump);
-			}
-			else if (mario.state != MarioState::standing)
-				marioMovement(mario, board, lastKey, key, marioMoveCounter, sideJump);
-		}
-		else
-			marioMovement(mario, board, lastKey, key, marioMoveCounter, sideJump);
-
-		if (barrelMoveCounter ==2)
-		{
-			barrelsMovement(barrels,numBarrels, board, interval);
+			barrelsMovement(barrels, numBarrels, board, interval, mario);
 			barrelMoveCounter = 0;
 		}
 
-		if (mario.state == MarioState::standing || mario.state == MarioState::falling) // In case key wasn't prased
+		if (moveCounter == 0)
 		{
 			Sleep(100);
+			char inputKey = 0;
+
+			if (_kbhit())
+			{
+				char inputKey = _getch();
+				if ((GameConfig::eKeys)inputKey == GameConfig::eKeys::ESC)
+				{
+					pauseGame(board, mario);
+				}
+				else
+				{
+					key = inputKey;
+					marioMovement(mario, board, lastKey, key, moveCounter, sideJump);
+				}
+			}
+			else if (mario.state != MarioState::standing)
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump);
+		}
+		else
+			marioMovement(mario, board, lastKey, key, moveCounter, sideJump);
+
+		if (mario.state == MarioState::standing) 
+		{
+			if (board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == 'O')
+				mario.checkCollide(board);
+			Sleep(200);
 		}
 		++interval;
 		++barrelMoveCounter;
-
 
 	}
 	gotoxy(0, GameConfig::MAX_Y + 2);
@@ -65,17 +76,23 @@ void Game::startGame(Mario& mario)
 }
 
 
-
 void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump)
 {
 	if (sideJump == true)
 	{
+		if (_kbhit())
+		{
+			char tmp = _getch();
+			if ((GameConfig::eKeys)tmp == GameConfig::eKeys::ESC)
+				pauseGame(board, mario);
+		}
+
 		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump);
 	}
-	else if ((GameConfig::eKeys)key == GameConfig::eKeys::UP || (GameConfig::eKeys)key == GameConfig::eKeys::UP2)
+	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP || (GameConfig::eKeys)key == GameConfig::eKeys::UP2))
 	{
 		Sleep(50);
-		if (_kbhit())
+		if (_kbhit() && moveCounter != -1)
 		{
 			char tmp = _getch();
 			if ((GameConfig::eKeys)tmp != GameConfig::eKeys::UP && (GameConfig::eKeys)tmp != GameConfig::eKeys::UP2)
@@ -84,6 +101,11 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 				lastKey = (GameConfig::eKeys)key;
 				key = tmp;
 				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump);
+				if ((GameConfig::eKeys)key == GameConfig::eKeys::ESC)
+				{
+					key = (char)GameConfig::eKeys::UP;
+					lastKey = GameConfig::eKeys::STAY;
+				}
 			}
 			else
 			{
@@ -97,7 +119,11 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 			mario.move((GameConfig::eKeys)key, board, moveCounter);
 		}
 		else
+		{
 			mario.move((GameConfig::eKeys)key, board, moveCounter);
+			if (mario.state == MarioState::standing)
+				lastKey = GameConfig::eKeys::STAY;
+		}
 	}
 	else if (mario.state != MarioState::jumping)
 	{
@@ -113,9 +139,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 
 }
 
-
-
-void Game::barrelsMovement(Barrel** barrels,int& numBarrels, GameConfig& board, int& interval)
+void Game::barrelsMovement(Barrel** barrels, int& numBarrels, GameConfig& board, int& interval, Mario& mario)
 {
 	if (interval % 20 == 0 && numBarrels < Barrel::maxBarrels)
 	{
@@ -134,9 +158,9 @@ void Game::barrelsMovement(Barrel** barrels,int& numBarrels, GameConfig& board, 
 		{
 			barrels[i]->moveBarrel(board);
 
-			if (barrels[i]->getLocation().x >= 79 || barrels[i]->getLocation().x <= 1 || !barrels[i]->isBarrelActive())
+			if (barrels[i]->getLocation().x >= 78 || barrels[i]->getLocation().x <= 1 || !barrels[i]->isBarrelActive())
 			{
-				barrels[i]->clearFromScreen();
+				barrels[i]->clearFromScreen(board);
 				barrels[i]->deactivate();
 				deleteFromArray(barrels, i, numBarrels);
 			}
@@ -150,6 +174,30 @@ void Game::barrelsMovement(Barrel** barrels,int& numBarrels, GameConfig& board, 
 			deleteFromArray(barrels, i, numBarrels);
 		}
 	}
+}
+
+void Game::pauseGame(GameConfig& board, Mario& mario)
+{
+	Menu menu;
+	clrscr();
+	menu.displayPause();
+
+	char inputKey2 = 0;
+	while (true)
+	{
+		if (_kbhit())
+		{
+			inputKey2 = _getch();
+			if ((GameConfig::eKeys)inputKey2 == GameConfig::eKeys::ESC)
+			{
+				break;
+			}
+		}
+	}
+	clrscr();
+	board.PrintBoard();
+	mario.printHearts();
+	mario.draw(mario.findMarioLocation());
 }
 
 void Game::deleteFromArray(Barrel** barrels, int index, int& numBarrels)
@@ -166,10 +214,9 @@ void Game::deleteArray(Barrel** barrels, int& numBarrels)
 	{
 		if (barrels[i] != nullptr)
 		{
-			delete barrels[i];  
-			barrels[i] = nullptr; 
+			delete barrels[i];
+			barrels[i] = nullptr;
 		}
 	}
-
 	numBarrels = 0;
 }

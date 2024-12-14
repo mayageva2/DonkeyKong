@@ -1,14 +1,15 @@
-﻿#ifndef _MARIO_H
+#ifndef _MARIO_H
 #define _MARIO_H
 #include "point.h"
 #include "general.h"
 #include "gameConfig.h"
+
 #include <conio.h>
 #include<iostream>
 
 const Point start = { 77, 23 };
 const Point hearts = { 64,1 };
-enum class MarioState { moving, jumping, standing, falling }; //chat GPT solution
+enum class MarioState { moving, jumping , standing, falling }; //chat GPT solution
 
 class Mario
 {
@@ -40,6 +41,10 @@ public:
 	bool isMarioOnFloor(GameConfig& currBoard);
 	Point findMarioLocation();
 	int getNumOfHearts() { return num_of_hearts; }
-	void printHearts(); 
+	void printLessHearts(); //BETTER GAME
+	void checkCollide(GameConfig& currBoard); 
+	void didMarioLose(GameConfig& currBoard);
+	void didMarioWin(GameConfig& currBoard);
+	void printHearts();
 };
 #endif

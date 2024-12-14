@@ -9,36 +9,32 @@
 using namespace std;
 
 const Point upstart = { 5,4 };
-const Point downstart = { 3,6 };
-
+const Point downstart = { 6,6 };
 
 class Barrel
 {
 	const char ladderCh = 'H';
-    const char barrelCh = 'O';
+	const char barrelCh = 'O';
 	int fallCount;
 	Point location;
 	bool direction;
 	bool isActive;
-	
+
 public:
-	bool dropDirection;          
+	bool dropDirection;
 	static const int maxBarrels = 100;
-
-	                             //true = right ; false = left;
-	Barrel() :location(upstart), direction(true),dropDirection(true),isActive(false), fallCount(0) {};
-
+	//true = right ; false = left;
+	Barrel() :location(upstart), direction(true), dropDirection(true), isActive(false), fallCount(0) {};
 
 	void moveBarrel(GameConfig& board);
 	void Print(int x, int y);
 	void PrintLadder();
 	Point getLocation() const { return location; }
-	void clearFromScreen() const;
+	void clearFromScreen(GameConfig& board);
 	void deactivate() { isActive = false; }
-	void activate() { isActive=true; }
+	void activate() { isActive = true; }
 	bool isBarrelActive() const { return isActive; }
-	static int GetMaxBarrels() { return maxBarrels; }
-
+	void barrelNotActive() { isActive = false; }
 };
 
 #endif

@@ -52,28 +52,11 @@ void Menu::displayEnd_Game(Mario& mario)
 	Sleep(2500);
 	clrscr();
 	displayMenu(mario);
-
 }
 
-void Menu::displayPauseScreen(GameConfig& board,Mario& m)
+void Menu::displayPause()
 {
-	clrscr(); //Clean previous screen
-	printScreen(pause); // Print pause screen
-	while (true)
-	{
-		if (_kbhit())
-		{
-			char key = _getch();
-			if (key == 27)
-			{
-				break;
-			}
-		}
-	}
-	clrscr(); //Clean previous screen (pause screen)
-	board.PrintBoard();	
-	m.printHearts();
-	m.draw(m.findMarioLocation());
-
+	printScreen(pause);
 }
+
 
