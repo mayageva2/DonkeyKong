@@ -1,12 +1,13 @@
 #include "barrel.h"
 
-void Barrel::clearFromScreen(GameConfig& board)
-{
-	board.SetChar(location.x, location.y, ' '); //resets barrel's previous location
-	//cout << "\xF0\x9F\x92\xA5";  // // BETTER VERSION
 
-	if (location.x == 78)
+void Barrel::clearFromScreen() 
+{
+	//cout << "\xF0\x9F\x92\xA5";  // // BETTER VERSION
+	if (location.x == 79)
 	{
+		gotoxy(location.x, location.y);
+		cout << "|";
 		location.x = 75;
 	}
 	gotoxy(location.x, location.y);
@@ -32,16 +33,13 @@ void Barrel::PrintLadder()
 
 void Barrel::moveBarrel(GameConfig& board)
 {
-	board.SetChar(this->location.x, this->location.y, ' '); //resets barrel's previous location
-	
 	char originalChar = board.GetChar(location.x, location.y);
-	board.SetChar(location.x, location.y, originalChar);     
-	gotoxy(location.x, location.y);                          
-	cout << originalChar;                                    
+	board.SetChar(location.x, location.y, originalChar);
+	gotoxy(location.x, location.y);
+	cout << originalChar;
 
 	char floor = board.GetChar(location.x, location.y + 1);
-
-	if ((dropDirection == false)) // Drop barrel down else drop barrel forward
+	if (dropDirection == false)
 	{
 		location.y++;
 		dropDirection = true;
@@ -54,30 +52,47 @@ void Barrel::moveBarrel(GameConfig& board)
 	}
 	else if (floor == '>')
 	{
-		direction = true;
-		fallCount = 0;
-		++location.x;
+		if (fallCount >= 8)
+		{
+			deactivate();
+		}
+		else
+		{
+			direction = true;
+			fallCount = 0;
+			++location.x;
+		}
 	}
 	else if (floor == '<')
 	{
-		direction = false;
+		if (fallCount >= 8)
+		{
+			deactivate();
+		}
+		else
+		{
+			direction = false;
 		fallCount = 0;
 		--location.x;
 	}
+	}
 	else if (floor == '=' || floor == '-')
 	{
-		fallCount = 0;
-		++location.x;
+		if (fallCount >= 8)
+		{
+			deactivate();
+		}
+		else
+		{
+			fallCount = 0;
+			++location.x;
+		}
 	}
-	if (fallCount >= 8)
-	{
-		deactivate();
-	}
-	else
-	{
 		board.SetChar(location.x, location.y, this->barrelCh);
 		Print(location.x, location.y);
-	}
-
-	//board.SetChar(this->location.x, this->location.y, this->barrelCh);
 }
+
+
+
+
+
