@@ -15,6 +15,7 @@ public:
 	void deleteFromArray(Barrel** barrels, int index, int& numBarrels);
 	void deleteArray(Barrel** barrels, int& numBarrels);
 	void pauseGame(GameConfig& board, Mario& mario);
+	void setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario);
 };
 
 #endif

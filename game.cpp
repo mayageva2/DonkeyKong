@@ -157,7 +157,7 @@ void Game::barrelsMovement(Barrel** barrels, int& numBarrels, GameConfig& board,
 	{
 		if (barrels[i]->isBarrelActive())
 		{
-			barrels[i]->moveBarrel(board);
+			barrels[i]->moveBarrel(board, mario);
 
 			if (barrels[i]->getLocation().x >= 78 || barrels[i]->getLocation().x <= 1 || !barrels[i]->isBarrelActive())
 			{
@@ -220,4 +220,18 @@ void Game::deleteArray(Barrel** barrels, int& numBarrels)
 		}
 	}
 	numBarrels = 0;
+}
+
+void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario)
+{
+	char ch = currBoard.GetChar(p.x, p.y);
+	if (ch == 'H' || ch == '<' || ch == '>')
+	{
+		currBoard.SetChar(p.x, p.y, object);
+		if (currBoard.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == 'O')
+			mario.collide(currBoard);
+		currBoard.SetChar(p.x, p.y, ch);
+	}
+	else
+		currBoard.SetChar(p.x, p.y, ch);
 }

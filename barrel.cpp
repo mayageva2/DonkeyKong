@@ -1,28 +1,14 @@
 #include "barrel.h"
 #include "mario.h"
+#include "game.h"
 
-<<<<<<< Updated upstream
-
-void Barrel::clearFromScreen() 
-{
-	//cout << "\xF0\x9F\x92\xA5";  // // BETTER VERSION
-	if (location.x == 79)
-=======
-<<<<<<< Updated upstream
-void Barrel::clearFromScreen(GameConfig& board)
-=======
 void Barrel::clearFromScreen(GameConfig& board, Mario& mario)
->>>>>>> Stashed changes
 {
-	board.SetChar(location.x, location.y, ' '); //resets barrel's previous location
+	Game game;
+	game.setCharCheck(location, board, ' ', mario); //resets barrel's previous location
 	//cout << "\xF0\x9F\x92\xA5";  // // BETTER VERSION
 
-<<<<<<< Updated upstream
-	if (location.x == 78)
-=======
 	if (location.x == 79)
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 	{
 		gotoxy(location.x, location.y);
 		cout << "|";
@@ -57,32 +43,18 @@ void Barrel::PrintLadder()
 	cout << this->ladderCh;
 }
 
-void Barrel::moveBarrel(GameConfig& board)
+void Barrel::moveBarrel(GameConfig& board,Mario& mario)
 {
-<<<<<<< Updated upstream
-=======
-	board.SetChar(this->location.x, this->location.y, ' '); //resets barrel's previous location
-<<<<<<< Updated upstream
-	
-=======
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+	Game game;
+	game.setCharCheck(this->location, board, ' ', mario); //resets barrel's previous location
 	char originalChar = board.GetChar(location.x, location.y);
-	board.SetChar(location.x, location.y, originalChar);
+	game.setCharCheck(location, board, originalChar, mario);
 	gotoxy(location.x, location.y);
 	cout << originalChar;
 
 	char floor = board.GetChar(location.x, location.y + 1);
-<<<<<<< Updated upstream
-	if (dropDirection == false)
-=======
 
-<<<<<<< Updated upstream
-	if ((dropDirection == false)) // Drop barrel down else drop barrel forward
-=======
 	if (dropDirection == false) // Drop barrel down else drop barrel forward
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 	{
 		location.y++;
 		dropDirection = true;
@@ -108,21 +80,6 @@ void Barrel::moveBarrel(GameConfig& board)
 	}
 	else if (floor == '<')
 	{
-<<<<<<< Updated upstream
-		if (fallCount >= 8)
-		{
-			deactivate();
-		}
-		else
-		{
-			direction = false;
-=======
-<<<<<<< Updated upstream
-		direction = false;
->>>>>>> Stashed changes
-		fallCount = 0;
-		--location.x;
-=======
 		if (fallCount >= 8)
 		{
 			deactivate();
@@ -133,8 +90,6 @@ void Barrel::moveBarrel(GameConfig& board)
 			fallCount = 0;
 			--location.x;
 		}
->>>>>>> Stashed changes
-	}
 	}
 	else if (floor == '=' || floor == '-')
 	{
@@ -148,18 +103,9 @@ void Barrel::moveBarrel(GameConfig& board)
 			++location.x;
 		}
 	}
-		board.SetChar(location.x, location.y, this->barrelCh);
-		Print(location.x, location.y);
+	game.setCharCheck(location,board, this->barrelCh, mario);
+	Print(location.x, location.y);
 }
-<<<<<<< Updated upstream
-
-
-
-
-
-=======
-<<<<<<< Updated upstream
-=======
 
 bool Barrel::marioCloseToExplosion(GameConfig& board,Mario& mario)
 {
@@ -180,5 +126,3 @@ bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos)
 	else
 		return false;
 }
->>>>>>> Stashed changes
->>>>>>> Stashed changes

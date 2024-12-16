@@ -52,7 +52,7 @@ public:
 	{
 		if (x >= 0 && x <= MAX_X && y >= 0 && y <= MAX_Y)
 		{
-			if (GetChar(x, y) == 'H')
+			/*if (GetChar(x, y) == 'H')
 			{
 				currentBoard[y][x] = ch;
 				currentBoard[y][x] = 'H';
@@ -67,7 +67,7 @@ public:
 				currentBoard[y][x] = ch;
 				currentBoard[y][x] = '>';
 			}
-			else
+			else*/
 				currentBoard[y][x] = ch;
 		}
 	}

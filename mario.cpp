@@ -18,10 +18,11 @@ void Mario::draw(const Point& pos) const  //this func draws mario in the locatio
 
 void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter) //this func moves mario according to user's key
 {
+	Game game;
 	bool sideJump = false;
 	if (currBoard.GetChar(this->location.x, this->location.y) == 'O')
 		collide(currBoard);
-	currBoard.SetChar(this->location.x, this->location.y, ' '); //resets mario's previous location
+	game.setCharCheck(this->location, currBoard, ' ', *this); //resets mario's previous location
 
 	switch (key)
 	{
@@ -55,7 +56,7 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter)
 
 	if (currBoard.GetChar(this->location.x, this->location.y) == 'O')
 		collide(currBoard);
-	currBoard.SetChar(this->location.x, this->location.y, this->ch);
+	game.setCharCheck(location, currBoard, this->ch, *this);
 }
 
 bool Mario::checkMove(GameConfig& currBoard, int x, int y)  //checks if mario hits a floor tile
