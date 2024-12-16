@@ -4,7 +4,7 @@
 #include "gameConfig.h"
 #include "menu.h"
 #include "game.h"
-
+#include "barrel.h"
 #include <iostream>
 #include <Windows.h>
 #include <conio.h>
@@ -18,11 +18,10 @@ void Mario::draw(const Point& pos) const  //this func draws mario in the locatio
 
 void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter) //this func moves mario according to user's key
 {
-	Game game;
 	bool sideJump = false;
 	if (currBoard.GetChar(this->location.x, this->location.y) == 'O')
 		collide(currBoard);
-	game.setCharCheck(this->location, currBoard, ' ', *this); //resets mario's previous location
+	currBoard.SetChar(this->location.x, this->location.y, ' '); //resets mario's previous location
 
 	switch (key)
 	{
@@ -54,9 +53,9 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter)
 		break;
 	}
 
-	if (currBoard.GetChar(this->location.x, this->location.y) == 'O')
+	if (currBoard.GetChar(this->location.x, this->location.y) == barrelCh)
 		collide(currBoard);
-	game.setCharCheck(location, currBoard, this->ch, *this);
+	currBoard.SetChar(this->location.x, this->location.y, this->ch);
 }
 
 bool Mario::checkMove(GameConfig& currBoard, int x, int y)  //checks if mario hits a floor tile
@@ -71,7 +70,7 @@ bool Mario::isInBoard(GameConfig& currBoard, int x)  //checks if a point is on b
 
 bool Mario::isMarioOnLadder(GameConfig& currBoard)
 {
-	return currBoard.GetChar(this->location.x, this->location.y) == 'H';
+	return currBoard.GetChar(this->location.x, this->location.y) == ladderCh;
 }
 
 void Mario::left(GameConfig& currBoard, int& moveCounter)  //moves mario to the left
@@ -82,14 +81,14 @@ void Mario::left(GameConfig& currBoard, int& moveCounter)  //moves mario to the 
 	this->location.diff_x = -1;
 	this->location.diff_y = 0;
 
-	if (currBoard.GetChar(p.x, p.y) == 'H')  //checks if there's a ladder
+	if (currBoard.GetChar(p.x, p.y) == ladderCh)  //checks if there's a ladder
 	{
-		p.draw('H', this->location);
+		p.draw(ladderCh, this->location);
 		isH = true;
 	}
 	else
 	{
-		p.draw(' ', this->location);
+		p.draw(deleteCh, this->location);
 		isH = false;
 	}
 
@@ -103,7 +102,7 @@ void Mario::left(GameConfig& currBoard, int& moveCounter)  //moves mario to the 
 
 		didMarioWin(currBoard);
 		Mario::draw(this->location);
-		Sleep(100);
+		Sleep(70);
 	}
 	else
 		stay(currBoard);
@@ -119,14 +118,14 @@ void Mario::right(GameConfig& currBoard, int& moveCounter)   //moves mario to th
 	this->location.diff_x = 1;
 	this->location.diff_y = 0;
 
-	if (currBoard.GetChar(p.x, p.y) == 'H')
+	if (currBoard.GetChar(p.x, p.y) == ladderCh)
 	{
-		p.draw('H', this->location);
+		p.draw(ladderCh, this->location);
 		isH = true;
 	}
 	else
 	{
-		p.draw(' ', this->location);
+		p.draw(deleteCh, this->location);
 		isH = false;
 	}
 
@@ -141,7 +140,7 @@ void Mario::right(GameConfig& currBoard, int& moveCounter)   //moves mario to th
 
 		didMarioWin(currBoard);
 		Mario::draw(this->location);
-		Sleep(100);
+		Sleep(70);
 	}
 	else
 		stay(currBoard);
@@ -154,7 +153,7 @@ void Mario::up(GameConfig& currBoard, int& moveCounter, bool& sideJump)  //makes
 	Point p(this->location);
 	bool isH = false;
 
-	if ((currBoard.GetChar(p.x, p.y) == 'H') || (!checkMove(currBoard, p.x, p.y) && currBoard.GetChar(p.x, p.y + 1) == 'H'))  //going up a ladder 
+	if ((currBoard.GetChar(p.x, p.y) == ladderCh) || (!checkMove(currBoard, p.x, p.y) && currBoard.GetChar(p.x, p.y + 1) == ladderCh))  //going up a ladder 
 		isH = true;
 	else    //jump
 		isH = false;
@@ -169,7 +168,7 @@ void Mario::up(GameConfig& currBoard, int& moveCounter, bool& sideJump)  //makes
 			falling(moveCounter, currBoard, sideJump);
 
 		if (moveCounter == 4)
-			moveCounter = ENDJUMP;
+			moveCounter = -1;
 	}
 	else  //going up a ladder
 	{
@@ -183,10 +182,10 @@ void Mario::jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump)
 
 	if (isInBoard(currBoard, p.y - 1) && checkMove(currBoard, this->location.x, p.y - 1)) //checks if the desination is outside boundries and checks for ceiling
 	{
-		p.draw(' ', this->location);
+		p.draw(deleteCh, this->location);
 		this->location.y -= 1;
 		Mario::draw(this->location);
-		Sleep(80);
+		Sleep(50);
 		moveCounter++;
 	}
 	else
@@ -205,10 +204,10 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump)
 
 	if (!isMarioOnFloor(currBoard))
 	{
-		p.draw(' ', this->location);
+		p.draw(deleteCh, this->location);
 		this->location.y += 1;
 		Mario::draw(this->location);
-		Sleep(80);
+		Sleep(50);
 		moveCounter++;
 	}
 	else
@@ -228,21 +227,22 @@ void Mario::climbUpAladder(int& moveCounter, GameConfig& currBoard)
 {
 	Point p(this->location);
 
-	if (currBoard.GetChar(p.x, p.y) == 'H')
+	if (currBoard.GetChar(p.x, p.y) == ladderCh)
 	{
-		p.draw('H', this->location);
+		p.draw(ladderCh, this->location);
 	}
 	else
 	{
 		char way = currBoard.GetChar(this->location.x, this->location.y);
 		p.draw(way, this->location);
-		moveCounter = ENDJUMP;
+		moveCounter = -1;
+
 	}
 
 	this->location.y -= 1;
 
 	Mario::draw(this->location);
-	Sleep(80);
+	Sleep(50);
 	moveCounter++;
 	if (isMarioOnFloor(currBoard))
 		stay(currBoard);
@@ -253,20 +253,20 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump)   //ma
 {
 	Point p(this->location);
 
-	if (currBoard.GetChar(p.x, p.y) == 'H')
+	if (currBoard.GetChar(p.x, p.y) == ladderCh)
 	{
 		if (!isMarioOnFloor(currBoard))
 		{
-			p.draw('H', this->location);
+			p.draw(ladderCh, this->location);
 			this->location.y += 1;
 		}
 		else
 		{
 			stay(currBoard);
-			moveCounter = ENDJUMP;
+			moveCounter = -1;
 		}
 	}
-	else if ((currBoard.GetChar(p.x, p.y + 1) == 'H' || currBoard.GetChar(p.x, p.y + 2) == 'H') && sideJump == false)
+	else if ((currBoard.GetChar(p.x, p.y + 1) == ladderCh || currBoard.GetChar(p.x, p.y + 2) == ladderCh) && sideJump == false)
 	{
 		char way = currBoard.GetChar(this->location.x, this->location.y);
 		p.draw(way, this->location);
@@ -281,7 +281,7 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump)   //ma
 	if (!_kbhit())
 	{
 		Mario::draw(this->location);
-		Sleep(80);
+		Sleep(50);
 		moveCounter++;
 	}
 	else
@@ -321,7 +321,7 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 		this->location.diff_x = -2;
 		this->location.diff_y = -2;
 
-		if (currBoard.GetChar(p.x, p.y) == 'H')
+		if (currBoard.GetChar(p.x, p.y) == ladderCh)
 		{
 			moveCounter = 3;
 		}
@@ -330,7 +330,7 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 	{
 		this->location.diff_x = 2;
 		this->location.diff_y = -2;
-		if (currBoard.GetChar(p.x, p.y) == 'H')
+		if (currBoard.GetChar(p.x, p.y) == ladderCh)
 		{
 			moveCounter = 3;
 		}
@@ -432,15 +432,19 @@ void Mario::printHearts()
 
 void Mario::collide(GameConfig& currBoard)
 {
-		gotoxy(this->location.x, this->location.y);
-		cout << "BOOM";
-		this->num_of_hearts--;
-		Sleep(2000);
-		didMarioLose(currBoard);
-		this->location = start;
-		Game game;
-		game.startGame(*this);
-		printHearts();
+	if (location.x >= 77)
+	{
+		location.x = 75;
+	}
+	gotoxy(location.x, location.y);
+	cout << EXPLOSION;
+	this->num_of_hearts--;
+	Sleep(2000);
+	didMarioLose(currBoard);
+	this->location = start;
+	Game game;
+	game.startGame(*this);
+	printHearts();
 }
 
 void Mario::didMarioLose(GameConfig& currBoard)
@@ -450,7 +454,9 @@ void Mario::didMarioLose(GameConfig& currBoard)
 		stay(currBoard);
 		clrscr();
 		Menu menu;
-		menu.displayEnd_Game(*this);
+		menu.printScreen(menu.end_game);
+		Sleep(3000);
+		menu.displayMenu(*this);
 		return;
 	}
 }
@@ -461,11 +467,9 @@ void Mario::didMarioWin(GameConfig& currBoard)
 
 	if (currBoard.GetChar(p.x + this->location.diff_x, p.y) == '$')   //checks if you reached pauline
 	{
-		draw(this->location);
 		stay(currBoard);
 		clrscr();
 		Menu menu;
-		Sleep(80);
 		menu.printScreen(menu.win);
 		Sleep(3000);
 		menu.displayMenu(*this);
@@ -475,6 +479,6 @@ void Mario::didMarioWin(GameConfig& currBoard)
 
 void Mario::resetMario()
 {
-	this->num_of_hearts = FULL_LIFE;
+	this->num_of_hearts = 3;
 	this->location = start;
 }

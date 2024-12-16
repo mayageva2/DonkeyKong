@@ -1,32 +1,36 @@
 #include "barrel.h"
 #include "mario.h"
-#include "game.h"
+
+void Barrel::ExplosionNearBorder(Point& location)
+{
+	gotoxy(location.x, location.y);
+	cout << "|";
+	location.x = 75;
+	
+}
 
 void Barrel::clearFromScreen(GameConfig& board, Mario& mario)
 {
-	Game game;
-	game.setCharCheck(location, board, ' ', mario); //resets barrel's previous location
+	board.SetChar(location.x, location.y, deleteCh); //resets barrel's previous location
 	//cout << "\xF0\x9F\x92\xA5";  // // BETTER VERSION
 
 	if (location.x == 79)
 	{
-		gotoxy(location.x, location.y);
-		cout << "|";
-		location.x = 75;
+		ExplosionNearBorder(location);
 	}
 	gotoxy(location.x, location.y);
-	if (marioCloseToExplosion(board, mario))
+	if (marioCloseToExplosion(board, mario)) 
 	{
-		cout << "BOOM";
+		ExplosionNearBorder(location);
 		mario.collide(board);
 		return;
 	}
-	cout << "BOOM";
-	Sleep(150);
+	cout << EXPLOSION;
+	Sleep(200);
 	for (int i = 3; i >= 0; i--) // CLEANS 'BOOM' from screen
 	{
 		gotoxy(location.x + i, location.y);
-		cout << " ";
+		cout << deleteCh;
 	}
 	if (mario.findMarioLocation().x == location.x + 3 && mario.findMarioLocation().y == location.y)
 		mario.draw(mario.findMarioLocation());
@@ -40,15 +44,15 @@ void Barrel::Print(int x, int y)
 
 void Barrel::PrintLadder()
 {
-	cout << this->ladderCh;
+	cout << ladderCh;
 }
 
-void Barrel::moveBarrel(GameConfig& board,Mario& mario)
+void Barrel::moveBarrel(GameConfig& board)
 {
-	Game game;
-	game.setCharCheck(this->location, board, ' ', mario); //resets barrel's previous location
+	board.SetChar(this->location.x, this->location.y, deleteCh); //resets barrel's previous location
+
 	char originalChar = board.GetChar(location.x, location.y);
-	game.setCharCheck(location, board, originalChar, mario);
+	board.SetChar(location.x, location.y, originalChar);
 	gotoxy(location.x, location.y);
 	cout << originalChar;
 
@@ -60,13 +64,9 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario)
 		dropDirection = true;
 	}
 
-	if (floor != '>' && floor != '<' && floor != '=' && floor != '-')
+	switch (floor)
 	{
-		++location.y;
-		++fallCount;
-	}
-	else if (floor == '>')
-	{
+	case '>':
 		if (fallCount >= 8)
 		{
 			deactivate();
@@ -77,9 +77,9 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario)
 			fallCount = 0;
 			++location.x;
 		}
-	}
-	else if (floor == '<')
-	{
+		break;
+
+	case '<':
 		if (fallCount >= 8)
 		{
 			deactivate();
@@ -90,9 +90,10 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario)
 			fallCount = 0;
 			--location.x;
 		}
-	}
-	else if (floor == '=' || floor == '-')
-	{
+		break;
+
+	case '=':
+	case '-':
 		if (fallCount >= 8)
 		{
 			deactivate();
@@ -102,12 +103,19 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario)
 			fallCount = 0;
 			++location.x;
 		}
+		break;
+
+	default:
+		++location.y;
+		++fallCount;
+		break;
 	}
-	game.setCharCheck(location,board, this->barrelCh, mario);
+
+	board.SetChar(location.x, location.y, barrelCh);
 	Print(location.x, location.y);
 }
 
-bool Barrel::marioCloseToExplosion(GameConfig& board,Mario& mario)
+bool Barrel::marioCloseToExplosion(GameConfig& board, Mario& mario)
 {
 	Point marioPos = mario.findMarioLocation();
 	if (isInExplosionArea(this->location, marioPos))

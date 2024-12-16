@@ -9,13 +9,12 @@
 #include <string>
 using namespace std;
 
-const Point upstart = { 5,4 };
-const Point downstart = { 6,6 };
+const Point upstart = { 7,4 };
+
+static constexpr char barrelCh = 'O';
 
 class Barrel
-{
-	const char ladderCh = 'H';
-	const char barrelCh = 'O';
+{	
 	int fallCount;
 	Point location;
 	bool direction;
@@ -27,7 +26,7 @@ public:
 	//true = right ; false = left;
 	Barrel() :location(upstart), direction(true), dropDirection(true), isActive(false), fallCount(0) {};
 
-	void moveBarrel(GameConfig& board, Mario& mario);
+	void moveBarrel(GameConfig& board);
 	void Print(int x, int y);
 	void PrintLadder();
 	Point getLocation() const { return location; }
@@ -38,6 +37,7 @@ public:
 	void barrelNotActive() { isActive = false; }
 	bool marioCloseToExplosion(GameConfig& board, Mario& mario);
 	bool isInExplosionArea(Point& barrelPos, Point& marioPos);
+	void ExplosionNearBorder(Point& location);
 };
 
 #endif
