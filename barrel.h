@@ -5,6 +5,7 @@
 #include <iostream>
 #include "general.h"
 #include "point.h"
+#include "mario.h"
 #include <string>
 using namespace std;
 
@@ -30,11 +31,13 @@ public:
 	void Print(int x, int y);
 	void PrintLadder();
 	Point getLocation() const { return location; }
-	void clearFromScreen(GameConfig& board);
+	void clearFromScreen(GameConfig& board, Mario& mario);
 	void deactivate() { isActive = false; }
 	void activate() { isActive = true; }
 	bool isBarrelActive() const { return isActive; }
 	void barrelNotActive() { isActive = false; }
+	bool marioCloseToExplosion(GameConfig& board, Mario& mario);
+	bool isInExplosionArea(Point& barrelPos, Point& marioPos);
 };
 
 #endif

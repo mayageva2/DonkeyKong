@@ -11,6 +11,10 @@
 
 void Game::startGame(Mario& mario)
 {
+	if (mario.getNumOfHearts() == 0)
+	{
+		mario.resetMario();
+	}
 	clrscr();
 	GameConfig::eKeys lastKey = GameConfig::eKeys::STAY;
 	GameConfig board;
@@ -31,15 +35,12 @@ void Game::startGame(Mario& mario)
 
 	while (true)
 	{
-		if (barrelMoveCounter == 2)
-		{
-			barrelsMovement(barrels, numBarrels, board, interval, mario);
-			barrelMoveCounter = 0;
-		}
+		barrelsMovement(barrels, numBarrels, board, interval, mario);
+		barrelMoveCounter = 0;
 
 		if (moveCounter == 0)
 		{
-			Sleep(100);
+			Sleep(80);
 			char inputKey = 0;
 
 			if (_kbhit())
@@ -64,8 +65,8 @@ void Game::startGame(Mario& mario)
 		if (mario.state == MarioState::standing) 
 		{
 			if (board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == 'O')
-				mario.checkCollide(board);
-			Sleep(200);
+				mario.collide(board);
+			Sleep(50);
 		}
 		++interval;
 		++barrelMoveCounter;
@@ -92,7 +93,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP || (GameConfig::eKeys)key == GameConfig::eKeys::UP2))
 	{
 		Sleep(50);
-		if (_kbhit() && moveCounter != -1)
+		if (_kbhit() && moveCounter != ENDJUMP)
 		{
 			char tmp = _getch();
 			if ((GameConfig::eKeys)tmp != GameConfig::eKeys::UP && (GameConfig::eKeys)tmp != GameConfig::eKeys::UP2)
@@ -112,7 +113,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 				return;
 			}
 		}
-		else if (moveCounter == -1)  //ends jump
+		else if (moveCounter == ENDJUMP)  //ends jump
 		{
 			moveCounter = 0;
 			key = (char)lastKey;
@@ -160,7 +161,7 @@ void Game::barrelsMovement(Barrel** barrels, int& numBarrels, GameConfig& board,
 
 			if (barrels[i]->getLocation().x >= 78 || barrels[i]->getLocation().x <= 1 || !barrels[i]->isBarrelActive())
 			{
-				barrels[i]->clearFromScreen(board);
+				barrels[i]->clearFromScreen(board, mario);
 				barrels[i]->deactivate();
 				deleteFromArray(barrels, i, numBarrels);
 			}

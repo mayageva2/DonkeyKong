@@ -20,7 +20,7 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter)
 {
 	bool sideJump = false;
 	if (currBoard.GetChar(this->location.x, this->location.y) == 'O')
-		checkCollide(currBoard);
+		collide(currBoard);
 	currBoard.SetChar(this->location.x, this->location.y, ' '); //resets mario's previous location
 
 	switch (key)
@@ -54,7 +54,7 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter)
 	}
 
 	if (currBoard.GetChar(this->location.x, this->location.y) == 'O')
-		checkCollide(currBoard);
+		collide(currBoard);
 	currBoard.SetChar(this->location.x, this->location.y, this->ch);
 }
 
@@ -102,7 +102,7 @@ void Mario::left(GameConfig& currBoard, int& moveCounter)  //moves mario to the 
 
 		didMarioWin(currBoard);
 		Mario::draw(this->location);
-		Sleep(70);
+		Sleep(100);
 	}
 	else
 		stay(currBoard);
@@ -140,7 +140,7 @@ void Mario::right(GameConfig& currBoard, int& moveCounter)   //moves mario to th
 
 		didMarioWin(currBoard);
 		Mario::draw(this->location);
-		Sleep(70);
+		Sleep(100);
 	}
 	else
 		stay(currBoard);
@@ -168,7 +168,7 @@ void Mario::up(GameConfig& currBoard, int& moveCounter, bool& sideJump)  //makes
 			falling(moveCounter, currBoard, sideJump);
 
 		if (moveCounter == 4)
-			moveCounter = -1;
+			moveCounter = ENDJUMP;
 	}
 	else  //going up a ladder
 	{
@@ -185,7 +185,7 @@ void Mario::jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump)
 		p.draw(' ', this->location);
 		this->location.y -= 1;
 		Mario::draw(this->location);
-		Sleep(50);
+		Sleep(80);
 		moveCounter++;
 	}
 	else
@@ -207,7 +207,7 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump)
 		p.draw(' ', this->location);
 		this->location.y += 1;
 		Mario::draw(this->location);
-		Sleep(50);
+		Sleep(80);
 		moveCounter++;
 	}
 	else
@@ -216,7 +216,7 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump)
 			moveCounter -= 4;
 		stay(currBoard);
 		if (moveCounter > 4)
-			checkCollide(currBoard);
+			collide(currBoard);
 		sideJump = false;
 		moveCounter = 0;
 	}
@@ -235,14 +235,13 @@ void Mario::climbUpAladder(int& moveCounter, GameConfig& currBoard)
 	{
 		char way = currBoard.GetChar(this->location.x, this->location.y);
 		p.draw(way, this->location);
-		moveCounter = -1;
-
+		moveCounter = ENDJUMP;
 	}
 
 	this->location.y -= 1;
 
 	Mario::draw(this->location);
-	Sleep(50);
+	Sleep(80);
 	moveCounter++;
 	if (isMarioOnFloor(currBoard))
 		stay(currBoard);
@@ -263,7 +262,7 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump)   //ma
 		else
 		{
 			stay(currBoard);
-			moveCounter = -1;
+			moveCounter = ENDJUMP;
 		}
 	}
 	else if ((currBoard.GetChar(p.x, p.y + 1) == 'H' || currBoard.GetChar(p.x, p.y + 2) == 'H') && sideJump == false)
@@ -281,7 +280,7 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump)   //ma
 	if (!_kbhit())
 	{
 		Mario::draw(this->location);
-		Sleep(50);
+		Sleep(80);
 		moveCounter++;
 	}
 	else
@@ -430,7 +429,7 @@ void Mario::printHearts()
 	cout << "  ";
 }/*/
 
-void Mario::checkCollide(GameConfig& currBoard)
+void Mario::collide(GameConfig& currBoard)
 {
 		gotoxy(this->location.x, this->location.y);
 		cout << "BOOM";
@@ -450,9 +449,7 @@ void Mario::didMarioLose(GameConfig& currBoard)
 		stay(currBoard);
 		clrscr();
 		Menu menu;
-		menu.printScreen(menu.end_game);
-		Sleep(2000);
-		menu.displayMenu(*this);
+		menu.displayEnd_Game(*this);
 		return;
 	}
 }
@@ -463,12 +460,20 @@ void Mario::didMarioWin(GameConfig& currBoard)
 
 	if (currBoard.GetChar(p.x + this->location.diff_x, p.y) == '$')   //checks if you reached pauline
 	{
+		draw(this->location);
 		stay(currBoard);
 		clrscr();
 		Menu menu;
+		Sleep(80);
 		menu.printScreen(menu.win);
-		Sleep(1000);
+		Sleep(3000);
 		menu.displayMenu(*this);
 		return;
 	}
+}
+
+void Mario::resetMario()
+{
+	this->num_of_hearts = FULL_LIFE;
+	this->location = start;
 }

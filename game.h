@@ -4,6 +4,8 @@
 #include "mario.h"
 #include "barrel.h"
 
+const int ENDJUMP = -1;
+
 class Game
 {
 public:
