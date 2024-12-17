@@ -18,19 +18,18 @@ class Barrel
 	Point location;
 	bool direction;
 	bool isActive;
+	
 
 public:
-	bool dropDirection;
+	bool dropDirection; // Indicates if the barrel is dropping: true = down, false = no drop
 	static const int maxBarrels = 100;
-	//true = right ; false = left;
-	Barrel() :location(upstart), direction(true), dropDirection(true), isActive(false), fallCount(0) {};
+	Barrel() :location(upstart), direction(true), dropDirection(true), isActive(false), fallCount(0) {};//Constractor
 
-	void moveBarrel(GameConfig& board, Mario& mario, bool& flag);
-	void Print(int x, int y);
-	Point getLocation() const { return location; }
-	void clearFromScreen(GameConfig& board, Mario& mario, bool& flag);
-	void deactivate() { isActive = false; }
-	void activate() { isActive = true; }
+	void moveBarrel(GameConfig& board, Mario& mario,bool& flag);
+	Point getLocation() const { return location; } //Get barrel location
+	void clearFromScreen(GameConfig& board, Mario& mario,bool& flag);// Clears the barrel from the screen and updates the game board
+	void deactivate() { isActive = false; }//Deactivate barrel
+	void activate() { isActive = true; } //Activate Barrel
 	bool isBarrelActive() const { return isActive; }
 	bool marioCloseToExplosion(GameConfig& board, Mario& mario);
 	bool isInExplosionArea(Point& barrelPos, Point& marioPos);
