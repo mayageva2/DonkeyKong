@@ -11,11 +11,7 @@ using namespace std;
 
 void main()
 {
-	//SetConsoleOutputCP(CP_UTF8);
 	Menu menu;
 	Mario mario;
 	menu.displayMenu(mario);
-	cout << "BEFORE";
-	clrscr();
-	cout << "BYE";
 }

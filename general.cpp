@@ -1,4 +1,5 @@
 #include "general.h"
+
 #include <windows.h> // for gotoxy
 #include <process.h> // for system
 #include <iostream>
@@ -19,3 +20,4 @@ void clrscr() //Clear screen
 {
 	system("cls");
 }
+
