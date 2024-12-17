@@ -11,7 +11,7 @@ using namespace std;
 const Point startMenu(8, 5);
 bool flag = true;
 
-void Menu::printScreen(const char** print) //prints screen
+void Menu::printScreen(const char** print)
 {
 	Point p = startMenu;
 	for (int i = 0; i < MENU_Y; i++)
@@ -22,11 +22,10 @@ void Menu::printScreen(const char** print) //prints screen
 	}
 }
 
-void Menu::displayMenu(Mario& mario) // displays main menu
+void Menu::displayMenu(Mario& mario)
 {
 	bool exitMenu = false; //chatGPT solution
 	Game game;
-	bool flag = true;
 
 	while (!exitMenu)
 	{
@@ -36,8 +35,7 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 		switch (key)
 		{
 		case '1':
-			mario.resetMario();
-			game.startGame(mario, flag);
+			game.startGame(mario,flag);
 			break;
 		case '8':
 			printScreen(this->instructions);
@@ -50,11 +48,18 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 	}
 }
 
-void Menu::displayEnd_Game(Mario& mario)  //ends game
+ void Menu::displayEnd_Game(Mario& mario)
 {
 	printScreen(end_game);
 	Sleep(2500);
 	clrscr();
+
 }
+
+void Menu::displayPause()
+{
+	printScreen(pause);
+}
+
 
 
