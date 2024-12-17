@@ -90,7 +90,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 
 		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump);
 	}
-	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP || (GameConfig::eKeys)key == GameConfig::eKeys::UP2))
+	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP) || ((GameConfig::eKeys)key == GameConfig::eKeys::UP2))
 	{
 		Sleep(50);
 		if (_kbhit() && moveCounter != ENDJUMP)
@@ -225,7 +225,7 @@ void Game::deleteArray(Barrel** barrels, int& numBarrels)
 void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario)
 {
 	char ch = currBoard.GetChar(p.x, p.y);
-	if (ch == 'H' || ch == '<' || ch == '>')
+	if (ch == ladderCh || ch == '<' || ch == '>')
 	{
 		currBoard.SetChar(p.x, p.y, object);
 		if (currBoard.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == 'O')

@@ -1,17 +1,19 @@
 #include "barrel.h"
 #include "mario.h"
+#include "game.h"
 
 void Barrel::ExplosionNearBorder(Point& location)
 {
 	gotoxy(location.x, location.y);
 	cout << "|";
 	location.x = 75;
-	
+
 }
 
 void Barrel::clearFromScreen(GameConfig& board, Mario& mario)
 {
-	board.SetChar(location.x, location.y, deleteCh); //resets barrel's previous location
+	Game game;
+	game.setCharCheck(location, board, deleteCh, mario); //resets barrel's previous location
 	//cout << "\xF0\x9F\x92\xA5";  // // BETTER VERSION
 
 	if (location.x == 79)
@@ -19,14 +21,14 @@ void Barrel::clearFromScreen(GameConfig& board, Mario& mario)
 		ExplosionNearBorder(location);
 	}
 	gotoxy(location.x, location.y);
-	if (marioCloseToExplosion(board, mario)) 
+	if (marioCloseToExplosion(board, mario))
 	{
 		ExplosionNearBorder(location);
 		mario.collide(board);
 		return;
 	}
 	cout << EXPLOSION;
-	Sleep(200);
+	Sleep(150);
 	for (int i = 3; i >= 0; i--) // CLEANS 'BOOM' from screen
 	{
 		gotoxy(location.x + i, location.y);
@@ -47,12 +49,12 @@ void Barrel::PrintLadder()
 	cout << ladderCh;
 }
 
-void Barrel::moveBarrel(GameConfig& board)
+void Barrel::moveBarrel(GameConfig& board,Mario& mario)
 {
-	board.SetChar(this->location.x, this->location.y, deleteCh); //resets barrel's previous location
-
+	Game game;
+	game.setCharCheck(this->location, board, deleteCh, mario); //resets barrel's previous location
 	char originalChar = board.GetChar(location.x, location.y);
-	board.SetChar(location.x, location.y, originalChar);
+	game.setCharCheck(location, board, originalChar, mario);
 	gotoxy(location.x, location.y);
 	cout << originalChar;
 
@@ -67,6 +69,7 @@ void Barrel::moveBarrel(GameConfig& board)
 	switch (floor)
 	{
 	case '>':
+	{
 		if (fallCount >= 8)
 		{
 			deactivate();
@@ -78,8 +81,9 @@ void Barrel::moveBarrel(GameConfig& board)
 			++location.x;
 		}
 		break;
-
+	}
 	case '<':
+	{
 		if (fallCount >= 8)
 		{
 			deactivate();
@@ -91,9 +95,10 @@ void Barrel::moveBarrel(GameConfig& board)
 			--location.x;
 		}
 		break;
-
+	}
 	case '=':
 	case '-':
+	{
 		if (fallCount >= 8)
 		{
 			deactivate();
@@ -104,14 +109,13 @@ void Barrel::moveBarrel(GameConfig& board)
 			++location.x;
 		}
 		break;
-
+	}
 	default:
 		++location.y;
 		++fallCount;
 		break;
 	}
-
-	board.SetChar(location.x, location.y, barrelCh);
+	game.setCharCheck(location,board, barrelCh, mario);
 	Print(location.x, location.y);
 }
 
@@ -120,6 +124,8 @@ bool Barrel::marioCloseToExplosion(GameConfig& board, Mario& mario)
 	Point marioPos = mario.findMarioLocation();
 	if (isInExplosionArea(this->location, marioPos))
 		return true;
+	else
+		return false;
 }
 
 bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos)
