@@ -33,6 +33,7 @@ void Menu::displayMenu(Mario& mario)
 		switch (key)
 		{
 		case '1':
+			mario.resetMario();
 			game.startGame(mario);
 			break;
 		case '8':

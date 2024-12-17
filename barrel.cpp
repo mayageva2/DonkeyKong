@@ -1,12 +1,13 @@
 #include "barrel.h"
 #include "mario.h"
 #include "game.h"
+#include "gameConfig.h"
 
 void Barrel::ExplosionNearBorder(Point& location)
 {
 	gotoxy(location.x, location.y);
 	cout << "|";
-	location.x = 75;
+	location.x = GameConfig::MAX_X-5;
 
 }
 
@@ -16,7 +17,7 @@ void Barrel::clearFromScreen(GameConfig& board, Mario& mario)
 	game.setCharCheck(location, board, deleteCh, mario); //resets barrel's previous location
 	//cout << "\xF0\x9F\x92\xA5";  // // BETTER VERSION
 
-	if (location.x == 79)
+	if (location.x == GameConfig::MAX_X -1)
 	{
 		ExplosionNearBorder(location);
 	}

@@ -11,10 +11,6 @@
 
 void Game::startGame(Mario& mario)
 {
-	if (mario.getNumOfHearts() == 0)
-	{
-		mario.resetMario();
-	}
 	clrscr();
 	GameConfig::eKeys lastKey = GameConfig::eKeys::STAY;
 	GameConfig board;

@@ -196,6 +196,11 @@ void Mario::jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump)
 		this->state = MarioState::falling;
 		moveCounter = 4;
 		sideJump = false;
+		if (isMarioOnFloor(currBoard))
+		{
+			stay(currBoard);
+			moveCounter = 0;
+		}
 	}
 
 }
@@ -466,9 +471,8 @@ void Mario::didMarioWin(GameConfig& currBoard)
 {
 	Point p(this->location);
 
-	if (currBoard.GetChar(p.x + this->location.diff_x, p.y) == '$')   //checks if you reached pauline
+	if (currBoard.GetChar(p.x, p.y) == '$')   //checks if you reached pauline
 	{
-		draw(this->location);
 		stay(currBoard);
 		clrscr();
 		Menu menu;
