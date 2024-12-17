@@ -1,23 +1,22 @@
 #include "barrel.h"
 #include "mario.h"
 #include "game.h"
-#include "gameConfig.h"
 
 void Barrel::ExplosionNearBorder(Point& location)
 {
 	gotoxy(location.x, location.y);
 	cout << "|";
-	location.x = GameConfig::MAX_X-5;
+	location.x = 75;
 
 }
 
-void Barrel::clearFromScreen(GameConfig& board, Mario& mario)
+void Barrel::clearFromScreen(GameConfig& board, Mario& mario,bool& flag)
 {
 	Game game;
-	game.setCharCheck(location, board, deleteCh, mario); //resets barrel's previous location
+	game.setCharCheck(location, board, ' ', mario,flag); //resets barrel's previous location
 	//cout << "\xF0\x9F\x92\xA5";  // // BETTER VERSION
 
-	if (location.x == GameConfig::MAX_X -1)
+	if (location.x == 79)
 	{
 		ExplosionNearBorder(location);
 	}
@@ -25,7 +24,7 @@ void Barrel::clearFromScreen(GameConfig& board, Mario& mario)
 	if (marioCloseToExplosion(board, mario))
 	{
 		ExplosionNearBorder(location);
-		mario.collide(board);
+		mario.collide(board,flag);
 		return;
 	}
 	cout << EXPLOSION;
@@ -50,12 +49,12 @@ void Barrel::PrintLadder()
 	cout << ladderCh;
 }
 
-void Barrel::moveBarrel(GameConfig& board,Mario& mario)
+void Barrel::moveBarrel(GameConfig& board, Mario& mario,bool& flag)
 {
 	Game game;
-	game.setCharCheck(this->location, board, deleteCh, mario); //resets barrel's previous location
+	game.setCharCheck(this->location, board, ' ', mario,flag); //resets barrel's previous location
 	char originalChar = board.GetChar(location.x, location.y);
-	game.setCharCheck(location, board, originalChar, mario);
+	game.setCharCheck(location, board, originalChar, mario,flag);
 	gotoxy(location.x, location.y);
 	cout << originalChar;
 
@@ -116,7 +115,7 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario)
 		++fallCount;
 		break;
 	}
-	game.setCharCheck(location,board, barrelCh, mario);
+	game.setCharCheck(location, board, barrelCh, mario,flag);
 	Print(location.x, location.y);
 }
 

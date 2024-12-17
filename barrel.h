@@ -25,11 +25,11 @@ public:
 	//true = right ; false = left;
 	Barrel() :location(upstart), direction(true), dropDirection(true), isActive(false), fallCount(0) {};
 
-	void moveBarrel(GameConfig& board, Mario& mario);
+	void moveBarrel(GameConfig& board, Mario& mario,bool& flag);
 	void Print(int x, int y);
 	void PrintLadder();
 	Point getLocation() const { return location; }
-	void clearFromScreen(GameConfig& board, Mario& mario);
+	void clearFromScreen(GameConfig& board, Mario& mario,bool& flag);
 	void deactivate() { isActive = false; }
 	void activate() { isActive = true; }
 	bool isBarrelActive() const { return isActive; }

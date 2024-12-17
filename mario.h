@@ -1,4 +1,4 @@
-#ifndef _MARIO_H
+﻿#ifndef _MARIO_H
 #define _MARIO_H
 #include "point.h"
 #include "general.h"
@@ -24,26 +24,26 @@ public:
 	Mario() : location(start) {}                 //constructor
 	Mario(const Mario& m) = delete;              //copy constructor block
 	void draw(const Point& pos) const;           //draw mario on point   
-	void move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter); //move mario accoring to key pressed
+	void move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,bool& flag); //move mario accoring to key pressed
 	bool checkMove(GameConfig& currBoard, int x, int y);   //check if point is a floor char
 	bool isInBoard(GameConfig& currBoard, int x);          //check if point is in board limits
 	bool isMarioOnLadder(GameConfig& currBoard);           //checks if mario is on a ladder
-	void left(GameConfig& currBoard, int& moveCounter);    //moves mario left
-	void right(GameConfig& currBoard, int& moveCounter);   //moves mario right
-	void up(GameConfig& currBoard, int& moveCounter, bool& sideJump);       //moves mario up
-	void jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump);   //moves mario down
-	void falling(int& moveCounter, GameConfig& currBoard, bool& sideJump);  //makes mario fall down
+	void left(GameConfig& currBoard, int& moveCounter,bool& flag);    //moves mario left
+	void right(GameConfig& currBoard, int& moveCounter,bool& flag);   //moves mario right
+	void up(GameConfig& currBoard, int& moveCounter, bool& sideJump,bool& flag);       //moves mario up
+	void jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump,bool& flag);   //moves mario down
+	void falling(int& moveCounter, GameConfig& currBoard, bool& sideJump,bool& flag);  //makes mario fall down
 	void climbUpAladder(int& moveCounter, GameConfig& currBoard);           //moves mario up a ladder
-	void down(GameConfig& currBoard, int& moveCounter, bool& sideJump);     //moves mario down
+	void down(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& flag);     //moves mario down
 	void stay(GameConfig& currBoard);  //stops mario's movement
-	void jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& sideJump); //makes mario jump and then move to side according to key
+	void jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& flag); //makes mario jump and then move to side according to key
 	bool isMarioOnFloor(GameConfig& currBoard);   //checks if mario stands on a floor
 	Point findMarioLocation();   //return mario's position
 	int getNumOfHearts() { return num_of_hearts; }  //returns amount of lives left
 	void printLessHearts(); //prints new amount of hearts
-	void collide(GameConfig& currBoard); //makes mario explode and restarts game
-	void didMarioLose(GameConfig& currBoard); //checks if mario lost all hearts
-	void didMarioWin(GameConfig& currBoard);  //checks if mario reached pauline
+	void collide(GameConfig& currBoard,bool& flag); //makes mario explode and restarts game
+	void didMarioLose(GameConfig& currBoard,bool& flag); //checks if mario lost all hearts
+	void didMarioWin(GameConfig& currBoard,bool& flag);  //checks if mario reached pauline
 	void printHearts();  //prints hearts on screen
 	void resetMario();   //resets mario
 };

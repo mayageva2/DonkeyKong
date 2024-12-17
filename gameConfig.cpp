@@ -27,4 +27,3 @@ void GameConfig::resetBoard()
 	gotoxy(3, 4);
 	std::cout << "\xF0\x9F\x99\x89";
 }*/
-

@@ -15,5 +15,7 @@ void main()
 	Menu menu;
 	Mario mario;
 	menu.displayMenu(mario);
-	
+	cout << "BEFORE";
+	clrscr();
+	cout << "BYE";
 }

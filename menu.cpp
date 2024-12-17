@@ -9,6 +9,7 @@
 using namespace std;
 
 const Point startMenu(8, 5);
+bool flag = true;
 
 void Menu::printScreen(const char** print)
 {
@@ -28,13 +29,13 @@ void Menu::displayMenu(Mario& mario)
 
 	while (!exitMenu)
 	{
+		clrscr();
 		printScreen(this->mainMenu);
 		char key = _getch();
 		switch (key)
 		{
 		case '1':
-			mario.resetMario();
-			game.startGame(mario);
+			game.startGame(mario,flag);
 			break;
 		case '8':
 			printScreen(this->instructions);
@@ -47,17 +48,18 @@ void Menu::displayMenu(Mario& mario)
 	}
 }
 
-void Menu::displayEnd_Game(Mario& mario)
+ void Menu::displayEnd_Game(Mario& mario)
 {
 	printScreen(end_game);
 	Sleep(2500);
 	clrscr();
-	displayMenu(mario);
+
 }
 
 void Menu::displayPause()
 {
 	printScreen(pause);
 }
+
 
 
