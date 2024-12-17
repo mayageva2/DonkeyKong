@@ -18,7 +18,7 @@ void GameConfig::resetBoard()
 {
 	for (int i = 0; i < MAX_Y; i++)
 	{
-		memcpy(currentBoard[i], originalBoard[i], MAX_X + 1);
+		memcpy(currentBoard[i], originalBoard[i], MAX_X);
 	}
 }
 
