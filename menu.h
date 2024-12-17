@@ -4,7 +4,9 @@
 
 class Menu
 {
+	Menu(const Menu&) = delete;
 public:
+	Menu() = default;
 	static constexpr int MENU_X = 75;
 	static constexpr int MENU_Y = 17;
 	const char* mainMenu[MENU_Y] = {

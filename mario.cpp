@@ -21,7 +21,7 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 {
 	Game game;
 	bool sideJump = false;
-	if (currBoard.GetChar(this->location.x, this->location.y) == barrelCh)
+	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH)
 		collide(currBoard, flag);
 	game.setCharCheck(this->location, currBoard, DELETE_CH, *this, flag); //resets mario's previous location
 
@@ -54,8 +54,9 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 		stay(currBoard);
 		break;
 	}
+	
 
-	if (currBoard.GetChar(this->location.x, this->location.y) == barrelCh)
+	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH)
 		collide(currBoard, flag);
 	game.setCharCheck(location, currBoard, this->ch, *this, flag);
 }
@@ -195,7 +196,7 @@ void Mario::jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump, bool
 		p.draw(DELETE_CH, this->location);
 		this->location.y -= 1;
 		Mario::draw(this->location);
-		Sleep(80);
+		Sleep(70);
 		moveCounter++;
 	}
 	else
@@ -403,6 +404,8 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 	}
 	else if (moveCounter >= 4)
 		down(currBoard, moveCounter, sideJump, flag);
+	if (flag)
+		Sleep(50);
 }
 
 bool Mario::isMarioOnFloor(GameConfig& currBoard) //checks if mario stands on a floor
@@ -431,7 +434,7 @@ void Mario::collide(GameConfig& currBoard, bool& flag)  //this func takes care o
 		location.x = 75;
 	}
 	gotoxy(location.x, location.y);
-	Sleep(200);
+	//Sleep(200);
 	cout << EXPLOSION;
 	this->num_of_hearts--;
 	Sleep(2000);
@@ -466,7 +469,7 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag) //checks if mario won
 		stay(currBoard);
 		clrscr();
 		Menu menu;
-		Sleep(80);
+		Sleep(70);
 		menu.printScreen(menu.win);
 		Sleep(3000);
 		flag = false;

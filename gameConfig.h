@@ -10,10 +10,10 @@ class GameConfig
 {
 public:
 	//Game boarders
-	static constexpr int MAX_X = 80;  //game limits
-	static constexpr int MAX_Y = 25;  //game limits
+	static constexpr int MAX_X = 80;  
+	static constexpr int MAX_Y = 25;  
 	const char* originalBoard[MAX_Y] = {
-		 // 012345678901a23456789012345678901234567890123456789012345678901234567890123456789
+	     // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
 		   "|------------------------------------------------------------------------------|", // 0
 		   "|                                  SCORE:0               HEARTS:               |", // 1
 		   "|               $                                                              |", // 2
