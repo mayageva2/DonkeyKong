@@ -1,50 +1,45 @@
 #include "barrel.h"
 #include "mario.h"
 #include "game.h"
+#include "gameConfig.h"
 
-
-void Barrel::clearFromScreen(GameConfig& board, Mario& mario,bool& flag)
+void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag)
 {
 	Game game;
-	game.setCharCheck(location, board, deleteCh, mario,flag); //resets barrel's previous location
+	game.setCharCheck(location, board, DELETE_CH, mario, flag); //resets barrel's previous location
 
-		if (location.x == 78)//If close to boarder move back so the EXPLOSION won't get out of frame
+	if (mario.findMarioLocation().x == this->location.x && mario.findMarioLocation().y == this->location.y)
+		mario.collide(board, flag);
+	else
+	{
+		if (location.x == 78)
 		{
 			location.x = 75;
 		}
-
-		if (marioCloseToExplosion(board, mario))
-		{
-			mario.collide(board, flag);
-		}
-
 		gotoxy(location.x, location.y);
-		cout << deleteCh;
+		cout << DELETE_CH;
 		gotoxy(location.x, location.y);
-
 		cout << EXPLOSION;
-
-		Sleep(150);
+		Sleep(80);
 		for (int i = 3; i >= 0; i--) // CLEANS 'BOOM' from screen
 		{
 			gotoxy(location.x + i, location.y);
-			cout << deleteCh;
+			cout << DELETE_CH;
 		}
+		if (marioCloseToExplosion(board, mario))
+			mario.collide(board, flag);
 	}
-	
+}
 
-
-
-
-void Barrel::moveBarrel(GameConfig& board, Mario& mario,bool& flag)
+void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag)
 {
-	Point p(location.x,location.y);
+	Point p(location.x, location.y);
 	Game game;
-	game.setCharCheck(this->location, board, deleteCh, mario,flag); //resets barrel's previous location
-	char originalChar = board.GetChar(location.x, location.y);//Restore the original character at the barrel's current location
-	game.setCharCheck(location, board, originalChar, mario,flag);
+	game.setCharCheck(this->location, board, DELETE_CH, mario, flag); //resets barrel's previous location
+	char originalChar = board.GetChar(location.x, location.y); //Restore the original character at the barrel's current location
+	game.setCharCheck(location, board, originalChar, mario, flag);
 	gotoxy(location.x, location.y);
-	cout << originalChar;//print original char on board
+	cout << originalChar; //print original char on board
 
 	char floor = board.GetChar(location.x, location.y + 1);//Check the char below the barrel to determine the floor type
 
@@ -103,8 +98,8 @@ void Barrel::moveBarrel(GameConfig& board, Mario& mario,bool& flag)
 		++fallCount;
 		break;
 	}
-	game.setCharCheck(location, board, barrelCh, mario,flag); //Update barrel's new position on the game board.
-	p.draw(barrelCh,location);//Draw the barrel at its new position on screen
+	game.setCharCheck(location,board, BARREL_CH, mario, flag); //Update barrel's new position on the game board.
+	p.draw(BARREL_CH, location);//Draw the barrel at its new position on screen
 }
 
 bool Barrel::marioCloseToExplosion(GameConfig& board, Mario& mario)
