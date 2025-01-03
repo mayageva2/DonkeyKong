@@ -5,8 +5,7 @@
 
 void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag)
 {
-	Game game;
-	game.setCharCheck(location, board, DELETE_CH, mario, flag); //resets barrel's previous location
+	Game::setCharCheck(location, board, DELETE_CH, mario, flag); //resets barrel's previous location
 
 	if (mario.findMarioLocation().x == this->location.x && mario.findMarioLocation().y == this->location.y)
 		mario.collide(board, flag);
@@ -34,12 +33,10 @@ void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag)
 void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag)
 {
 	Point p(location.x, location.y);
-	Game game;
-	game.setCharCheck(this->location, board, DELETE_CH, mario, flag); //resets barrel's previous location
+	Game::setCharCheck(this->location, board, DELETE_CH, mario, flag); //resets barrel's previous location
 	char originalChar = board.GetChar(location.x, location.y); //Restore the original character at the barrel's current location
-	game.setCharCheck(location, board, originalChar, mario, flag);
-	gotoxy(location.x, location.y);
-	cout << originalChar; //print original char on board
+	Game::setCharCheck(location, board, originalChar, mario, flag);
+	p.draw(originalChar, location); //print original char on board
 
 	char floor = board.GetChar(location.x, location.y + 1);//Check the char below the barrel to determine the floor type
 
@@ -98,7 +95,7 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag)
 		++fallCount;
 		break;
 	}
-	game.setCharCheck(location,board, BARREL_CH, mario, flag); //Update barrel's new position on the game board.
+	Game::setCharCheck(location,board, BARREL_CH, mario, flag); //Update barrel's new position on the game board.
 	p.draw(BARREL_CH, location);//Draw the barrel at its new position on screen
 }
 

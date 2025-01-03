@@ -4,9 +4,13 @@
 #include "general.h"
 #include "gameConfig.h"
 #include "menu.h"
+#include "ghost.h"
 
 #include <conio.h>
 #include <Windows.h>
+#include <vector>
+#include <iostream>
+using namespace std;
 
 
 void Game::startGame(Mario& mario, bool& flag)  //starts game
@@ -24,6 +28,9 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
 	Menu menu;
+	vector<Ghost> ghosts;
+	ghosts.reserve(2);
+	createGhosts(ghosts);
 
 	mario.draw(mario.findMarioLocation());
 	mario.state = MarioState::standing;
@@ -31,6 +38,9 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 	flag = true;
 	while (flag)
 	{
+		for (int i = 0; i < ghosts.size(); i++)
+			ghosts[i].checkMove(board, mario, flag, ghosts);
+
 		barrelsMovement(barrels, numBarrels, board, interval, mario, flag); // Move Barrels
 
 		if (moveCounter == 0)
@@ -74,6 +84,19 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 	}
 	gotoxy(0, GameConfig::MAX_Y + 2);
 	deleteArray(barrels, numBarrels); //Clear barrels array
+}
+
+void Game::createGhosts(vector<Ghost>& ghosts)
+{
+	Point p1(78, 10);
+	int numGhostsToAdd = 2;
+
+	for (int i = 0; i < numGhostsToAdd; i++)
+	{
+		Ghost ghost(p1.x, p1.y);
+		ghosts.push_back(ghost);
+		p1.x -= 3;
+	}
 }
 
 
@@ -177,6 +200,8 @@ void Game::barrelsMovement(Barrel** barrels, int& numBarrels, GameConfig& board,
 		}
 	}
 }
+
+
 
 void Game::pauseGame(GameConfig& board, Mario& mario)  //pause the game
 {

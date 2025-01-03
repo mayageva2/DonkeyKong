@@ -25,7 +25,7 @@ void Menu::printScreen(const char** print) //prints screen
 void Menu::displayMenu(Mario& mario) // displays main menu
 {
 	bool exitMenu = false; //chatGPT solution
-	Game game;
+	Game game;  /************************ !!!need to change to Game:: but startgame cant be static!!! ****************************/
 	bool flag = true;
 
 	while (!exitMenu)

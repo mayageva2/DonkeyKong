@@ -3,6 +3,10 @@
 #include "game.h"
 #include "mario.h"
 #include "barrel.h"
+#include "ghost.h"
+#include <vector>
+#include <iostream>
+using namespace std;
 
 const int ENDJUMP = -1;
 
@@ -16,8 +20,9 @@ public:
 	void barrelsMovement(Barrel** barrels, int& numBarrels, GameConfig& board, int& interval, Mario& mario, bool& flag); //moves each barrel
 	void deleteFromArray(Barrel** barrels, int index, int& numBarrels); //deletes barrels
 	void deleteArray(Barrel** barrels, int& numBarrels); //deletes barrels array
-	void pauseGame(GameConfig& board, Mario& mario); //pause the game
-	void setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag); // checks if theres a ladder or floor and then goes to set char on board
+	static void pauseGame(GameConfig& board, Mario& mario); //pause the game
+	static void setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag); // checks if theres a ladder or floor and then goes to set char on board
+	void createGhosts(vector<Ghost>& ghosts);
 };
 
 #endif

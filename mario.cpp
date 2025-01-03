@@ -5,6 +5,7 @@
 #include "menu.h"
 #include "game.h"
 #include "barrel.h"
+#include "ghost.h"
 
 #include <iostream>
 #include <Windows.h>
@@ -19,11 +20,10 @@ void Mario::draw(const Point& pos) const  //this func draws mario in the locatio
 
 void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag) //this func moves mario according to user's key
 {
-	Game game;
 	bool sideJump = false;
-	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH)
+	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetChar(this->location.x, this->location.y) == GHOST_CH)
 		collide(currBoard, flag);
-	game.setCharCheck(this->location, currBoard, DELETE_CH, *this, flag); //resets mario's previous location
+	Game::setCharCheck(this->location, currBoard, DELETE_CH, *this, flag); //resets mario's previous location
 
 	switch (key)
 	{
@@ -56,9 +56,9 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 	}
 	
 
-	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH)
+	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetChar(this->location.x, this->location.y) == GHOST_CH)
 		collide(currBoard, flag);
-	game.setCharCheck(location, currBoard, this->ch, *this, flag);
+	Game::setCharCheck(location, currBoard, this->ch, *this, flag);
 }
 
 bool Mario::checkMove(GameConfig& currBoard, int x, int y)  //checks if mario hits a floor tile
@@ -329,7 +329,6 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 {
 	Point p(this->location);
 	bool isH = false;
-	Game game;
 
 	if (key == GameConfig::eKeys::LEFT || key == GameConfig::eKeys::LEFT2) //check if after jump mario should move left
 	{
@@ -362,7 +361,7 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 	}
 	else if (key == GameConfig::eKeys::ESC)
 	{
-		game.pauseGame(currBoard, *this);
+		Game::pauseGame(currBoard, *this);
 		sideJump = false;
 		return;
 	}
@@ -444,7 +443,7 @@ void Mario::collide(GameConfig& currBoard, bool& flag)  //this func takes care o
 	{
 		this->location = start;
 		Game game;
-		game.startGame(*this, flag);
+		game.startGame(*this, flag);  /************************ !!!need to change to Game:: but startgame cant be static!!! ****************************/
 	}
 }
 
