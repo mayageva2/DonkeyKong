@@ -1,5 +1,4 @@
 #pragma once
-#include "GameConfig.h"
 #include <iostream>
 
 class Point

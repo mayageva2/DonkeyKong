@@ -68,7 +68,7 @@ bool Mario::checkMove(GameConfig& currBoard, int x, int y)  //checks if mario hi
 
 bool Mario::isInBoard(GameConfig& currBoard, int x)  //checks if a point is on board
 {
-	return (x < GameConfig::MAX_X - 1 && x >= 1);
+	return (x < MAX_X - 1 && x >= 1);
 }
 
 bool Mario::isMarioOnLadder(GameConfig& currBoard)

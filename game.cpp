@@ -18,6 +18,7 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 	clrscr();
 	GameConfig::eKeys lastKey = GameConfig::eKeys::STAY;
 	GameConfig board;
+	board.load("dkong_a.screen", flag);
 	board.resetBoard();
 	board.PrintBoard();
 	mario.printHearts();
@@ -82,7 +83,7 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 
 		++interval;
 	}
-	gotoxy(0, GameConfig::MAX_Y + 2);
+	gotoxy(0, MAX_Y + 2);
 	deleteArray(barrels, numBarrels); //Clear barrels array
 }
 
