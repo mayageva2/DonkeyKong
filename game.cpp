@@ -34,7 +34,7 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 	createGhosts(ghosts);
 	static vector<Point>currHammers;
 	if (mario.getNumOfHearts() == FULL_LIFE) { currHammers = originalHammers; }//In case of new game initialize num of hammers
-	//PATISHIM RESTART NEED TO UNDERSTND WHY/////////////////////////////////////////////////////////
+	//לנסות להעביר את ווקטור פטישים להיות חבר מחלקה כי פה הוא מתאפס כל פעם מחדש..
 	board.drawHammers(currHammers);
 	mario.draw(mario.findMarioLocation());
 	mario.state = MarioState::standing;

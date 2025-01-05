@@ -490,7 +490,7 @@ void Mario::resetMario()  //this func initiallize mario's data members
 	this->location = start;
 }
 
-void Mario::pickHammer(vector<Point>hammers)
+void Mario::pickHammer(vector<Point>&hammers)
 {
 	num_of_hammers++;
 	printHammers();//Print new nuber of hammers

@@ -49,6 +49,6 @@ public:
 	void printHearts();  //prints num of hearts on screen
 	void resetMario();   //resets mario
 	void printHammers();  //prints num of hammers on screen
-	void pickHammer(vector<Point>hammers);
+	void pickHammer(vector<Point>&hammers);
 };
 #endif
