@@ -12,28 +12,39 @@ static const string EXPLOSION = "BOOM"; //const for explosion print
 static constexpr int MAX_X = 80;
 static constexpr int MAX_Y = 25;
 
+class Mario;
+
 class GameConfig
 {
-/*public:
-	static constexpr int MAX_X = 80;
-	static constexpr int MAX_Y = 25;
-private:*/
-	char originalBoard[MAX_Y][MAX_X + 1];
-	char currentBoard[MAX_Y][MAX_X + 1];  //current board
-	Point marioPos;
-	Point donkeyPos;
+	char originalBoard[MAX_Y][MAX_X + 1] = {};
+	char currentBoard[MAX_Y][MAX_X + 1] = {};  //current board
+	static Point marioPos;
+	static Point donkeyPos;
+	static Point hammerPos;
+	static Point legendPos;
 	vector<Point> GhostsPos;
+	size_t currentGhostIndex = 0;
 	int ghostCounter;
 	int marioCounter;
 	int donkeyCounter;
+	int hammerCounter;
+	int legendCounter;
 	static constexpr int MIN_Y = 1;
 	static constexpr int MIN_X = 1;
 public:
-	GameConfig(int x = 0, int y = 0) : marioPos(x, y), marioCounter(0), donkeyPos(x, y), donkeyCounter(0), ghostCounter(0) {}
+	GameConfig() : marioCounter(0), donkeyCounter(0), ghostCounter(0), hammerCounter(0), legendCounter(0) {}
 	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27 }; 
-	void load(const string& filename, bool& flag);
+	void load(const string& filename, bool& error);
 	void PrintBoard() const;
 	void resetBoard();
+	static Point getMarioPos() { return marioPos; }
+	static Point getDonkeyKongPos() { return donkeyPos; }
+	static Point getLegendPos() { return legendPos; }
+	Point getGhostPos();
+	int getGhostsAmount() { return ghostCounter; }
+	void insertLegend();
+	void printHearts(Mario& mario);
+	void init();
 
 	char GetChar(int x, int y) const// returns a char that is placed on given point on board
 	{
@@ -47,6 +58,8 @@ public:
 			currentBoard[y][x] = ch;
 		}
 	}
+
+	
 };
 
 #endif

@@ -10,6 +10,9 @@ using namespace std;
 
 const Point startMenu(8, 5);
 bool flag = true;
+const int START_GAME = 1;
+const int INSTRUCTIONS = 8;
+const int EXIT = 9;
 
 void Menu::printScreen(const char** print) //prints screen
 {
@@ -24,23 +27,45 @@ void Menu::printScreen(const char** print) //prints screen
 
 void Menu::displayMenu(Mario& mario) // displays main menu
 {
+	GameConfig board;
 	bool exitMenu = false; //chatGPT solution
 	Game game;  /************************ !!!need to change to Game:: but startgame cant be static!!! ****************************/
 	bool flag = true;
+	bool screenError = false;
+	char screenKey = DELETE_CH;
 
 	while (!exitMenu)
 	{
 		clrscr();
-		printScreen(this->mainMenu);
+		printScreen(mainMenu);
+		board.init();
 		char key = _getch();
 		switch (key)
 		{
 		case '1':
-			mario.resetMario();
-			game.startGame(mario, flag);
+			printScreen(chooseScreen);
+			screenKey = _getch();
+			switch (screenKey)
+			{
+			case '1':
+				board.load("dkong_a.screen", screenError);
+				break;
+			case '2':
+				board.load("dkong_b.screen", screenError);
+				break;
+			case '3':
+				board.load("dkong_c.screen", screenError);
+				break;
+			}
+
+			if (!screenError)
+			{
+				mario.resetMario();
+				game.startGame(mario, board, flag);
+			}
 			break;
 		case '8':
-			printScreen(this->instructions);
+			printScreen(instructions);
 			while (!_kbhit()) {}
 			break;
 		case '9':
@@ -57,4 +82,10 @@ void Menu::displayEnd_Game(Mario& mario)  //ends game
 	clrscr();
 }
 
+const char Menu::legend[Menu::LegendY][Menu::LegendX + 1] = {
+	// 012345678901234567890
+	  " lives              ",//0
+	  " score              ",//1
+	  " hammer             "//2
+};
 

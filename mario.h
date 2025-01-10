@@ -7,8 +7,6 @@
 #include <conio.h>
 #include<iostream>
 
-const Point start = { 77, 23 };
-const Point hearts = { 64,1 };
 enum class MarioState { moving, jumping, standing, falling }; //chat GPT solution
 const int FULL_LIFE = 3;
 
@@ -21,7 +19,7 @@ class Mario
 
 public:
 	MarioState state = MarioState::standing;     //initiallize state
-	Mario() : location(start) {}                 //constructor
+	Mario() : location(GameConfig::getMarioPos()) {}                 //constructor
 	Mario(const Mario& m) = delete;              //copy constructor block
 	void draw(const Point& pos) const;           //draw mario on point   
 	void move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag); //move mario accoring to key pressed
@@ -43,7 +41,6 @@ public:
 	void collide(GameConfig& currBoard, bool& flag); //makes mario explode and restarts game
 	void didMarioLose(GameConfig& currBoard, bool& flag); //checks if mario lost all hearts
 	void didMarioWin(GameConfig& currBoard, bool& flag);  //checks if mario reached pauline
-	void printHearts();  //prints hearts on screen
 	void resetMario();   //resets mario
 };
 #endif

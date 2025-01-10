@@ -1,12 +1,18 @@
 #include "gameConfig.h"
 #include "general.h"
 #include "point.h"
+#include "menu.h"
 
 #include <fstream>
 #include <iostream>
 using namespace std;
 
-void GameConfig::load(const std::string& filename, bool& flag) 
+Point GameConfig::marioPos(0, 0);
+Point GameConfig::donkeyPos(0, 0);
+Point GameConfig::hammerPos(0, 0);
+Point GameConfig::legendPos(0, 0);
+
+void GameConfig::load(const std::string& filename, bool& error) 
 {
 	ifstream screen_file(filename);
 	//cout << screen_file.is_open() << std::endl;
@@ -14,6 +20,8 @@ void GameConfig::load(const std::string& filename, bool& flag)
 	int curr_row = 0;
 	int curr_col = 0;
 	char c;
+	GhostsPos.clear();
+	GhostsPos.shrink_to_fit();
 	while (!screen_file.get(c).eof() && curr_row < MAX_Y) 
 	{
 		if (c == '\n') {
@@ -29,23 +37,25 @@ void GameConfig::load(const std::string& filename, bool& flag)
 		}
 		if (curr_col < MAX_X) {
 			// handle special chars
-			if (c == '@') {
+			if (c == '@') 
+			{
 				marioPos = { curr_col, curr_row };
 				marioCounter++;
-				if (marioCounter > 1 || marioCounter < 1)
+				if (marioCounter > 1)
 				{
-					cout << "error message";
-					flag = false;
+					cout << "error message : mario counter";
+					error = true;
 					return;
 				}
 			}
-			else if (c == '&') {
+			else if (c == '&') 
+			{
 				donkeyPos = { curr_col, curr_row };
 				donkeyCounter++;
-				if (donkeyCounter > 1 || donkeyCounter < 1)
+				if (donkeyCounter > 1)
 				{
-					cout << "error message";
-					flag = false;
+					cout << "error message: donkey counter";
+					error = true;
 					return;
 				}
 			}
@@ -55,15 +65,48 @@ void GameConfig::load(const std::string& filename, bool& flag)
 				GhostsPos.push_back(p);
 				ghostCounter++;
 			}
+			else if (c == 'p')
+			{
+				hammerPos = { curr_col, curr_row };
+				hammerCounter++;
+				if (hammerCounter > 1)
+				{
+					cout << "error message = hammer counter";
+					error = true;
+					return;
+				}
+			}
 			else if (c == 'L')
 			{
-				//add
+				legendCounter++;
+				legendPos = { curr_col, curr_row };
 			}
 
 			originalBoard[curr_row][curr_col++] = c;
 		}
 	}
 	int last_row = (curr_row < MAX_Y ? curr_row : MAX_Y - 1);
+	if (hammerCounter < 1 || marioCounter < 1 || legendCounter < 1 || donkeyCounter < 1)
+	{
+		cout << "error message = object missing";
+		error = true;
+		return;
+	}
+	insertLegend();
+}
+
+void GameConfig::insertLegend()
+{
+	if (legendPos.x + Menu::LegendX <= MAX_X && legendPos.y + Menu::LegendY <= MAX_Y)
+	{
+		for (int i = 0; i < Menu::LegendY; i++)
+		{
+			for (int j = 0; j < Menu::LegendX; j++)
+			{
+				originalBoard[legendPos.y + i][legendPos.x + j] = Menu::legend[i][j];
+			}
+		}
+	}
 }
 
 void GameConfig::PrintBoard() const//prints board
@@ -81,6 +124,28 @@ void GameConfig::resetBoard() //resets to original board
 	{
 		memcpy(currentBoard[i], originalBoard[i], MAX_X);
 	}
+}
+
+Point GameConfig::getGhostPos()
+{
+	Point ghostPos = GhostsPos[currentGhostIndex];
+	currentGhostIndex = (currentGhostIndex + 1) % GhostsPos.size();
+	return ghostPos;
+}
+
+void GameConfig::printHearts(Mario& mario) //this func print hearts on screen
+{
+	gotoxy(legendPos.x + 15, legendPos.y);
+	cout << mario.getNumOfHearts();
+}
+
+void GameConfig::init()
+{
+	ghostCounter = 0;
+	marioCounter = 0;
+	donkeyCounter = 0;
+	hammerCounter = 0;
+	legendCounter = 0;
 }
 
 

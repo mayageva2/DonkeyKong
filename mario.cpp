@@ -23,7 +23,8 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 	bool sideJump = false;
 	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetChar(this->location.x, this->location.y) == GHOST_CH)
 		collide(currBoard, flag);
-	Game::setCharCheck(this->location, currBoard, DELETE_CH, *this, flag); //resets mario's previous location
+	if(flag)
+		Game::setCharCheck(this->location, currBoard, DELETE_CH, *this, flag); //resets mario's previous location
 
 	switch (key)
 	{
@@ -55,10 +56,13 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 		break;
 	}
 	
-
-	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetChar(this->location.x, this->location.y) == GHOST_CH)
-		collide(currBoard, flag);
-	Game::setCharCheck(location, currBoard, this->ch, *this, flag);
+	if (flag)
+	{
+		if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetChar(this->location.x, this->location.y) == GHOST_CH)
+			collide(currBoard, flag);
+		if (flag)
+			Game::setCharCheck(location, currBoard, this->ch, *this, flag);
+	}
 }
 
 bool Mario::checkMove(GameConfig& currBoard, int x, int y)  //checks if mario hits a floor tile
@@ -420,12 +424,6 @@ Point Mario::findMarioLocation() //this func returns mario's location
 	return (this->location);
 }
 
-void Mario::printHearts() //this func print hearts on screen
-{
-	gotoxy(hearts.x, hearts.y);
-	cout << this->num_of_hearts;
-}
-
 void Mario::collide(GameConfig& currBoard, bool& flag)  //this func takes care of mario's explosion
 {
 	if (location.x >= 77)
@@ -441,9 +439,9 @@ void Mario::collide(GameConfig& currBoard, bool& flag)  //this func takes care o
 	didMarioLose(currBoard, flag);
 	if (flag)
 	{
-		this->location = start;
+		this->location = GameConfig::getMarioPos();
 		Game game;
-		game.startGame(*this, flag);  /************************ !!!need to change to Game:: but startgame cant be static!!! ****************************/
+		game.startGame(*this, currBoard, flag);  /************************ !!!need to change to Game:: but startgame cant be static!!! ****************************/
 	}
 }
 
@@ -478,5 +476,5 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag) //checks if mario won
 void Mario::resetMario()  //this func initiallize mario's data members
 {
 	this->num_of_hearts = FULL_LIFE;
-	this->location = start;
+	this->location = GameConfig::getMarioPos();
 }

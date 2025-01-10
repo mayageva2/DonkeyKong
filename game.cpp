@@ -13,15 +13,13 @@
 using namespace std;
 
 
-void Game::startGame(Mario& mario, bool& flag)  //starts game
+void Game::startGame(Mario& mario,GameConfig& board, bool& flag)  //starts game
 {
 	clrscr();
 	GameConfig::eKeys lastKey = GameConfig::eKeys::STAY;
-	GameConfig board;
-	board.load("dkong_a.screen", flag);
 	board.resetBoard();
 	board.PrintBoard();
-	mario.printHearts();
+	board.printHearts(mario);
 	Barrel* barrels[Barrel::maxBarrels] = { nullptr };
 	int numBarrels = 0;
 	int interval = 0;
@@ -30,8 +28,8 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 	bool sideJump = false;
 	Menu menu;
 	vector<Ghost> ghosts;
-	ghosts.reserve(2);
-	createGhosts(ghosts);
+	ghosts.reserve(board.getGhostsAmount());
+	createGhosts(ghosts, board);
 
 	mario.draw(mario.findMarioLocation());
 	mario.state = MarioState::standing;
@@ -70,7 +68,7 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 
 		if (mario.state == MarioState::standing) 
 		{
-			if (board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)
+			if (board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH || board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == GHOST_CH)
 				mario.collide(board, flag);
 			if (flag)
 				Sleep(100);
@@ -84,19 +82,19 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 		++interval;
 	}
 	gotoxy(0, MAX_Y + 2);
+	ghosts.clear();
+	ghosts.shrink_to_fit();
 	deleteArray(barrels, numBarrels); //Clear barrels array
 }
 
-void Game::createGhosts(vector<Ghost>& ghosts)
+void Game::createGhosts(vector<Ghost>& ghosts, GameConfig& board)
 {
-	Point p1(78, 10);
-	int numGhostsToAdd = 2;
-
-	for (int i = 0; i < numGhostsToAdd; i++)
+	int amountOfGhosts = board.getGhostsAmount();
+	for (int i = 0; i < amountOfGhosts; i++)
 	{
+		Point p1 = board.getGhostPos();
 		Ghost ghost(p1.x, p1.y);
 		ghosts.push_back(ghost);
-		p1.x -= 3;
 	}
 }
 
@@ -224,7 +222,7 @@ void Game::pauseGame(GameConfig& board, Mario& mario)  //pause the game
 	}
 	clrscr();
 	board.PrintBoard();
-	mario.printHearts();
+	board.printHearts(mario);
 	mario.draw(mario.findMarioLocation());
 }
 
@@ -259,7 +257,7 @@ void Game::deleteArray(Barrel** barrels, int& numBarrels) //deletes barrels arra
 void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag) // checks if theres a ladder or floor and then goes to set char on board
 {
 	char ch = currBoard.GetChar(p.x, p.y);
-	if (ch == LADDER_CH || ch == '<' || ch == '>')
+	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '-' || ch == '|' || ch == 'Q')
 	{
 		currBoard.SetChar(p.x, p.y, object);
 		if (currBoard.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)

@@ -9,7 +9,6 @@
 #include <string>
 using namespace std;
 
-const Point upstart = { 7,4 };
 static constexpr char BARREL_CH = 'O';
 
 class Barrel
@@ -22,7 +21,7 @@ class Barrel
 public:
 	bool dropDirection;// Indicates if the barrel is dropping: true = down, false = no drop
 	static const int maxBarrels = 100;
-	Barrel() :location(upstart), direction(true), dropDirection(true), isActive(false), fallCount(0) {};//Constractor
+	Barrel() :location(GameConfig::getDonkeyKongPos()), direction(true), dropDirection(true), isActive(false), fallCount(0) {};//Constractor
 
 	void moveBarrel(GameConfig& board, Mario& mario, bool& flag);
 	Point getLocation() const { return location; } //Get barrel location
