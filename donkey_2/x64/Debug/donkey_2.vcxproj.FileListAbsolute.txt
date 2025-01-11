@@ -1,2 +1,0 @@
-C:\Users\Victo\source\repos\DonkeyKong\donkey_2\x64\Debug\donkey_2.exe
-C:\Users\Victo\source\repos\cpp\donkey_2\x64\Debug\donkey_2.exe
