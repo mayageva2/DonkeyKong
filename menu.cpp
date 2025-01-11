@@ -50,25 +50,31 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 			printScreen(instructions);
 			while (!_kbhit()) {}
 			break;
-
 		case '2':
 			printScreen(chooseScreen);
 			screenKey = _getch();
-			switch (screenKey)
-			{
-			case '1':
-				loadScreens(0, screens, board, screenError, mario);
-				break;
-			case '2':
-				loadScreens(1, screens, board, screenError, mario);
-				break;
-			case '3':
-				loadScreens(2, screens, board, screenError, mario);
-			}
+			choosescreen(screenKey, screens, board, screenError, mario);
+			break;
 		case '9':
 			exitMenu = true;
 			break;
 		}
+	}
+}
+
+void Menu::choosescreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario)
+{
+	switch (screenKey)
+	{
+	case '1':
+		loadScreens(0, screens, board, screenError, mario);
+		break;
+	case '2':
+		loadScreens(1, screens, board, screenError, mario);
+		break;
+	case '3':
+		loadScreens(2, screens, board, screenError, mario);
+		break;
 	}
 }
 

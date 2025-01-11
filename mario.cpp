@@ -88,16 +88,15 @@ void Mario::left(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mari
 	this->location.diff_x = -1;
 	this->location.diff_y = 0;
 
-	if (currBoard.GetChar(p.x, p.y) == LADDER_CH)  //checks if there's a ladder
+	if (currBoard.GetChar(p.x, p.y) == LADDER_CH)
 	{
 		p.draw(LADDER_CH, this->location);
 		isH = true;
 	}
+	else if (Game::isInLegend(p, currBoard))
+		p.draw(currBoard.GetChar(p.x, p.y), this->location);
 	else
-	{
 		p.draw(DELETE_CH, this->location);
-		isH = false;
-	}
 
 	if (checkMove(currBoard, p.x + this->location.diff_x, p.y + this->location.diff_y))
 	{
@@ -133,11 +132,10 @@ void Mario::right(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mar
 		p.draw(LADDER_CH, this->location);
 		isH = true;
 	}
+	else if (Game::isInLegend(p, currBoard))
+		p.draw(currBoard.GetChar(p.x, p.y), this->location);
 	else
-	{
 		p.draw(DELETE_CH, this->location);
-		isH = false;
-	}
 
 
 	if (checkMove(currBoard, p.x + this->location.diff_x, p.y + this->location.diff_y))
@@ -197,7 +195,10 @@ void Mario::jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump, bool
 
 	if (isInBoard(currBoard, p.y - 1) && checkMove(currBoard, this->location.x, p.y - 1)) //checks if the desination is outside boundries and checks for ceiling
 	{
-		p.draw(DELETE_CH, this->location);
+		if (Game::isInLegend(p, currBoard))
+			p.draw(currBoard.GetChar(p.x, p.y), this->location);
+		else
+			p.draw(DELETE_CH, this->location);
 		this->location.y -= 1;
 		Mario::draw(this->location);
 		Sleep(70);
@@ -224,7 +225,10 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump, boo
 
 	if (!isMarioOnFloor(currBoard))
 	{
-		p.draw(DELETE_CH, this->location);
+		if(Game::isInLegend(p, currBoard))
+			p.draw(currBoard.GetChar(p.x, p.y), this->location);
+		else
+			p.draw(DELETE_CH, this->location);
 		this->location.y += 1;
 		Mario::draw(this->location);
 		Sleep(80);

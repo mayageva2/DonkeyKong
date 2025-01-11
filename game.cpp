@@ -254,10 +254,25 @@ void Game::deleteArray(Barrel** barrels, int& numBarrels) //deletes barrels arra
 	numBarrels = 0;
 }
 
+bool Game::isInLegend(Point& p, GameConfig& currBoard)
+{
+	Point legend = currBoard.getLegendPos();
+	int min_x = legend.x;
+	int max_x = legend.x + 19;
+	int min_y = legend.y;
+	int max_y = legend.y + 2;
+
+	if (p.x >= min_x && p.x <= max_x && p.y >= min_y && p.y <= max_y)
+		return true;
+	else
+		return false;
+}
+
 void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin) // checks if theres a ladder or floor and then goes to set char on board
 {
 	char ch = currBoard.GetChar(p.x, p.y);
-	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '-' || ch == '|' || ch == 'Q')
+	bool returnCh = isInLegend(p, currBoard);
+	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '-' || ch == '|' || ch == 'Q' || ch == '$' || returnCh)
 	{
 		currBoard.SetChar(p.x, p.y, object);
 		if (currBoard.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)
@@ -267,3 +282,4 @@ void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mar
 	else
 		currBoard.SetChar(p.x, p.y, object);
 }
+

@@ -129,10 +129,10 @@ public:
 		  "|                                                                           |",//7
 		  "|                                                                           |",//8
 	      "|                                                                           |",//9
-		  "|           ==========          ==========          ==========              |",//10
-		  "|          | screen 1 |        | screen 2 |        | screen 3 |             |",//11
-		  "|           ==========          ==========          ==========              |",//12
-		  "|             Press 1             Press 2             Press 3               |",//13
+		  "|    ================         ================         ================     |",//10
+		  "|   | dkong_a.screen |       | dkong_b.screen |       | dkong_c.screen |    |",//11
+		  "|    ================         ================         ================     |",//12
+		  "|         Press 1                 Press 2                  Press 3          |",//13
 		  "|                                                                           |",//14
 		  "|                                                                           |",//15
 		  "|---------------------------------------------------------------------------|",//16
@@ -142,5 +142,6 @@ public:
 	void displayMenu(Mario& mario);        // displays main menu
 	void displayEnd_Game(Mario& mario);    //ends game
 	void loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario);
+	void choosescreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario);
 };
 #endif

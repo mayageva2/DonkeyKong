@@ -14,7 +14,7 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
 
     checkCollision(ghosts);
 
-    if (board.GetChar(p.x + location.diff_x, p.y + 1) == '<' || board.GetChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetChar(p.x + location.diff_x, p.y + 1) == '-')
+    if ((board.GetChar(p.x + location.diff_x, p.y + 1) == '<' || board.GetChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetChar(p.x + location.diff_x, p.y + 1) == '-') && (board.GetChar(p.x + location.diff_x, p.y) != '<') && (board.GetChar(p.x + location.diff_x, p.y) != '>'))
     {
         if (board.GetChar(this->location.x + location.diff_x, this->location.y) == GHOST_CH)
         {

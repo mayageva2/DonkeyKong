@@ -23,6 +23,7 @@ public:
 	static void pauseGame(GameConfig& board, Mario& mario); //pause the game
 	static void setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin); // checks if theres a ladder or floor and then goes to set char on board
 	void createGhosts(vector<Ghost>& ghosts, GameConfig& board);
+	static bool isInLegend(Point& p, GameConfig& currBoard);
 };
 
 #endif
