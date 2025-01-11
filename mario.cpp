@@ -18,7 +18,7 @@ void Mario::draw(const Point& pos) const  //this func draws mario in the locatio
 	cout << this->ch;
 }
 
-void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag) //this func moves mario according to user's key
+void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag,vector<Point>hammers) //this func moves mario according to user's key
 {
 	bool sideJump = false;
 	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetChar(this->location.x, this->location.y) == GHOST_CH)
@@ -55,10 +55,13 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 		break;
 	}
 	
-
+	if (currBoard.GetChar(this->location.x, this->location.y) == HAMMER)//Mario reaches to hammer
+		pickHammer(hammers);
+	
 	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetChar(this->location.x, this->location.y) == GHOST_CH)
 		collide(currBoard, flag);
 	Game::setCharCheck(location, currBoard, this->ch, *this, flag);
+
 }
 
 bool Mario::checkMove(GameConfig& currBoard, int x, int y)  //checks if mario hits a floor tile
@@ -420,10 +423,16 @@ Point Mario::findMarioLocation() //this func returns mario's location
 	return (this->location);
 }
 
-void Mario::printHearts() //this func print hearts on screen
+void Mario::printHearts() //this func print num of hearts on screen
 {
 	gotoxy(hearts.x, hearts.y);
 	cout << this->num_of_hearts;
+}
+
+void Mario::printHammers()//this func print num of hammers on screen
+{
+	gotoxy(hammers.x, hammers.y);
+	cout << this->num_of_hammers;
 }
 
 void Mario::collide(GameConfig& currBoard, bool& flag)  //this func takes care of mario's explosion
@@ -479,4 +488,13 @@ void Mario::resetMario()  //this func initiallize mario's data members
 {
 	this->num_of_hearts = FULL_LIFE;
 	this->location = start;
+}
+
+void Mario::pickHammer(vector<Point>hammers)
+{
+	num_of_hammers++;
+	printHammers();//Print new nuber of hammers
+	GameConfig::SetChar(this->location.x, this->location.y, DELETE_CH);
+	auto deleteHammer = find(hammers.begin(), hammers.end(), this->location);
+	hammers.erase(deleteHammer);//After mario picked hammer, erase from list of free hammers
 }

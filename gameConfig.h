@@ -2,9 +2,15 @@
 #define _GAMECONFIG_H
 #include <iostream>
 #include <string>
+#include <vector>
+#include "point.h"
+using namespace std;
+
 static constexpr char LADDER_CH = 'H'; //const for ladder
 static constexpr char DELETE_CH = ' ';  //const to clear pos
+static constexpr char HAMMER = 'p';
 static const std::string EXPLOSION = "BOOM"; //const for explosion print
+static const vector<Point>originalHammers = { {65,5},{7,11},{35,23} };//const for hammers placement at new game
 
 class GameConfig
 {
@@ -15,7 +21,7 @@ public:
 	const char* originalBoard[MAX_Y] = {
 	     // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
 		   "|------------------------------------------------------------------------------|", // 0
-		   "|                                  SCORE:0               HEARTS:               |", // 1
+		   "|                            SCORE:0           HAMMERS:             HEARTS:    |", // 1
 		   "|               $                                                              |", // 2
 		   "|            >>>>>>>>                                                          |", // 3
 		   "|     &      H      H                                                          |", // 4
@@ -40,7 +46,7 @@ public:
 		   "|               >>>>>>                     H           H                       |", // 23
 		   "|------------------------------------------------------------------------------|"  // 24
 	};
-	char currentBoard[MAX_Y][MAX_X]; //current board
+	static char currentBoard[MAX_Y][MAX_X]; //current board
 	static constexpr int MIN_Y = 1; 
 	static constexpr int MIN_X = 1;
 	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27 }; 
@@ -52,13 +58,15 @@ public:
 		return currentBoard[y][x];
 	}
 
-	void SetChar(int x, int y, char ch)// Prints a char that is placed on given point on board
+	static void SetChar(int x, int y, char ch)// Prints a char that is placed on given point on board
 	{
 		if (x >= 0 && x <= MAX_X && y >= 0 && y <= MAX_Y)
 		{
 			currentBoard[y][x] = ch;
 		}
 	}
+
+	const void drawHammers(vector<Point>& hammers); //draws hammers on board
 };
 
 #endif
