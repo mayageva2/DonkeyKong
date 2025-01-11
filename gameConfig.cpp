@@ -3,9 +3,12 @@
 #include "point.h"
 #include "menu.h"
 
-#include <fstream>
 #include <iostream>
-using namespace std;
+#include <vector>
+#include <string>
+#include <filesystem>
+#include <algorithm>
+#include <fstream>
 
 Point GameConfig::marioPos(0, 0);
 Point GameConfig::donkeyPos(0, 0);
@@ -14,7 +17,7 @@ Point GameConfig::legendPos(0, 0);
 
 void GameConfig::load(const std::string& filename, bool& error) 
 {
-	ifstream screen_file(filename);
+	std::ifstream screen_file(filename);
 	//cout << screen_file.is_open() << std::endl;
 	// TODO: handle errors (all sort of...) - do not submit it like that :)
 	int curr_row = 0;
@@ -43,7 +46,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 				marioCounter++;
 				if (marioCounter > 1)
 				{
-					cout << "error message : mario counter";
+					std::cout << "error message : mario counter";
 					error = true;
 					return;
 				}
@@ -54,7 +57,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 				donkeyCounter++;
 				if (donkeyCounter > 1)
 				{
-					cout << "error message: donkey counter";
+					std::cout << "error message: donkey counter";
 					error = true;
 					return;
 				}
@@ -71,7 +74,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 				hammerCounter++;
 				if (hammerCounter > 1)
 				{
-					cout << "error message = hammer counter";
+					std::cout << "error message = hammer counter";
 					error = true;
 					return;
 				}
@@ -88,7 +91,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 	int last_row = (curr_row < MAX_Y ? curr_row : MAX_Y - 1);
 	if (hammerCounter < 1 || marioCounter < 1 || legendCounter < 1 || donkeyCounter < 1)
 	{
-		cout << "error message = object missing";
+		std::cout << "error message = object missing";
 		error = true;
 		return;
 	}
@@ -113,9 +116,9 @@ void GameConfig::PrintBoard() const//prints board
 {
 	gotoxy(0, 0);
 	for (int i = 0; i < MAX_Y - 1; i++) {
-		cout << originalBoard[i] << '\n';
+		std::cout << originalBoard[i] << '\n';
 	}
-	cout << originalBoard[MAX_Y - 1];
+	std::cout << originalBoard[MAX_Y - 1];
 }
 
 void GameConfig::resetBoard() //resets to original board
@@ -136,7 +139,7 @@ Point GameConfig::getGhostPos()
 void GameConfig::printHearts(Mario& mario) //this func print hearts on screen
 {
 	gotoxy(legendPos.x + 15, legendPos.y);
-	cout << mario.getNumOfHearts();
+	std::cout << mario.getNumOfHearts();
 }
 
 void GameConfig::init()
@@ -148,5 +151,33 @@ void GameConfig::init()
 	legendCounter = 0;
 }
 
+bool GameConfig::isDkongScreenFile(const std::string& filename)
+{
+	const std::string prefix = "dkong_";
+	const std::string suffix = ".screen";
+
+	return filename.size() > prefix.size() + suffix.size() &&
+		filename.substr(0, prefix.size()) == prefix &&
+		filename.substr(filename.size() - suffix.size()) == suffix;
+}
+
+std::vector<std::string> GameConfig::getDkongScreens(const std::string& directoryPath) //chat GPT solution
+{
+	std::vector<std::string> screens;
+
+	for (const auto& entry : std::filesystem::directory_iterator(directoryPath))
+	{
+		if (entry.is_regular_file()) 
+		{
+			std::string filename = entry.path().filename().string();
+			if (isDkongScreenFile(filename)) {
+				screens.push_back(entry.path().string());
+			}
+		}
+	}
+
+	std::sort(screens.begin(), screens.end());
+	return screens;
+}
 
 

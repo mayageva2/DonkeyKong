@@ -1,12 +1,11 @@
+#include <iostream>
+#include <conio.h>
+#include <windows.h> 
+
 #include "menu.h"
 #include "point.h"
 #include "general.h"
 #include "game.h"
-
-#include <iostream>
-#include <windows.h> 
-#include <conio.h>
-using namespace std;
 
 const Point startMenu(8, 5);
 bool flag = true;
@@ -20,7 +19,7 @@ void Menu::printScreen(const char** print) //prints screen
 	for (int i = 0; i < MENU_Y; i++)
 	{
 		gotoxy(p.x, p.y);
-		cout << print[i];
+		std::cout << print[i];
 		p.y++;
 	}
 }
@@ -33,6 +32,8 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 	bool flag = true;
 	bool screenError = false;
 	char screenKey = DELETE_CH;
+	std::string path = ".";
+	std::vector<std::string> screens = board.getDkongScreens(path);
 
 	while (!exitMenu)
 	{
@@ -42,37 +43,55 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 		char key = _getch();
 		switch (key)
 		{
-		case '1':
-			printScreen(chooseScreen);
-			screenKey = _getch();
-			switch (screenKey)
-			{
-			case '1':
-				board.load("dkong_a.screen", screenError);
-				break;
-			case '2':
-				board.load("dkong_b.screen", screenError);
-				break;
-			case '3':
-				board.load("dkong_c.screen", screenError);
-				break;
-			}
-
-			if (!screenError)
-			{
-				mario.resetMario();
-				game.startGame(mario, board, flag);
-			}
+		case '1':	
+			loadScreens(0, screens, board, screenError, mario);
 			break;
 		case '8':
 			printScreen(instructions);
 			while (!_kbhit()) {}
 			break;
+
+		case '2':
+			printScreen(chooseScreen);
+			screenKey = _getch();
+			switch (screenKey)
+			{
+			case '1':
+				loadScreens(0, screens, board, screenError, mario);
+				break;
+			case '2':
+				loadScreens(1, screens, board, screenError, mario);
+				break;
+			case '3':
+				loadScreens(2, screens, board, screenError, mario);
+			}
 		case '9':
 			exitMenu = true;
 			break;
 		}
 	}
+}
+
+void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario)
+{
+	Game game;
+	bool mariowin = true;
+	for (i; i < screens.size(); i++)
+	{
+		board.init();
+		if (mariowin)
+		{
+			board.load(screens[i], screenError);
+
+			if (!screenError)
+			{
+				mariowin = false;
+				mario.resetMarioPos();
+				game.startGame(mario, board, flag, mariowin);
+			}
+		}
+	}
+	mario.resetMario();
 }
 
 void Menu::displayEnd_Game(Mario& mario)  //ends game

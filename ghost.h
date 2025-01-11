@@ -12,7 +12,7 @@ class Ghost : public movingObject
 {
 public:
 	Ghost(int x, int y, bool dir = true) : movingObject(x, y, dir) {} //Constractor
-	void checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts);
+	void checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin);
 	void checkCollision(std::vector<Ghost>& ghosts);
 	void randomDirection();
 	void moveGhosts();

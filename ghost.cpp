@@ -2,12 +2,12 @@
 #include "mario.h"
 #include "game.h"
 
-void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts)
+void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin)
 {
     Point p(location.x, location.y);
-    Game::setCharCheck(this->location, board, DELETE_CH, mario, flag);
+    Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin);
     char originalChar = board.GetChar(location.x, location.y);
-    Game::setCharCheck(location, board, originalChar, mario, flag);
+    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin);
     p.draw(originalChar, location);
 
     location.diff_x = direction ? 1 : -1;
@@ -39,7 +39,7 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
     }
 
     moveGhosts();
-    Game::setCharCheck(location, board, GHOST_CH, mario, flag);
+    Game::setCharCheck(location, board, GHOST_CH, mario, flag, mariowin);
     p.draw(GHOST_CH, location);
 }
 

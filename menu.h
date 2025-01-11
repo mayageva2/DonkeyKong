@@ -24,10 +24,10 @@ public:
 		"|                                     __/ |                   __/ |         |",//7
 		"|                                    |___/                   |___/          |",//8
 		"|                                                                           |",//9
-		"|         ============        ==============           ======               |",//10
-		"|        | Start Game |      | Instructions |         | EXIT |              |",//11
-		"|         ============        ==============           ======               |",//12
-		"|            Press 1              Press 8              Press 9              |",//13
+		"|    ============      ==============      ===============      ======      |",//10
+		"|   | Start Game |    | Instructions |    | Choose Screen |    | EXIT |     |",//11
+		"|    ============      ==============      ===============      ======      |",//12
+		"|       Press 1            Press 8             Press 2          Press 9     |",//13
 		"|                                                                           |",//14
 		"|                                                                           |",//15
 		"|---------------------------------------------------------------------------|" //16
@@ -141,5 +141,6 @@ public:
 	void printScreen(const char** print);  //prints screen
 	void displayMenu(Mario& mario);        // displays main menu
 	void displayEnd_Game(Mario& mario);    //ends game
+	void loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario);
 };
 #endif

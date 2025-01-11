@@ -22,8 +22,8 @@ public:
 	static const int maxBarrels = 100;
 	Barrel(): movingObject(GameConfig::getDonkeyKongPos().x, GameConfig::getDonkeyKongPos().y, true), fallCount(0), isActive(false), dropDirection(true) {} //Constractor
 
-	void moveBarrel(GameConfig& board, Mario& mario, bool& flag);
-	void clearFromScreen(GameConfig& board, Mario& mario, bool& flag); // Clears the barrel from the screen and updates the game board
+	void moveBarrel(GameConfig& board, Mario& mario, bool& flag, bool& mariowin);
+	void clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& mariowin); // Clears the barrel from the screen and updates the game board
 	void deactivate() { isActive = false; } //Deactivate barrel
 	void activate() { isActive = true; } //Activate Barrel
 	bool isBarrelActive() const { return isActive; }
