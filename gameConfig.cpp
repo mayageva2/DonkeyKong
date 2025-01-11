@@ -1,7 +1,7 @@
 #include "gameConfig.h"
+#include <iostream>
 #include "general.h"
-
-char GameConfig::currentBoard[MAX_Y][MAX_X] = {}; //Initialize static member 'currentBoard'
+using namespace std;
 
 void GameConfig::PrintBoard() //prints board
 {
@@ -19,17 +19,6 @@ void GameConfig::resetBoard() //resets to original board
 		memcpy(currentBoard[i], originalBoard[i], MAX_X);
 	}
 }
-
-const void GameConfig::drawHammers(vector<Point>& hammers)//draws hammers on board
-{
-	for (const auto& hammer : hammers)
-	{
-		SetChar(hammer.x, hammer.y, HAMMER);
-		Point::draw(HAMMER, hammer);
-	}
-}
-
-
 
 
 
