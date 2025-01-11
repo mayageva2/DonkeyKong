@@ -3,42 +3,50 @@
 #include "game.h"
 #include "gameConfig.h"
 
-void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag)
+void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag,bool& marioKilled)
 {
 	Game::setCharCheck(location, board, DELETE_CH, mario, flag); //resets barrel's previous location
-
 	if (mario.findMarioLocation().x == this->location.x && mario.findMarioLocation().y == this->location.y)
 		mario.collide(board, flag);
 	else
 	{
-		if (location.x == 78)
+		if (marioKilled) //don't explode on mario
 		{
-			location.x = 75;
+			if (mario.findMarioLocation().x > location.x)
+				location.x -= 2;
 		}
-		gotoxy(location.x, location.y);
-		cout << DELETE_CH;
-		gotoxy(location.x, location.y);
-		cout << EXPLOSION;
+			if (location.x == 78 && !marioKilled) //in case of explosion next to border
+			{
+				location.x = 75;
+			}
+			Point::draw(DELETE_CH, location);
+			gotoxy(location.x, location.y);
+			cout << EXPLOSION;
 		Sleep(80);
-		for (int i = 3; i >= 0; i--) // CLEANS 'BOOM' from screen
+		for (int i = 0; i <4; i++) // CLEANS 'BOOM' from screen
 		{
-			gotoxy(location.x + i, location.y);
-			cout << DELETE_CH;
+			char originalCh = board.GetCurrentChar(location.x + i, location.y);
+			Point tmp = location;
+			tmp.x += i;
+			Point::draw(originalCh,tmp);
 		}
-		if (marioCloseToExplosion(board, mario))
-			mario.collide(board, flag);
+		if (marioCloseToExplosion(board, mario) && mario.state!= MarioState::killing)
+		{
+				mario.collide(board, flag);
+		}
 	}
+	deactivate();
 }
 
 void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag)
 {
 	Point p(location.x, location.y);
 	Game::setCharCheck(this->location, board, DELETE_CH, mario, flag); //resets barrel's previous location
-	char originalChar = board.GetChar(location.x, location.y); //Restore the original character at the barrel's current location
+	char originalChar = board.GetCurrentChar(location.x, location.y); //Restore the original character at the barrel's current location
 	Game::setCharCheck(location, board, originalChar, mario, flag);
 	p.draw(originalChar, location); //print original char on board
 
-	char floor = board.GetChar(location.x, location.y + 1);//Check the char below the barrel to determine the floor type
+	char floor = board.GetCurrentChar(location.x, location.y + 1);//Check the char below the barrel to determine the floor type
 
 	if (dropDirection == false) // Drop barrel down else drop barrel forward
 	{

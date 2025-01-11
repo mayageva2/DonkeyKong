@@ -5,12 +5,12 @@
 #include <iostream>
 #include "general.h"
 #include "point.h"
-#include "mario.h"
 #include <string>
 using namespace std;
 
 const Point upstart = { 7,4 };
 static constexpr char BARREL_CH = 'O';
+class Mario;
 
 class Barrel
 {
@@ -26,7 +26,7 @@ public:
 
 	void moveBarrel(GameConfig& board, Mario& mario, bool& flag);
 	Point getLocation() const { return location; } //Get barrel location
-	void clearFromScreen(GameConfig& board, Mario& mario, bool& flag); // Clears the barrel from the screen and updates the game board
+	void clearFromScreen(GameConfig& board, Mario& mario, bool& flag,bool& marioKilled); // Clears the barrel from the screen and updates the game board
 	void deactivate() { isActive = false; } //Deactivate barrel
 	void activate() { isActive = true; } //Activate Barrel
 	bool isBarrelActive() const { return isActive; }

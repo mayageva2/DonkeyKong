@@ -1,15 +1,22 @@
 #include "gameConfig.h"
 #include "general.h"
+#include "mario.h"
 
-char GameConfig::currentBoard[MAX_Y][MAX_X] = {}; //Initialize static member 'currentBoard'
+char GameConfig::currentBoard[MAX_Y][MAX_X] = {}; //Initialize static member - chatGPT solution
 
-void GameConfig::PrintBoard() //prints board
+void GameConfig::PrintBoard(Mario& mario) //prints board
 {
 	gotoxy(0, 0);
 	for (int i = 0; i < MAX_Y - 1; i++) {
 		cout << originalBoard[i] << '\n';
 	}
 	cout << originalBoard[MAX_Y - 1];
+
+	
+	printHammer();
+	mario.printHearts();
+	mario.printHammers();
+	mario.printScore();
 }
 
 void GameConfig::resetBoard() //resets to original board
@@ -20,14 +27,6 @@ void GameConfig::resetBoard() //resets to original board
 	}
 }
 
-const void GameConfig::drawHammers(vector<Point>& hammers)//draws hammers on board
-{
-	for (const auto& hammer : hammers)
-	{
-		SetChar(hammer.x, hammer.y, HAMMER);
-		Point::draw(HAMMER, hammer);
-	}
-}
 
 
 

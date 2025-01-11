@@ -1,10 +1,2 @@
-﻿  barrel.cpp
-  game.cpp
-  ghost.cpp
-  main.cpp
-C:\Users\Victo\source\repos\cpp\main.cpp(13,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
-  mario.cpp
-  menu.cpp
-  Generating Code...
-C:\Users\Victo\source\repos\cpp\mario.cpp(419): warning C4715: 'Mario::isMarioOnFloor': not all control paths return a value
+﻿  game.cpp
   donkey_2.vcxproj -> C:\Users\Victo\source\repos\cpp\donkey_2\x64\Debug\donkey_2.exe

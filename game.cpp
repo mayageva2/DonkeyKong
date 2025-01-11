@@ -19,23 +19,17 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 	GameConfig::eKeys lastKey = GameConfig::eKeys::STAY;
 	GameConfig board;
 	board.resetBoard();
-	board.PrintBoard();
-	mario.printHearts();
-	mario.printHammers();
-	Barrel* barrels[Barrel::maxBarrels] = { nullptr };
-	int numBarrels = 0;
+	board.PrintBoard(mario);
 	int interval = 0;
 	int moveCounter = 0;
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
 	Menu menu;
 	vector<Ghost> ghosts;
+	vector<Barrel> barrels;
 	ghosts.reserve(2);
 	createGhosts(ghosts);
-	static vector<Point>currHammers;
-	if (mario.getNumOfHearts() == FULL_LIFE) { currHammers = originalHammers; }//In case of new game initialize num of hammers
-	//לנסות להעביר את ווקטור פטישים להיות חבר מחלקה כי פה הוא מתאפס כל פעם מחדש..
-	board.drawHammers(currHammers);
+
 	mario.draw(mario.findMarioLocation());
 	mario.state = MarioState::standing;
 
@@ -45,7 +39,7 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 		for (int i = 0; i < ghosts.size(); i++)
 			ghosts[i].checkMove(board, mario, flag, ghosts);
 
-		barrelsMovement(barrels, numBarrels, board, interval, mario, flag); // Move Barrels
+		barrelsMovement(barrels, board, interval, mario, flag); // Move Barrels
 
 		if (moveCounter == 0)
 		{
@@ -62,18 +56,18 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 				else
 				{
 					key = inputKey;
-					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, currHammers);
+					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, barrels, ghosts);
 				}
 			}
 			else if (mario.state != MarioState::standing)
-				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, currHammers);
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, barrels, ghosts);
 		}
 		else
-			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, currHammers);
+			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, barrels, ghosts);
 
-		if (mario.state == MarioState::standing) 
+		if (mario.state == MarioState::standing)
 		{
-			if (board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)
+			if (board.GetCurrentChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)
 				mario.collide(board, flag);
 			if (flag)
 				Sleep(100);
@@ -83,17 +77,17 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 			if (flag)
 				Sleep(50);
 		}
-
+		
 		++interval;
 	}
 	gotoxy(0, GameConfig::MAX_Y + 2);
-	deleteArray(barrels, numBarrels); //Clear barrels array
+	barrels.clear(); //Clear barrels array
 }
 
 void Game::createGhosts(vector<Ghost>& ghosts)
 {
-	Point p1(78, 10);
-	int numGhostsToAdd = 2;
+	Point p1(78,10);    
+	int numGhostsToAdd = 1; //שיניתי ל1 כדי שיהיה קל יותר להרוג, צריך לחשוב על מיקום חדש כי אי אפשר להתמודד עם שתיים במיקום הזה
 
 	for (int i = 0; i < numGhostsToAdd; i++)
 	{
@@ -103,7 +97,7 @@ void Game::createGhosts(vector<Ghost>& ghosts)
 	}
 }
 
-void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, vector<Point>hammers)   //makes sure mario goes as he should 
+void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, vector<Barrel>& barrels, vector<Ghost>&ghosts)   //makes sure mario goes as he should 
 {
 	if (sideJump == true)
 	{
@@ -114,6 +108,16 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 				pauseGame(board, mario);
 		}
 		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag);
+	}
+	else if (((GameConfig::eKeys)key == GameConfig::eKeys::KILL) || ((GameConfig::eKeys)key == GameConfig::eKeys::KILL2))//////NEED TO ADD LAST KEY TO MOVE/////////
+	{
+		MarioState prevState = mario.state;
+		mario.move(GameConfig::eKeys::KILL,board, moveCounter, flag, ghosts, barrels);
+		
+		if (prevState != MarioState::standing) // if mario was walking before kill then keep walking after
+		{
+			key = (char)lastKey;
+		}
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP) || ((GameConfig::eKeys)key == GameConfig::eKeys::UP2))
 	{
@@ -142,11 +146,11 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 		{
 			moveCounter = 0;
 			key = (char)lastKey;
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag,hammers);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag,ghosts,barrels);
 		}
 		else
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, hammers);
+			mario.move((GameConfig::eKeys)key,board, moveCounter, flag,ghosts,barrels);
 			if (mario.state == MarioState::standing)
 				lastKey = GameConfig::eKeys::STAY;
 		}
@@ -155,42 +159,41 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 	{
 		if (mario.isMarioOnFloor(board) && mario.state != MarioState::falling)
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, hammers);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, ghosts, barrels);
 			lastKey = (GameConfig::eKeys)key;
 		}
 		else
-			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, hammers);
+			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, ghosts, barrels);
 	}
 
 }
 
-void Game::barrelsMovement(Barrel** barrels, int& numBarrels, GameConfig& board, int& interval, Mario& mario, bool& flag) //moves each barrel
+void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag) //moves each barrel
 {
+	bool marioKilled = false;
 	if (!flag) { return; }
-	if (interval % 10 == 0 && numBarrels < Barrel::maxBarrels)
+	if (interval % 10 == 0)
 	{
-		barrels[numBarrels] = new Barrel();  //Add a new barrel to the array
-		barrels[numBarrels]->activate();
+		barrels.emplace_back();  // Add a new barrel to the vector
+		barrels.back().activate();
 		if (interval % 20 == 0) //Change drop direction every 40 intervals
 		{
-			barrels[numBarrels]->dropDirection = false;
+			barrels.back().dropDirection = false;
 		}
-		numBarrels++;
 	}
 
-	for (int i = 0; i < numBarrels;)
+	for (size_t i = 0; i < barrels.size();)
 	{
 		if (!flag) { break; }
-		if (barrels[i]->isBarrelActive()) //Move barrel only if active
+		if (barrels[i].isBarrelActive())
 		{
-			barrels[i]->moveBarrel(board, mario, flag);
+			barrels[i].moveBarrel(board, mario, flag);
 
 			//Remove barrel from array if reached screen boundaries or became inactive
-			if (barrels[i]->getLocation().x >= 78 || barrels[i]->getLocation().x <= 1 || !barrels[i]->isBarrelActive())
+			if (barrels[i].getLocation().x >= 78 || barrels[i].getLocation().x <= 1 || !barrels[i].isBarrelActive())
 			{
-				barrels[i]->clearFromScreen(board, mario, flag); //Print EXPLOSION
-				barrels[i]->deactivate();
-				deleteFromArray(barrels, i, numBarrels);
+				barrels[i].clearFromScreen(board, mario, flag,marioKilled); //Print EXPLOSION
+				barrels.erase(barrels.begin() + i);
 			}
 			else
 			{
@@ -199,8 +202,9 @@ void Game::barrelsMovement(Barrel** barrels, int& numBarrels, GameConfig& board,
 		}
 		else
 		{
-			deleteFromArray(barrels, i, numBarrels);
+			barrels.erase(barrels.begin() + i);
 		}
+
 	}
 }
 
@@ -223,46 +227,18 @@ void Game::pauseGame(GameConfig& board, Mario& mario)  //pause the game
 		}
 	}
 	clrscr();
-	board.PrintBoard();
+	board.PrintBoard(mario);
 	mario.printHearts();
 	mario.draw(mario.findMarioLocation());
 }
 
-void Game::deleteFromArray(Barrel** barrels, int index, int& numBarrels) //deletes barrels
-{
-	if (barrels[index] != nullptr)
-	{
-		delete barrels[index]; 
-		barrels[index] = nullptr;
-	}
-	if (index != numBarrels - 1)
-	{
-		barrels[index] = barrels[numBarrels - 1];  //Move last barrel to the deleted position- ChatGpt solution
-		barrels[numBarrels - 1] = nullptr;
-	}
-	numBarrels--;
-}
-
-void Game::deleteArray(Barrel** barrels, int& numBarrels) //deletes barrels array
-{
-	for (int i = 0; i < numBarrels; ++i)
-	{
-		if (barrels[i] != nullptr)
-		{
-			delete barrels[i];
-			barrels[i] = nullptr;
-		}
-	}
-	numBarrels = 0;
-}
-
 void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag) // checks if theres a ladder or floor and then goes to set char on board
 {
-	char ch = currBoard.GetChar(p.x, p.y);
+	char ch = currBoard.GetCurrentChar(p.x, p.y);
 	if (ch == LADDER_CH || ch == '<' || ch == '>')
 	{
 		currBoard.SetChar(p.x, p.y, object);
-		if (currBoard.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)
+		if (currBoard.GetCurrentChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)
 			mario.collide(currBoard, flag);
 		currBoard.SetChar(p.x, p.y, ch);
 	}

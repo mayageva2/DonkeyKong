@@ -28,6 +28,7 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 	Game game;  /************************ !!!need to change to Game:: but startgame cant be static!!! ****************************/
 	bool flag = true;
 
+
 	while (!exitMenu)
 	{
 		clrscr();
