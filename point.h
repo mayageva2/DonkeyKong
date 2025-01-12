@@ -11,7 +11,7 @@ public:
 	bool operator==(const Point& other) const {
 		return (x == other.x && y == other.y);
 	}
-	void draw(char ch, Point pos); //draws point on screen
+	static void draw(char ch, Point pos); //draws point on screen
 };
 #endif
 

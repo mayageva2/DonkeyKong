@@ -55,14 +55,14 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 	case GameConfig::eKeys::KILL:
 	case GameConfig::eKeys::KILL2:
 		state = MarioState::killing;
-		killEnemy(currBoard, ghosts, barrels, flag);
+		killEnemy(currBoard, *this, ghosts, barrels, flag, mariowin);
 		break;
 	}
 	
   	if (flag)
    {
 	    if (currBoard.GetCurrentChar(this->location.x, this->location.y) == HAMMER)//Mario reaches to hammer
-	    	pickHammer();
+	    	pickHammer(currBoard);
 	    if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == GHOST_CH)
 	    	collide(currBoard, flag, mariowin);
 	    if (flag)
@@ -99,7 +99,7 @@ void Mario::left(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mari
 		isH = true;
 	}
 	else if (Game::isInLegend(p, currBoard))
-		p.draw(currBoard.GetChar(p.x, p.y), this->location);
+		p.draw(currBoard.GetCurrentChar(p.x, p.y), this->location);
 	else
 		p.draw(DELETE_CH, this->location);
 
@@ -138,7 +138,7 @@ void Mario::right(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mar
 		isH = true;
 	}
 	else if (Game::isInLegend(p, currBoard))
-		p.draw(currBoard.GetChar(p.x, p.y), this->location);
+		p.draw(currBoard.GetCurrentChar(p.x, p.y), this->location);
 	else
 		p.draw(DELETE_CH, this->location);
 
@@ -201,7 +201,7 @@ void Mario::jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump, bool
 	if (isInBoard(currBoard, p.y - 1) && checkMove(currBoard, this->location.x, p.y - 1)) //checks if the desination is outside boundries and checks for ceiling
 	{
 		if (Game::isInLegend(p, currBoard))
-			p.draw(currBoard.GetChar(p.x, p.y), this->location);
+			p.draw(currBoard.GetCurrentChar(p.x, p.y), this->location);
 		else
 			p.draw(DELETE_CH, this->location);
 		this->location.y -= 1;
@@ -231,7 +231,7 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump, boo
 	if (!isMarioOnFloor(currBoard))
 	{
 		if(Game::isInLegend(p, currBoard))
-			p.draw(currBoard.GetChar(p.x, p.y), this->location);
+			p.draw(currBoard.GetCurrentChar(p.x, p.y), this->location);
 		else
 			p.draw(DELETE_CH, this->location);
 		this->location.y += 1;
@@ -338,7 +338,7 @@ void Mario::stay(GameConfig& currBoard) //stops mario's movement
 	this->state = MarioState::standing;
 }
 
-void Mario::killEnemy(GameConfig& currBoard, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag)
+void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin)
 {
 	if (num_of_hammers > 0)
 	{
@@ -353,7 +353,7 @@ void Mario::killEnemy(GameConfig& currBoard, vector<Ghost>& ghosts, vector<Barre
 				hammerUsePos.x += i;
 				enemyKilled = true;
 				num_of_hammers--;
-				printHammers();
+				currBoard.printHammer();
 				break;
 			}
 		}
@@ -361,21 +361,21 @@ void Mario::killEnemy(GameConfig& currBoard, vector<Ghost>& ghosts, vector<Barre
 		if (enemyKilled)
 		{
 			num_of_points += 1000;
-			printScore();
-			deleteKilledEnemy(currBoard, hammerUsePos, ghosts, barrels, flag); // Delete killed enemy
+			currBoard.printScore(mario);
+			deleteKilledEnemy(currBoard, hammerUsePos, ghosts, barrels, flag, mariowin); // Delete killed enemy
 		}
 
 	}
 }
 
-void Mario::deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag)
+void Mario::deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin)
 {
 	bool marioKilled = true;
 	for (size_t i = 0; i < barrels.size();)
 	{
 		if (barrels[i].getLocation() == killPos)
 		{
-			barrels[i].clearFromScreen(currBoard, *this, flag, marioKilled);
+			barrels[i].clearFromScreen(currBoard, *this, flag, mariowin, marioKilled);
 			break;
 		}
 		else
@@ -390,7 +390,7 @@ void Mario::deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost
 		{
 			if (ghosts[i].getLocation() == killPos)
 			{
-				ghosts[i].clearGhostFromScreen(currBoard, *this, flag); // Delete ghost from screen
+				ghosts[i].clearGhostFromScreen(currBoard, *this, flag, marioKilled, mariowin); // Delete ghost from screen
 				ghosts.erase(ghosts.begin() + i);
 				break;
 			}
@@ -557,11 +557,11 @@ void Mario::resetMario()  //this func initiallize mario's data members
 	this->location = start;
 }
 
-void Mario::pickHammer()
+void Mario::pickHammer(GameConfig& board)
 {
-	num_of_hammers++;
-	printHammers();//Print new nuber of hammers
-	GameConfig::SetChar(this->location.x, this->location.y, DELETE_CH);
+	Point p(board.getLegendPos());
+	board.printHammer();
+	board.SetChar(this->location.x, this->location.y, DELETE_CH);
 }
 
 void Mario::resetMarioPos()  //this func initiallize mario's position

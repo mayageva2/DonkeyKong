@@ -163,6 +163,19 @@ void GameConfig::printHearts(Mario& mario) //this func print hearts on screen
 	std::cout << mario.getNumOfHearts();
 }
 
+void GameConfig::printHammer()
+{
+	gotoxy(legendPos.x + 15, legendPos.y + 2);
+	std::cout << "V";
+}
+
+void GameConfig::printScore(Mario& mario)
+{
+	gotoxy(legendPos.x + 11, legendPos.y + 1);
+	std::cout << mario.getScore();
+}
+
+
 void GameConfig::init()
 {
 	ghostCounter = 0;

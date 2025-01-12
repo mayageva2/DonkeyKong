@@ -19,7 +19,7 @@ public:
 	void randomDirection();
 	void moveGhosts();
 	Point getLocation() const { return location; } //Get ghost location
-	void clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag);
+	void clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin);
 };
 
 #endif

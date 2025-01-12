@@ -14,7 +14,7 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
 
     checkCollision(ghosts);
 
-    if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '-'&& (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>')))
+    if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '-'&& (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
     {
         if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == GHOST_CH)
         {
@@ -71,9 +71,9 @@ void Ghost::randomDirection()
         direction = !direction;
 }
 
-void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag)
+void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin)
 {
     char originalChar = board.GetOriginalChar(location.x, location.y);
     Point::draw(originalChar, location);
-    Game::setCharCheck(location, board, originalChar, mario, flag);
+    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin);
 }

@@ -45,6 +45,7 @@ public:
 	static Point getMarioPos() { return marioPos; }
 	static Point getDonkeyKongPos() { return donkeyPos; }
 	static Point getLegendPos() { return legendPos; }
+	static Point getHammerPos() { return hammerPos; }
 	Point getGhostPos();
 	int getGhostsAmount() { return ghostCounter; }
 	void insertLegend();
@@ -53,13 +54,9 @@ public:
 	bool isDkongScreenFile(const std::string& filename);
 	std::vector<std::string> getDkongScreens(const std::string& directoryPath);
 	void printErrors();
-
-	void printHammer()
-	{
-		SetChar(hammer.x, hammer.y, HAMMER);
-		Point::draw(HAMMER, hammer);
-	}
-
+	void printHammer();
+	void printScore(Mario& mario);
+	
 	char GetCurrentChar(int x, int y) const// returns a char that is placed on given point on board
 	{
 		return currentBoard[y][x];

@@ -42,18 +42,19 @@ public:
 	void climbUpAladder(int& moveCounter, GameConfig& currBoard);           //moves mario up a ladder
 	void down(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin);     //moves mario down
 	void stay(GameConfig& currBoard);  //stops mario's movement
-	void killEnemy(GameConfig& currBoard, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag); //kill barrel or ghost with hammer
+	void killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin); //kill barrel or ghost with hammer
 	void jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin); //makes mario jump and then move to side according to key
 	bool isMarioOnFloor(GameConfig& currBoard);   //checks if mario stands on a floor
 	Point findMarioLocation();   //return mario's position
 	int getNumOfHearts() { return num_of_hearts; }  //returns amount of lives left
+	int getScore() { return num_of_points; }  //returns amount of lives left
 	void collide(GameConfig& currBoard, bool& flag, bool& mariowin); //makes mario explode and restarts game
 	void didMarioLose(GameConfig& currBoard, bool& flag); //checks if mario lost all hearts
 	void didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin);  //checks if mario reached pauline
 	void resetMario();   //resets mario
-	void pickHammer();
+	void pickHammer(GameConfig& board);
 	int getNumOfHammers() { return num_of_hammers; }  //returns amount of hammers mario picked
-	void deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag);
+	void deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin);
 	void setScore(int points) { num_of_points += points; }
 	void resetMarioPos();
 };

@@ -114,7 +114,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::KILL) || ((GameConfig::eKeys)key == GameConfig::eKeys::KILL2))//////NEED TO ADD LAST KEY TO MOVE/////////
 	{
 		MarioState prevState = mario.state;
-		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, ghosts, barrels);
+		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels);
 
 		if (prevState != MarioState::standing) // if mario was walking before kill then keep walking after
 		{
@@ -189,12 +189,12 @@ void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& inte
 		if (!flag) { break; }
 		if (barrels[i].isBarrelActive()) //Move barrel only if active
 		{
-			barrels[i].moveBarrel(board, mario, flag);
+			barrels[i].moveBarrel(board, mario, flag, mariowin);
 
 			//Remove barrel from array if reached screen boundaries or became inactive
 			if (barrels[i].getLocation().x >= 78 || barrels[i].getLocation().x <= 1 || !barrels[i].isBarrelActive())
 			{
-				barrels[i].clearFromScreen(board, mario, flag, marioKilled); //Print EXPLOSION
+				barrels[i].clearFromScreen(board, mario, flag,mariowin, marioKilled); //Print EXPLOSION
 				barrels.erase(barrels.begin() + i);
 			}
 			else
