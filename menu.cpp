@@ -165,6 +165,11 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 				mario.resetMarioPos();
 				game.startGame(mario, board, flag, mariowin);
 			}
+			else 
+			{
+				board.printErrors();
+				screenError = false;
+			}
 		}
 	}
 	mario.resetMario();
