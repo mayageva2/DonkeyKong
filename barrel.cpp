@@ -3,12 +3,12 @@
 #include "game.h"
 #include "gameConfig.h"
 
-void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled)
+void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& mariowin, bool& marioKilled)
 {
-	Game::setCharCheck(location, board, DELETE_CH, mario, flag); //resets barrel's previous location
+	Game::setCharCheck(location, board, DELETE_CH, mario, flag, mariowin); //resets barrel's previous location
 
 	if (mario.findMarioLocation().x == this->location.x && mario.findMarioLocation().y == this->location.y)
-		mario.collide(board, flag);
+		mario.collide(board, flag, mariowin);
 	else
 	{
 		if (marioKilled) //don't explode on mario
@@ -33,17 +33,17 @@ void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& 
 			Point::draw(originalCh, tmp);
 		}
 		if (marioCloseToExplosion(board, mario) && mario.state != MarioState::killing)
-			mario.collide(board, flag);
+			mario.collide(board, flag, mariowin);
 	}
 	deactivate();
 }
 
-void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag)
+void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariowin)
 {
 	Point p(location.x, location.y);
-	Game::setCharCheck(this->location, board, DELETE_CH, mario, flag); //resets barrel's previous location
-	char originalChar = board.GetCurrentChar(location.x, location.y); //Restore the original character at the barrel's current location
-	Game::setCharCheck(location, board, originalChar, mario, flag);
+	Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin); //resets barrel's previous location
+		char originalChar = board.GetCurrentChar(location.x, location.y); //Restore the original character at the barrel's current location
+	Game::setCharCheck(location, board, originalChar, mario, flag, mariowin);
 	p.draw(originalChar, location); //print original char on board
 
 	char floor = board.GetCurrentChar(location.x, location.y + 1);//Check the char below the barrel to determine the floor type
@@ -102,7 +102,7 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag)
 		++fallCount;
 		break;
 	}
-	Game::setCharCheck(location,board, BARREL_CH, mario, flag); //Update barrel's new position on the game board.
+	Game::setCharCheck(location,board, BARREL_CH, mario, flag, mariowin); //Update barrel's new position on the game board.
 	p.draw(BARREL_CH, location);//Draw the barrel at its new position on screen
 }
 

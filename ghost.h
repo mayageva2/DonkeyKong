@@ -2,20 +2,19 @@
 #define _GHOST_H
 #include "point.h"
 #include "gameConfig.h"
+#include "movingobject.h"
+
 #include <vector>
 #include <iostream>
 
 class Mario;
 static constexpr char GHOST_CH = 'x';
 
-class Ghost
+class Ghost : public movingObject 
 {
-	Point location;
-	bool direction; //true = right, false = left
-
 public:
-	Ghost(int x, int y, bool dir = true) : location(x, y), direction(dir) {} //Constractor
-	void checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts);
+	Ghost(int x, int y, bool dir = true) : movingObject(x, y, dir) {} //Constractor
+	void checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin);
 	void checkCollision(std::vector<Ghost>& ghosts);
 	void randomDirection();
 	void moveGhosts();

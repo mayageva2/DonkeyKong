@@ -13,13 +13,13 @@
 using namespace std;
 
 
-void Game::startGame(Mario& mario, bool& flag)  //starts game
+void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)  //starts game
 {
 	clrscr();
 	GameConfig::eKeys lastKey = GameConfig::eKeys::STAY;
-	GameConfig board;
 	board.resetBoard();
-	board.PrintBoard(mario);
+	board.PrintBoard();
+	board.printHearts(mario);
 	int interval = 0;
 	int moveCounter = 0;
 	char key = (char)GameConfig::eKeys::STAY;
@@ -27,9 +27,8 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 	Menu menu;
 	vector<Ghost> ghosts;
 	vector<Barrel> barrels;
-	ghosts.reserve(2);
-	createGhosts(ghosts);
-
+	ghosts.reserve(board.getGhostsAmount());
+	createGhosts(ghosts, board);
 	mario.draw(mario.findMarioLocation());
 	mario.state = MarioState::standing;
 
@@ -37,9 +36,9 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 	while (flag)
 	{
 		for (int i = 0; i < ghosts.size(); i++)
-			ghosts[i].checkMove(board, mario, flag, ghosts);
+			ghosts[i].checkMove(board, mario, flag, ghosts, mariowin);
 
-		barrelsMovement(barrels, board, interval, mario, flag); // Move Barrels
+		barrelsMovement(barrels, board, interval, mario, flag, mariowin); // Move Barrels
 
 		if (moveCounter == 0)
 		{
@@ -56,21 +55,24 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 				else
 				{
 					key = inputKey;
-					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, barrels, ghosts);
+					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts);
 				}
 			}
 			else if (mario.state != MarioState::standing)
-				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, barrels, ghosts);
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts);
 		}
 		else
-			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, barrels, ghosts);
+			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts);
 
 		if (mario.state == MarioState::standing) 
 		{
-			if (board.GetCurrentChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)
-				mario.collide(board, flag);
 			if (flag)
+			{
+        Point p1 = mario.findMarioLocation();
+				if (board.GetCurrentChar(p1.x, p1.y) == BARREL_CH || board.GetCurrentChar(p1.x, p1.y) == GHOST_CH)
+					mario.collide(board, flag, mariowin);
 				Sleep(100);
+			}
 		}
 		if (mario.state == MarioState::falling)
 		{
@@ -80,25 +82,24 @@ void Game::startGame(Mario& mario, bool& flag)  //starts game
 
 		++interval;
 	}
-	gotoxy(0, GameConfig::MAX_Y + 2);
+	gotoxy(0, MAX_Y + 2);
+	ghosts.clear();
+	ghosts.shrink_to_fit();
 	barrels.clear(); //Clear barrels array
 }
 
-void Game::createGhosts(vector<Ghost>& ghosts)
+void Game::createGhosts(vector<Ghost>& ghosts, GameConfig& board)
 {
-	Point p1(78, 10);
-	int numGhostsToAdd = 1;
-
-	for (int i = 0; i < numGhostsToAdd; i++)
+	int amountOfGhosts = board.getGhostsAmount();
+	for (int i = 0; i < amountOfGhosts; i++)
 	{
+		Point p1 = board.getGhostPos();
 		Ghost ghost(p1.x, p1.y);
 		ghosts.push_back(ghost);
-		p1.x -= 3;
 	}
 }
 
-
-void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, vector<Barrel>& barrels, vector<Ghost>& ghosts)   //makes sure mario goes as he should 
+void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost>& ghosts)   //makes sure mario goes as he should 
 {
 	if (sideJump == true)
 	{
@@ -108,7 +109,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 			if ((GameConfig::eKeys)tmp == GameConfig::eKeys::ESC)
 				pauseGame(board, mario);
 		}
-		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag);
+		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin);
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::KILL) || ((GameConfig::eKeys)key == GameConfig::eKeys::KILL2))//////NEED TO ADD LAST KEY TO MOVE/////////
 	{
@@ -131,7 +132,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 				sideJump = true;
 				lastKey = (GameConfig::eKeys)key;
 				key = tmp;
-				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag);
+				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin);
 				if ((GameConfig::eKeys)key == GameConfig::eKeys::ESC)
 				{
 					key = (char)GameConfig::eKeys::UP;
@@ -147,11 +148,11 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 		{
 			moveCounter = 0;
 			key = (char)lastKey;
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, ghosts, barrels);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels);
 		}
 		else
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, ghosts, barrels);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels);
 			if (mario.state == MarioState::standing)
 				lastKey = GameConfig::eKeys::STAY;
 		}
@@ -160,16 +161,16 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 	{
 		if (mario.isMarioOnFloor(board) && mario.state != MarioState::falling)
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, ghosts, barrels);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels);
 			lastKey = (GameConfig::eKeys)key;
 		}
 		else
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, ghosts, barrels);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels);
 	}
 
 }
 
-void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag) //moves each barrel
+void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin) //moves each barrel
 {
 	bool marioKilled = false;
 	if (!flag) { return; }
@@ -229,21 +230,38 @@ void Game::pauseGame(GameConfig& board, Mario& mario)  //pause the game
 		}
 	}
 	clrscr();
-	board.PrintBoard(mario);
-	mario.printHearts();
+	board.PrintBoard();
+	board.printHearts(mario);
 	mario.draw(mario.findMarioLocation());
 }
 
-void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag) // checks if theres a ladder or floor and then goes to set char on board
+bool Game::isInLegend(Point& p, GameConfig& currBoard)
+{
+	Point legend = currBoard.getLegendPos();
+	int min_x = legend.x;
+	int max_x = legend.x + 19;
+	int min_y = legend.y;
+	int max_y = legend.y + 2;
+
+	if (p.x >= min_x && p.x <= max_x && p.y >= min_y && p.y <= max_y)
+		return true;
+	else
+		return false;
+}
+
+void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin) // checks if theres a ladder or floor and then goes to set char on board
 {
 	char ch = currBoard.GetCurrentChar(p.x, p.y);
-	if (ch == LADDER_CH || ch == '<' || ch == '>')
+	bool returnCh = isInLegend(p, currBoard);
+	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '-' || ch == '|' || ch == 'Q' || ch == '$' || returnCh)
 	{
 		currBoard.SetChar(p.x, p.y, object);
-		if (currBoard.GetCurrentChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)
-			mario.collide(currBoard, flag);
+		Point p1 = mario.findMarioLocation();
+		if (currBoard.GetCurrentChar(p1.x, p1.y) == BARREL_CH || currBoard.GetCurrentChar(p1.x, p1.y) == GHOST_CH)
+			mario.collide(currBoard, flag, mariowin);
 		currBoard.SetChar(p.x, p.y, ch);
 	}
 	else
 		currBoard.SetChar(p.x, p.y, object);
 }
+
