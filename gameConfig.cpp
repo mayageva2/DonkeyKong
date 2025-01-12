@@ -1,5 +1,6 @@
 #include "gameConfig.h"
 #include "general.h"
+#include "mario.h"
 #include "point.h"
 #include "menu.h"
 
@@ -9,6 +10,8 @@
 #include <filesystem>
 #include <algorithm>
 #include <fstream>
+
+//char GameConfig::currentBoard[MAX_Y][MAX_X] = {}; //Initialize static member - chatGPT solution
 
 Point GameConfig::marioPos(0, 0);
 Point GameConfig::donkeyPos(0, 0);

@@ -4,8 +4,6 @@
 #include "gameConfig.h"
 #include "menu.h"
 #include "game.h"
-#include "barrel.h"
-#include "ghost.h"
 
 #include <iostream>
 #include <Windows.h>
@@ -18,10 +16,10 @@ void Mario::draw(const Point& pos) const  //this func draws mario in the locatio
 	cout << this->ch;
 }
 
-void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin) //this func moves mario according to user's key
+void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin, vector<Ghost>& ghosts, vector<Barrel>& barrels) //this func moves mario according to user's key
 {
 	bool sideJump = false;
-	if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetChar(this->location.x, this->location.y) == GHOST_CH)
+	if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == GHOST_CH)
 		collide(currBoard, flag, mariowin);
 	if(flag)
 		Game::setCharCheck(this->location, currBoard, DELETE_CH, *this, flag, mariowin); //resets mario's previous location
@@ -54,20 +52,27 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 		state = MarioState::standing;
 		stay(currBoard);
 		break;
+	case GameConfig::eKeys::KILL:
+	case GameConfig::eKeys::KILL2:
+		state = MarioState::killing;
+		killEnemy(currBoard, ghosts, barrels, flag);
+		break;
 	}
 	
-	if (flag)
-	{
-		if (currBoard.GetChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetChar(this->location.x, this->location.y) == GHOST_CH)
-			collide(currBoard, flag, mariowin);
-		if (flag)
-			Game::setCharCheck(location, currBoard, this->ch, *this, flag, mariowin);
-	}
+  	if (flag)
+   {
+	    if (currBoard.GetCurrentChar(this->location.x, this->location.y) == HAMMER)//Mario reaches to hammer
+	    	pickHammer();
+	    if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == GHOST_CH)
+	    	collide(currBoard, flag, mariowin);
+	    if (flag)
+		  	Game::setCharCheck(location, currBoard, this->ch, *this, flag, mariowin);
+    }
 }
 
 bool Mario::checkMove(GameConfig& currBoard, int x, int y)  //checks if mario hits a floor tile
 {
-	return currBoard.GetChar(x, y) != '<' && currBoard.GetChar(x, y) != '>';
+	return currBoard.GetCurrentChar(x, y) != '<' && currBoard.GetCurrentChar(x, y) != '>';
 }
 
 bool Mario::isInBoard(GameConfig& currBoard, int x)  //checks if a point is on board
@@ -77,7 +82,7 @@ bool Mario::isInBoard(GameConfig& currBoard, int x)  //checks if a point is on b
 
 bool Mario::isMarioOnLadder(GameConfig& currBoard)
 {
-	return currBoard.GetChar(this->location.x, this->location.y) == LADDER_CH;
+	return currBoard.GetCurrentChar(this->location.x, this->location.y) == LADDER_CH;
 }
 
 void Mario::left(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin)  //moves mario to the left
@@ -88,7 +93,7 @@ void Mario::left(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mari
 	this->location.diff_x = -1;
 	this->location.diff_y = 0;
 
-	if (currBoard.GetChar(p.x, p.y) == LADDER_CH)
+	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)  //checks if there's a ladder
 	{
 		p.draw(LADDER_CH, this->location);
 		isH = true;
@@ -127,7 +132,7 @@ void Mario::right(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mar
 	this->location.diff_x = 1;
 	this->location.diff_y = 0;
 
-	if (currBoard.GetChar(p.x, p.y) == LADDER_CH)
+	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)
 	{
 		p.draw(LADDER_CH, this->location);
 		isH = true;
@@ -166,7 +171,7 @@ void Mario::up(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& fl
 	Point p(this->location);
 	bool isH = false;
 
-	if ((currBoard.GetChar(p.x, p.y) == LADDER_CH) || (!checkMove(currBoard, p.x, p.y) && currBoard.GetChar(p.x, p.y + 1) == LADDER_CH))  //going up a ladder 
+	if ((currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH) || (!checkMove(currBoard, p.x, p.y) && currBoard.GetCurrentChar(p.x, p.y + 1) == LADDER_CH))  //going up a ladder 
 		isH = true;
 	else    //jump
 		isH = false;
@@ -251,13 +256,13 @@ void Mario::climbUpAladder(int& moveCounter, GameConfig& currBoard) //this func 
 {
 	Point p(this->location);
 
-	if (currBoard.GetChar(p.x, p.y) == LADDER_CH)
+	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)
 	{
 		p.draw(LADDER_CH, this->location);
 	}
 	else
 	{
-		char way = currBoard.GetChar(this->location.x, this->location.y);
+		char way = currBoard.GetCurrentChar(this->location.x, this->location.y);
 		p.draw(way, this->location);
 		moveCounter = ENDJUMP;
 	}
@@ -276,7 +281,7 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& 
 {
 	Point p(this->location);
 
-	if (currBoard.GetChar(p.x, p.y) == LADDER_CH)
+	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)
 	{
 		if (!isMarioOnFloor(currBoard))
 		{
@@ -289,9 +294,9 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& 
 			moveCounter = ENDJUMP;
 		}
 	}
-	else if ((currBoard.GetChar(p.x, p.y + 1) == LADDER_CH || currBoard.GetChar(p.x, p.y + 2) == LADDER_CH) && sideJump == false)
+	else if ((currBoard.GetCurrentChar(p.x, p.y + 1) == LADDER_CH || currBoard.GetCurrentChar(p.x, p.y + 2) == LADDER_CH) && sideJump == false)
 	{
-		char way = currBoard.GetChar(this->location.x, this->location.y);
+		char way = currBoard.GetCurrentChar(this->location.x, this->location.y);
 		p.draw(way, this->location);
 		this->location.y += 1;
 	}
@@ -333,6 +338,71 @@ void Mario::stay(GameConfig& currBoard) //stops mario's movement
 	this->state = MarioState::standing;
 }
 
+void Mario::killEnemy(GameConfig& currBoard, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag)
+{
+	if (num_of_hammers > 0)
+	{
+		Point hammerUsePos = this->location;
+		bool enemyKilled = false;
+
+		for (int i = -2; i < 3; i++)
+		{
+			if (currBoard.GetCurrentChar(hammerUsePos.x + i, hammerUsePos.y) == GHOST_CH ||
+				currBoard.GetCurrentChar(hammerUsePos.x + i, hammerUsePos.y) == BARREL_CH)
+			{
+				hammerUsePos.x += i;
+				enemyKilled = true;
+				num_of_hammers--;
+				printHammers();
+				break;
+			}
+		}
+
+		if (enemyKilled)
+		{
+			num_of_points += 1000;
+			printScore();
+			deleteKilledEnemy(currBoard, hammerUsePos, ghosts, barrels, flag); // Delete killed enemy
+		}
+
+	}
+}
+
+void Mario::deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag)
+{
+	bool marioKilled = true;
+	for (size_t i = 0; i < barrels.size();)
+	{
+		if (barrels[i].getLocation() == killPos)
+		{
+			barrels[i].clearFromScreen(currBoard, *this, flag, marioKilled);
+			break;
+		}
+		else
+		{
+			++i;
+		}
+	}
+
+	if (currBoard.GetCurrentChar(killPos.x, killPos.y) == GHOST_CH) //Delete ghost
+	{
+		for (size_t i = 0; i < ghosts.size();)
+		{
+			if (ghosts[i].getLocation() == killPos)
+			{
+				ghosts[i].clearGhostFromScreen(currBoard, *this, flag); // Delete ghost from screen
+				ghosts.erase(ghosts.begin() + i);
+				break;
+			}
+			else
+			{
+				++i;
+			}
+		}
+	}
+
+}
+
 void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin)   //this func allows mario to jump and move simultaneously
 {
 	Point p(this->location);
@@ -343,7 +413,7 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 		this->location.diff_x = -2;
 		this->location.diff_y = -2;
 
-		if (currBoard.GetChar(p.x, p.y) == LADDER_CH)
+		if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)
 		{
 			moveCounter = 3;
 		}
@@ -352,7 +422,7 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 	{
 		this->location.diff_x = 2;
 		this->location.diff_y = -2;
-		if (currBoard.GetChar(p.x, p.y) == LADDER_CH)
+		if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)
 		{
 			moveCounter = 3;
 		}
@@ -419,7 +489,7 @@ bool Mario::isMarioOnFloor(GameConfig& currBoard) //checks if mario stands on a 
 {
 	Point p(this->location);
 
-	if (currBoard.GetChar(p.x, p.y + 1) != '<' && currBoard.GetChar(p.x, p.y + 1) != '>' && currBoard.GetChar(p.x, p.y + 1) != '-')
+	if (currBoard.GetCurrentChar(p.x, p.y + 1) != '<' && currBoard.GetCurrentChar(p.x, p.y + 1) != '>' && currBoard.GetCurrentChar(p.x, p.y + 1) != '-')
 		return false;
 }
 
@@ -443,6 +513,7 @@ void Mario::collide(GameConfig& currBoard, bool& flag, bool& mariowin)  //this f
 	didMarioLose(currBoard, flag);
 	if (flag)
 	{
+		num_of_hammers = ZERO;
 		this->location = GameConfig::getMarioPos();
 		Game game;
 		game.startGame(*this, currBoard, flag, mariowin);  /************************ !!!need to change to Game:: but startgame cant be static!!! ****************************/
@@ -453,6 +524,7 @@ void Mario::didMarioLose(GameConfig& currBoard, bool& flag)  //checks if mario l
 {
 	if (num_of_hearts == 0)
 	{
+		num_of_points = ZERO;
 		stay(currBoard);
 		clrscr();
 		Menu menu;
@@ -465,7 +537,7 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin) //che
 {
 	Point p(this->location);
 
-	if (currBoard.GetChar(p.x, p.y) == '$')   //checks if you reached pauline
+	if (currBoard.GetCurrentChar(p.x, p.y) == '$')   //checks if you reached pauline
 	{
 		stay(currBoard);
 		clrscr();
@@ -481,7 +553,15 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin) //che
 void Mario::resetMario()  //this func initiallize mario's data members
 {
 	this->num_of_hearts = FULL_LIFE;
-	this->location = GameConfig::getMarioPos();
+	this->num_of_hammers = ZERO;
+	this->location = start;
+}
+
+void Mario::pickHammer()
+{
+	num_of_hammers++;
+	printHammers();//Print new nuber of hammers
+	GameConfig::SetChar(this->location.x, this->location.y, DELETE_CH);
 }
 
 void Mario::resetMarioPos()  //this func initiallize mario's position

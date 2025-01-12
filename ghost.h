@@ -1,11 +1,13 @@
 #ifndef _GHOST_H
 #define _GHOST_H
 #include "point.h"
-#include "mario.h"
+#include "gameConfig.h"
 #include "movingobject.h"
+
 #include <vector>
 #include <iostream>
 
+class Mario;
 static constexpr char GHOST_CH = 'x';
 
 class Ghost : public movingObject 
@@ -16,6 +18,8 @@ public:
 	void checkCollision(std::vector<Ghost>& ghosts);
 	void randomDirection();
 	void moveGhosts();
+	Point getLocation() const { return location; } //Get ghost location
+	void clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag);
 };
 
 #endif
