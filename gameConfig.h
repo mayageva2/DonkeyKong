@@ -2,9 +2,16 @@
 #define _GAMECONFIG_H
 #include <iostream>
 #include <string>
+#include "point.h"
+using namespace std;
+
+class Mario; //Declaration
+
 static constexpr char LADDER_CH = 'H'; //const for ladder
 static constexpr char DELETE_CH = ' ';  //const to clear pos
+static constexpr char HAMMER = 'p';//const for hammer 
 static const std::string EXPLOSION = "BOOM"; //const for explosion print
+const Point hammer = { 70,23 };//hammer point on board
 
 class GameConfig
 {
@@ -15,7 +22,7 @@ public:
 	const char* originalBoard[MAX_Y] = {
 	     // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
 		   "|------------------------------------------------------------------------------|", // 0
-		   "|                                  SCORE:0               HEARTS:               |", // 1
+		   "|                                  SCORE:                HEARTS:               |", // 1
 		   "|               $                                                              |", // 2
 		   "|            >>>>>>>>                                                          |", // 3
 		   "|     &      H      H                                                          |", // 4
@@ -43,13 +50,24 @@ public:
 	char currentBoard[MAX_Y][MAX_X]; //current board
 	static constexpr int MIN_Y = 1; 
 	static constexpr int MIN_X = 1;
-	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27 }; 
-	void PrintBoard();
+	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27, KILL = 'p', KILL2 = 'P' };
+	void PrintBoard(Mario& mario);
 	void resetBoard();
 
-	char GetChar(int x, int y)// returns a char that is placed on given point on board
+	void printHammer()
+	{
+		SetChar(hammer.x, hammer.y, HAMMER);
+		Point::draw(HAMMER, hammer);
+	}
+
+	char GetCurrentChar(int x, int y)// returns a char that is placed on given point on board
 	{
 		return currentBoard[y][x];
+	}
+
+	char GetOriginalChar(int x, int y)// returns a char that is placed on given point on board
+	{
+		return originalBoard[y][x];
 	}
 
 	void SetChar(int x, int y, char ch)// Prints a char that is placed on given point on board
