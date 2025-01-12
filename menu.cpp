@@ -43,8 +43,15 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 		char key = _getch();
 		switch (key)
 		{
-		case '1':	
-			loadScreens(0, screens, board, screenError, mario);
+		case '1':
+			if (screens.size() == 0)
+			{
+				clrscr();
+				std::cout << "Error Message: no screen files found";
+				Sleep(2000);
+			}
+			else
+				loadScreens(0, screens, board, screenError, mario);
 			break;
 		case '8':
 			printScreen(instructions);
@@ -64,6 +71,13 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 char Menu::printChooseScreen(std::vector<std::string> screens)
 {
 	size_t size = screens.size();
+	if (size == 0)
+	{
+		clrscr();
+		std::cout << "Error Message: no screen files found";
+		Sleep(2000);
+		return DELETE_CH;
+	}
 	int i = 0, j = 0;
 	char counter = '1';
 	while (size != 0)

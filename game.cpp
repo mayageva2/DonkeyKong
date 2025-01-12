@@ -68,10 +68,12 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)
 
 		if (mario.state == MarioState::standing) 
 		{
-			if (board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH || board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == GHOST_CH)
-				mario.collide(board, flag, mariowin);
 			if (flag)
+			{
+				if (board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH || board.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == GHOST_CH)
+					mario.collide(board, flag, mariowin);
 				Sleep(100);
+			}
 		}
 		if (mario.state == MarioState::falling)
 		{
@@ -275,7 +277,8 @@ void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mar
 	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '-' || ch == '|' || ch == 'Q' || ch == '$' || returnCh)
 	{
 		currBoard.SetChar(p.x, p.y, object);
-		if (currBoard.GetChar(mario.findMarioLocation().x, mario.findMarioLocation().y) == BARREL_CH)
+		Point p1 = mario.findMarioLocation();
+		if (currBoard.GetChar(p1.x, p1.y) == BARREL_CH || currBoard.GetChar(p1.x, p1.y) == GHOST_CH)
 			mario.collide(currBoard, flag, mariowin);
 		currBoard.SetChar(p.x, p.y, ch);
 	}
