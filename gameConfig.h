@@ -33,11 +33,12 @@ class GameConfig
 	int donkeyCounter;
 	int hammerCounter;
 	int legendCounter;
+	int PaulineCounter;
 	static constexpr int MIN_Y = 1;
 	static constexpr int MIN_X = 1;
 public:
-	GameConfig() : marioCounter(0), donkeyCounter(0), ghostCounter(0), hammerCounter(0), legendCounter(0) {}
-		enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27, KILL = 'p', KILL2 = 'P' }; 
+	GameConfig() : marioCounter(0), donkeyCounter(0), ghostCounter(0), hammerCounter(0), legendCounter(0), PaulineCounter(0) {}
+	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27, KILL = 'p', KILL2 = 'P' }; 
 	void load(const std::string& filename, bool& error);
 	void PrintBoard() const;
 	void resetBoard();
@@ -51,6 +52,7 @@ public:
 	void init();
 	bool isDkongScreenFile(const std::string& filename);
 	std::vector<std::string> getDkongScreens(const std::string& directoryPath);
+	void printErrors();
 
 	void printHammer()
 	{

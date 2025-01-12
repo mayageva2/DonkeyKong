@@ -47,23 +47,11 @@ void GameConfig::load(const std::string& filename, bool& error)
 			{
 				marioPos = { curr_col, curr_row };
 				marioCounter++;
-				if (marioCounter > 1)
-				{
-					std::cout << "error message : mario counter";
-					error = true;
-					return;
-				}
 			}
 			else if (c == '&') 
 			{
 				donkeyPos = { curr_col, curr_row };
 				donkeyCounter++;
-				if (donkeyCounter > 1)
-				{
-					std::cout << "error message: donkey counter";
-					error = true;
-					return;
-				}
 			}
 			else if (c == 'x')
 			{
@@ -75,30 +63,60 @@ void GameConfig::load(const std::string& filename, bool& error)
 			{
 				hammerPos = { curr_col, curr_row };
 				hammerCounter++;
-				if (hammerCounter > 1)
-				{
-					std::cout << "error message = hammer counter";
-					error = true;
-					return;
-				}
 			}
 			else if (c == 'L')
 			{
 				legendCounter++;
 				legendPos = { curr_col, curr_row };
 			}
+			else if (c == '$')
+			{
+				PaulineCounter++;
+			}
 
 			originalBoard[curr_row][curr_col++] = c;
 		}
 	}
 	int last_row = (curr_row < MAX_Y ? curr_row : MAX_Y - 1);
-	if (hammerCounter < 1 || marioCounter < 1 || legendCounter < 1 || donkeyCounter < 1)
-	{
-		std::cout << "error message = object missing";
+	if (marioCounter != 1 || legendCounter != 1 || PaulineCounter != 1 || hammerCounter > 1 || donkeyCounter > 1)
 		error = true;
-		return;
-	}
+	
 	insertLegend();
+}
+
+void GameConfig::printErrors()
+{
+	clrscr();
+	if (marioCounter < 1)
+	{
+		std::cout << "error message: mario char is missing\n";
+	}
+	if (legendCounter < 1)
+	{
+		std::cout << "error message: legend char is missing\n";
+	}
+	if (PaulineCounter < 1)
+	{
+		std::cout << "error message: Pauline char is missing\n";
+	}
+	if (marioCounter > 1)
+	{
+		std::cout << "error message: more than 1 mario\n";
+	}
+	if (hammerCounter > 1)
+	{
+		std::cout << "error message:  more than 1 hammer\n";
+	}
+	if (donkeyCounter > 1)
+	{
+		std::cout << "error message:  more than 1 donkeyKong\n";
+	}
+	if (PaulineCounter > 1)
+	{
+		std::cout << "error message: more than 1 pauline\n";
+	}
+	std::cout << "\npress any key to continue to next screen\n";
+	while (!_kbhit()) {}
 }
 
 void GameConfig::insertLegend()
@@ -152,6 +170,7 @@ void GameConfig::init()
 	donkeyCounter = 0;
 	hammerCounter = 0;
 	legendCounter = 0;
+	PaulineCounter = 0;
 }
 
 bool GameConfig::isDkongScreenFile(const std::string& filename)
