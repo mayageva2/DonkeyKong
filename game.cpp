@@ -20,6 +20,7 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)
 	board.resetBoard();
 	board.PrintBoard();
 	board.printHearts(mario);
+	board.printScore(mario);
 	int interval = 0;
 	int moveCounter = 0;
 	char key = (char)GameConfig::eKeys::STAY;
@@ -68,7 +69,7 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)
 		{
 			if (flag)
 			{
-        Point p1 = mario.findMarioLocation();
+				Point p1 = mario.findMarioLocation();
 				if (board.GetCurrentChar(p1.x, p1.y) == BARREL_CH || board.GetCurrentChar(p1.x, p1.y) == GHOST_CH)
 					mario.collide(board, flag, mariowin);
 				Sleep(100);
@@ -165,7 +166,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 			lastKey = (GameConfig::eKeys)key;
 		}
 		else
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels);
+			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels);
 	}
 
 }

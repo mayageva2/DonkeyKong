@@ -10,7 +10,6 @@ static constexpr char LADDER_CH = 'H'; //const for ladder
 static constexpr char DELETE_CH = ' ';  //const to clear pos
 static constexpr char HAMMER = 'p';//const for hammer 
 static const std::string EXPLOSION = "BOOM"; //const for explosion print
-const Point hammer = { 70,23 };//hammer point on board
 static constexpr int MAX_X = 80;
 static constexpr int MAX_Y = 25;
 

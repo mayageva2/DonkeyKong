@@ -19,7 +19,7 @@ void Mario::draw(const Point& pos) const  //this func draws mario in the locatio
 void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin, vector<Ghost>& ghosts, vector<Barrel>& barrels) //this func moves mario according to user's key
 {
 	bool sideJump = false;
-	if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == GHOST_CH)
+	if ((currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == GHOST_CH) && (char)key != 'p' && (char)key != 'P')
 		collide(currBoard, flag, mariowin);
 	if(flag)
 		Game::setCharCheck(this->location, currBoard, DELETE_CH, *this, flag, mariowin); //resets mario's previous location
@@ -107,9 +107,6 @@ void Mario::left(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mari
 	{
 		if (isInBoard(currBoard, p.x + this->location.diff_x))
 			this->location.x += this->location.diff_x;
-
-		if (isInBoard(currBoard, p.y + this->location.diff_y))
-			this->location.y += this->location.diff_y;
 
 		didMarioWin(currBoard, flag, mariowin);
 		if (flag)
@@ -340,7 +337,7 @@ void Mario::stay(GameConfig& currBoard) //stops mario's movement
 
 void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin)
 {
-	if (num_of_hammers > 0)
+	if (hammer)
 	{
 		Point hammerUsePos = this->location;
 		bool enemyKilled = false;
@@ -352,8 +349,6 @@ void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts
 			{
 				hammerUsePos.x += i;
 				enemyKilled = true;
-				num_of_hammers--;
-				currBoard.printHammer();
 				break;
 			}
 		}
@@ -513,7 +508,8 @@ void Mario::collide(GameConfig& currBoard, bool& flag, bool& mariowin)  //this f
 	didMarioLose(currBoard, flag);
 	if (flag)
 	{
-		num_of_hammers = ZERO;
+		hammer = false;
+		num_of_points = ZERO;
 		this->location = GameConfig::getMarioPos();
 		Game game;
 		game.startGame(*this, currBoard, flag, mariowin);  /************************ !!!need to change to Game:: but startgame cant be static!!! ****************************/
@@ -553,13 +549,14 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin) //che
 void Mario::resetMario()  //this func initiallize mario's data members
 {
 	this->num_of_hearts = FULL_LIFE;
-	this->num_of_hammers = ZERO;
-	this->location = start;
+	this->hammer = false;
+	this->location = GameConfig::getMarioPos();
 }
 
 void Mario::pickHammer(GameConfig& board)
 {
 	Point p(board.getLegendPos());
+	setHammer(true);
 	board.printHammer();
 	board.SetChar(this->location.x, this->location.y, DELETE_CH);
 }

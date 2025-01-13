@@ -171,7 +171,7 @@ void GameConfig::printHammer()
 
 void GameConfig::printScore(Mario& mario)
 {
-	gotoxy(legendPos.x + 11, legendPos.y + 1);
+	gotoxy(legendPos.x + 15, legendPos.y + 1);
 	std::cout << mario.getScore();
 }
 

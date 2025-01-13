@@ -9,10 +9,6 @@
 #include<iostream>
 #include<vector>
 
-const Point start = { 77, 23 };
-const Point hearts = { 64,1 };
-const Point hammers = { 55,1 };
-const Point score = { 35,1 };
 enum class MarioState { moving, jumping, standing, falling, killing }; //chat GPT solution
 const int FULL_LIFE = 3;
 const int ZERO = 0;
@@ -21,9 +17,9 @@ class Mario
 {
 	Point location;                  // mario's location
 	int num_of_hearts = FULL_LIFE;   // num of lives
-	int num_of_points = ZERO;                   // mario's score
+	int num_of_points = ZERO;        // mario's score
 	const char ch = '@';             // how mario appears on screen
-	int num_of_hammers = ZERO;         // num of hammers
+	bool hammer = false;             //checks if mario has hammer
 
 public:
 	MarioState state = MarioState::standing;     //initiallize state
@@ -53,9 +49,18 @@ public:
 	void didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin);  //checks if mario reached pauline
 	void resetMario();   //resets mario
 	void pickHammer(GameConfig& board);
-	int getNumOfHammers() { return num_of_hammers; }  //returns amount of hammers mario picked
 	void deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin);
 	void setScore(int points) { num_of_points += points; }
 	void resetMarioPos();
+
+	bool hasHammer() const
+	{
+		return hammer;
+	}
+
+	void setHammer(bool hasHammer)
+	{
+		hammer = hasHammer;
+	}
 };
 #endif
