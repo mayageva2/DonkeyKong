@@ -11,8 +11,6 @@
 #include <algorithm>
 #include <fstream>
 
-//char GameConfig::currentBoard[MAX_Y][MAX_X] = {}; //Initialize static member - chatGPT solution
-
 Point GameConfig::marioPos(0, 0);
 Point GameConfig::donkeyPos(0, 0);
 Point GameConfig::hammerPos(0, 0);
@@ -21,8 +19,6 @@ Point GameConfig::legendPos(0, 0);
 void GameConfig::load(const std::string& filename, bool& error) 
 {
 	std::ifstream screen_file(filename);
-	//cout << screen_file.is_open() << std::endl;
-	// TODO: handle errors (all sort of...) - do not submit it like that :)
 	int curr_row = 0;
 	int curr_col = 0;
 	char c;
