@@ -1,9 +1,7 @@
 #include "gameConfig.h"
 #include "general.h"
 #include "mario.h"
-#include "point.h"
 #include "menu.h"
-
 #include <iostream>
 #include <vector>
 #include <string>
@@ -129,13 +127,45 @@ void GameConfig::insertLegend()
 	}
 }
 
-void GameConfig::PrintBoard() const//prints board
+void GameConfig::PrintBoard(bool& ifcolorMode) const//prints board
 {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(0, 0);
-	for (int i = 0; i < MAX_Y - 1; i++) {
-		std::cout << originalBoard[i] << '\n';
+
+
+	for (int i = 0; i < MAX_Y; i++) {
+		for (int j = 0; originalBoard[i][j] != '\0'; j++) {
+			if (ifcolorMode) 
+			{
+				if (originalBoard[i][j] == LADDER_CH) {
+					SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY); // Yellow 
+				}
+				else if (originalBoard[i][j] == '>' || originalBoard[i][j] == '=' || originalBoard[i][j] == '<') {
+					SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN ); // Brown 
+				}
+				else if (originalBoard[i][j] == DONKEY_KONG_CH) {
+					SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN); // Green
+				}
+				else if (originalBoard[i][j] == PAULINE_CH) {
+					SetConsoleTextAttribute(hConsole, FOREGROUND_RED| FOREGROUND_BLUE | FOREGROUND_INTENSITY); // Purple
+				}
+				else if (originalBoard[i][j] == HAMMER) {
+					SetConsoleTextAttribute(hConsole, FOREGROUND_RED ); // Purple
+				}
+				else if(originalBoard[i][j] !=DELETE_CH){
+					SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY); 
+				}
+				
+			}
+
+			std::cout << originalBoard[i][j];
+		}
+		std::cout << '\n';
 	}
-	std::cout << originalBoard[MAX_Y - 1];
+
+	if (ifcolorMode) {
+		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Reset to default color
+	}
 }
 
 void GameConfig::resetBoard() //resets to original board
@@ -153,21 +183,36 @@ Point GameConfig::getGhostPos()
 	return ghostPos;
 }
 
-void GameConfig::printHearts(Mario& mario) //this func print hearts on screen
+void GameConfig::printHearts(Mario& mario,bool& ifcolorMode) //this func print hearts on screen
 {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(legendPos.x + 15, legendPos.y);
+	if (ifcolorMode)
+	{
+		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	}
 	std::cout << mario.getNumOfHearts();
 }
 
-void GameConfig::printHammer()
+void GameConfig::printHammer(bool& ifcolorMode)
 {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(legendPos.x + 15, legendPos.y + 2);
+	if (ifcolorMode)
+	{
+		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	}
 	std::cout << "V";
 }
 
-void GameConfig::printScore(Mario& mario)
+void GameConfig::printScore(Mario& mario, bool& ifcolorMode)
 {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(legendPos.x + 15, legendPos.y + 1);
+	if (ifcolorMode)
+	{
+		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	}
 	std::cout << mario.getScore();
 }
 

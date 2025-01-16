@@ -8,18 +8,18 @@
 #include <iostream>
 
 class Mario;
-static constexpr char GHOST_CH = 'x';
+
 
 class Ghost : public movingObject 
 {
 public:
 	Ghost(int x, int y, bool dir = true) : movingObject(x, y, dir) {} //Constractor
-	void checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin);
+	void checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin,bool& ifcolorMode);
 	void checkCollision(std::vector<Ghost>& ghosts);
 	void randomDirection();
 	void moveGhosts();
 	Point getLocation() const { return location; } //Get ghost location
-	void clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin);
+	void clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin, bool& ifcolorMode);
 };
 
 #endif
