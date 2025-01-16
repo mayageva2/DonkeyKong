@@ -32,6 +32,8 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 	bool flag = true;
 	bool screenError = false;
 	char screenKey = DELETE_CH;
+	char colorModeKey= DELETE_CH;
+	bool ifcolorM = false;
 	std::string path = ".";
 	std::vector<std::string> screens = board.getDkongScreens(path);
 
@@ -51,15 +53,21 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 				Sleep(2000);
 			}
 			else
-				loadScreens(0, screens, board, screenError, mario);
+				colorModeKey = printCModeScreen();
+				loadScreens(0, screens, board, screenError, mario, colorModeKey);
 			break;
 		case '8':
 			printScreen(instructions);
 			while (!_kbhit()) {}
 			break;
 		case '2':
-			screenKey = printChooseScreen(screens);
-			loadChosenScreen(screenKey, screens, board, screenError, mario);
+			colorModeKey = printCModeScreen();
+			if (colorModeKey == 'c' || colorModeKey == 'C')
+			{
+				ifcolorM = true;
+			}
+			screenKey = printChooseScreen(screens, ifcolorM);
+			loadChosenScreen(screenKey, screens, board, screenError, mario, colorModeKey);
 			break;
 		case '9':
 			exitMenu = true;
@@ -68,7 +76,15 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 	}
 }
 
-char Menu::printChooseScreen(std::vector<std::string> screens)
+char Menu::printCModeScreen()
+{
+	clrscr();
+	printScreen(colorModeScreen);
+	char key = _getch();
+	return key;
+}
+
+char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode)
 {
 	size_t size = screens.size();
 	if (size == 0)
@@ -89,7 +105,7 @@ char Menu::printChooseScreen(std::vector<std::string> screens)
 			Point counterPoints[1] ={ Point(49, 18) }; //check place
 			j = 0;
 			printScreen(choose1Screen);
-			addNames(1, counter, namePoints, counterPoints, screens);
+			addNames(1, counter, namePoints, counterPoints, screens,ifcolorMode);
 			size--;
 			break;
 		}
@@ -98,7 +114,7 @@ char Menu::printChooseScreen(std::vector<std::string> screens)
 			Point counterPoints[2] = { Point(31, 18),  Point(67, 18) }; //check place
 			j = 0;
 			printScreen(choose2Screen);
-			addNames(2, counter, namePoints, counterPoints, screens);
+			addNames(2, counter, namePoints, counterPoints, screens, ifcolorMode);
 			size = size - 2;
 			break;
 		}
@@ -107,8 +123,8 @@ char Menu::printChooseScreen(std::vector<std::string> screens)
 			Point counterPoints[3] = { Point(24, 18), Point(49, 18), Point(74, 18) }; //check place
 			j = 0;
 			printScreen(choose3Screen);
-			namePoints[i].draw(screens[i][j], namePoints[i]);
-			addNames(3, counter, namePoints, counterPoints, screens);
+			namePoints[i].draw(screens[i][j], namePoints[i], ifcolorMode);
+			addNames(3, counter, namePoints, counterPoints, screens, ifcolorMode);
 			size = size - 3;
 			break;
 		}
@@ -124,7 +140,7 @@ char Menu::printChooseScreen(std::vector<std::string> screens)
 	}
 }
 
-void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens)
+void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens,bool& ifcolorMode)
 {
 	int j = 0;
 
@@ -132,11 +148,11 @@ void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPo
 	{
 		while (screens[i][j] != '\0')
 		{
-			namePoints[i].draw(screens[i][j], namePoints[i]);
+			namePoints[i].draw(screens[i][j], namePoints[i], ifcolorMode);
 			namePoints[i].x++;
 			j++;
 		}
-		counterPoints[i].draw(counter, counterPoints[i]);
+		counterPoints[i].draw(counter, counterPoints[i], ifcolorMode);
 		counter++;
 		j = 0;
 	}
@@ -148,10 +164,11 @@ void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPo
 }
 
 
-void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario)
+void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode)
 {
 	Game game;
 	bool mariowin = true;
+	bool ifcolorMode = false;
 	for (i; i < screens.size(); i++)
 	{
 		board.init();
@@ -163,7 +180,11 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 			{
 				mariowin = false;
 				mario.resetMarioPos();
-				game.startGame(mario, board, flag, mariowin);
+				if (colorMode == 'c' || colorMode == 'C')
+				{
+					ifcolorMode = true;
+				}
+				game.startGame(mario, board, flag, mariowin, ifcolorMode);
 			}
 			else 
 			{
@@ -175,10 +196,10 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 	mario.resetMario();
 }
 
-void Menu::loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario)
+void Menu::loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode)
 {
 	int i = screenKey - '0' -1;
-	loadScreens(i, screens, board, screenError, mario);
+	loadScreens(i, screens, board, screenError, mario,colorMode);
 }
 
 void Menu::displayEnd_Game(Mario& mario)  //ends game

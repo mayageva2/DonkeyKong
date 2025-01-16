@@ -2,13 +2,13 @@
 #include "mario.h"
 #include "game.h"
 
-void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin)
+void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin,bool& ifcolorMode)
 {
     Point p(location.x, location.y);
-    Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin);
+    Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode);
     char originalChar = board.GetCurrentChar(location.x, location.y);
-    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin);
-    p.draw(originalChar, location);
+    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode);
+    p.draw(originalChar, location,ifcolorMode);
 
     location.diff_x = direction ? 1 : -1;
 
@@ -39,8 +39,8 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
     }
 
     moveGhosts();
-    Game::setCharCheck(location, board, GHOST_CH, mario, flag, mariowin);
-    p.draw(GHOST_CH, location);
+    Game::setCharCheck(location, board, GHOST_CH, mario, flag, mariowin,ifcolorMode);
+    p.draw(GHOST_CH, location,ifcolorMode);
 }
 
 void Ghost::checkCollision(std::vector<Ghost>& ghosts)
@@ -71,9 +71,9 @@ void Ghost::randomDirection()
         direction = !direction;
 }
 
-void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin)
+void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin,bool& ifcolorMode)
 {
     char originalChar = board.GetOriginalChar(location.x, location.y);
-    Point::draw(originalChar, location);
-    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin);
+    Point::draw(originalChar, location,ifcolorMode);
+    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode);
 }

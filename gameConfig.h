@@ -4,14 +4,13 @@
 #include <string>
 #include <vector>
 #include "point.h"
+
 //class Mario; //Declaration
 
-static constexpr char LADDER_CH = 'H'; //const for ladder
-static constexpr char DELETE_CH = ' ';  //const to clear pos
-static constexpr char HAMMER = 'p';//const for hammer 
-static const std::string EXPLOSION = "BOOM"; //const for explosion print
+
 static constexpr int MAX_X = 80;
 static constexpr int MAX_Y = 25;
+
 
 class Mario;
 
@@ -39,7 +38,7 @@ public:
 	GameConfig() : marioCounter(0), donkeyCounter(0), ghostCounter(0), hammerCounter(0), legendCounter(0), PaulineCounter(0) {}
 	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27, KILL = 'p', KILL2 = 'P' }; 
 	void load(const std::string& filename, bool& error);
-	void PrintBoard() const;
+	void PrintBoard(bool& ifcolorMode) const;
 	void resetBoard();
 	static Point getMarioPos() { return marioPos; }
 	static Point getDonkeyKongPos() { return donkeyPos; }
@@ -48,13 +47,13 @@ public:
 	Point getGhostPos();
 	int getGhostsAmount() { return ghostCounter; }
 	void insertLegend();
-	void printHearts(Mario& mario);
+	void printHearts(Mario& mario, bool& ifcolorMode);
 	void init();
 	bool isDkongScreenFile(const std::string& filename);
 	std::vector<std::string> getDkongScreens(const std::string& directoryPath);
 	void printErrors();
-	void printHammer();
-	void printScore(Mario& mario);
+	void printHammer(bool& ifcolorMode);
+	void printScore(Mario& mario, bool& ifcolorMode);
 	
 	char GetCurrentChar(int x, int y) const// returns a char that is placed on given point on board
 	{
