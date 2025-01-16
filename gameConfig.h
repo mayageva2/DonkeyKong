@@ -4,57 +4,59 @@
 #include <string>
 #include <vector>
 #include "point.h"
-//class Mario; //Declaration
 
 static constexpr char LADDER_CH = 'H'; //const for ladder
 static constexpr char DELETE_CH = ' ';  //const to clear pos
 static constexpr char HAMMER = 'p';//const for hammer 
 static const std::string EXPLOSION = "BOOM"; //const for explosion print
-static constexpr int MAX_X = 80;
-static constexpr int MAX_Y = 25;
+static constexpr int MAX_X = 80;  //screen size
+static constexpr int MAX_Y = 25;  //screen size
 
 class Mario;
 
 class GameConfig
 {
-	char originalBoard[MAX_Y][MAX_X + 1] = {};
-	char currentBoard[MAX_Y][MAX_X + 1] = {};  //current board
-	static Point marioPos;
-	static Point donkeyPos;
-	static Point hammerPos;
-	static Point legendPos;
-	std::vector<Point> GhostsPos;
-	size_t currentGhostIndex = 0;
-	std::vector<std::string> screenFiles;
-	size_t currentScreenIndex = 0;
-	int ghostCounter;
-	int marioCounter;
-	int donkeyCounter;
-	int hammerCounter;
-	int legendCounter;
-	int PaulineCounter;
-	static constexpr int MIN_Y = 1;
-	static constexpr int MIN_X = 1;
+	std::vector<Point> GhostsPos;         //a vector containing all of ghosts positions
+	std::vector<std::string> screenFiles; //a vector containing all the screen files names
+	size_t currentGhostIndex = 0;         //ghosts vector index
+	size_t currentScreenIndex = 0;        //screen files vector index
+	static Point marioPos;      //mario's position
+	static Point donkeyPos;     //donkeyKong's position
+	static Point hammerPos;     //hammer's position
+	static Point legendPos;     //legend starting position (top left)
+	int ghostCounter;      //amount of 'x' on screen given
+	int marioCounter;      //amount of '@' on screen given
+	int donkeyCounter;     //amount of '&' on screen given
+	int hammerCounter;     //amount of 'p' on screen given
+	int legendCounter;     //amount of 'L' on screen given
+	int PaulineCounter;    //amount of '$' on screen given
+	bool ghostPosError = false;  //checks if ghost isn't on floor
+	bool legendError = false;    //checks if legen have enough space in screen
+	bool oversizeScreen = false; //checks if screen given is larger than approved screen size
+	char originalBoard[MAX_Y][MAX_X + 1] = {};  //original board
+	char currentBoard[MAX_Y][MAX_X + 1] = {};   //current board
 public:
-	GameConfig() : marioCounter(0), donkeyCounter(0), ghostCounter(0), hammerCounter(0), legendCounter(0), PaulineCounter(0) {}
-	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27, KILL = 'p', KILL2 = 'P' }; 
-	void load(const std::string& filename, bool& error);
-	void PrintBoard() const;
-	void resetBoard();
-	static Point getMarioPos() { return marioPos; }
-	static Point getDonkeyKongPos() { return donkeyPos; }
-	static Point getLegendPos() { return legendPos; }
-	static Point getHammerPos() { return hammerPos; }
-	Point getGhostPos();
-	int getGhostsAmount() { return ghostCounter; }
-	void insertLegend();
-	void printHearts(Mario& mario);
-	void init();
-	bool isDkongScreenFile(const std::string& filename);
-	std::vector<std::string> getDkongScreens(const std::string& directoryPath);
-	void printErrors();
-	void printHammer();
-	void printScore(Mario& mario);
+	GameConfig() : ghostCounter(0), marioCounter(0), donkeyCounter(0), hammerCounter(0), legendCounter(0), PaulineCounter(0) {} //constructor
+	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27, KILL = 'p', KILL2 = 'P' }; //user's keys
+	void initBoard(); //initialize board
+	void load(const std::string& filename, bool& error); //load board
+	void addFrame(); //adds Q frame to board
+	void PrintBoard() const; //prints board on screen
+	void resetBoard(); //reset current board to original board
+	static Point getMarioPos() { return marioPos; }  //returns mario's position
+	static Point getDonkeyKongPos() { return donkeyPos; }  //returns donkeyKong's position
+	Point getLegendPos() { return legendPos; } //returns legend's start position
+	Point getGhostPos(); //returns all ghosts positions
+	int getGhostsAmount() { return ghostCounter; } //returns amount of ghosts
+	bool insertLegend(); 
+	void printHearts(Mario& mario); //print amount of hearts
+	void init();  //initiallizes all counters
+	bool isDkongScreenFile(const std::string& filename); //checks if files is a screen file
+	std::vector<std::string> getDkongScreens(const std::string& directoryPath);  //get screens from file
+	void printErrors(); //prints errors in screen
+	bool isGhostsOnFloor(); //checks if ghost isn't on floor
+	void printHammer();  //prints V in legend when mario has a hammer
+	void printScore(Mario& mario); //prints score
 	
 	char GetCurrentChar(int x, int y) const// returns a char that is placed on given point on board
 	{
@@ -74,7 +76,6 @@ public:
 		}
 	}
 
-	
 };
 
 #endif

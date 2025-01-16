@@ -19,17 +19,15 @@ class Barrel : public movingObject
 	bool isActive;
 
 public:
-	bool dropDirection;// Indicates if the barrel is dropping: true = down, false = no drop
-	static const int maxBarrels = 100;
+	bool dropDirection;      // Indicates if the barrel is dropping: true = down, false = no drop
 	Barrel(): movingObject(GameConfig::getDonkeyKongPos().x, GameConfig::getDonkeyKongPos().y, true), fallCount(0), isActive(false), dropDirection(true) {} //Constractor
-	Point getLocation() const { return location; } //Get barrel location
-	void moveBarrel(GameConfig& board, Mario& mario, bool& flag, bool& mariowin);
+	void moveBarrel(GameConfig& board, Mario& mario, bool& flag, bool& mariowin);    //moves the barrel
 	void clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& mariowin, bool& marioKilled); // Clears the barrel from the screen and updates the game board
-	void deactivate() { isActive = false; } //Deactivate barrel
-	void activate() { isActive = true; } //Activate Barrel
-	bool isBarrelActive() const { return isActive; }
-	bool marioCloseToExplosion(GameConfig& board, Mario& mario);
-	bool isInExplosionArea(Point& barrelPos, Point& marioPos);
+	void deactivate() { isActive = false; }            //Deactivate barrel
+	void activate() { isActive = true; }               //Activate Barrel
+	bool isBarrelActive() const { return isActive; }   //checks if a barrel is active
+	bool marioCloseToExplosion(GameConfig& board, Mario& mario);   //checks if mario is in the barrel explosion area
+	bool isInExplosionArea(Point& barrelPos, Point& marioPos);     //helper func to checks if mario is in the barrel explosion area
 };
 
 #endif

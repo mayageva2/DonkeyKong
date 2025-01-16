@@ -42,7 +42,7 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariow
 {
 	Point p(location.x, location.y);
 	Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin); //resets barrel's previous location
-		char originalChar = board.GetCurrentChar(location.x, location.y); //Restore the original character at the barrel's current location
+	char originalChar = board.GetCurrentChar(location.x, location.y); //Restore the original character at the barrel's current location
 	Game::setCharCheck(location, board, originalChar, mario, flag, mariowin);
 	p.draw(originalChar, location); //print original char on board
 
@@ -84,7 +84,7 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariow
 		break;
 	}
 	case '=':// Continue previous direction 
-	case '-':
+	case 'Q':
 	{
 		if (fallCount >= 8)
 		{

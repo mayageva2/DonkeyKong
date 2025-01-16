@@ -20,8 +20,8 @@ public:
 	void barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin); //moves each barrel
 	static void pauseGame(GameConfig& board, Mario& mario); //pause the game
 	static void setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin); // checks if theres a ladder or floor and then goes to set char on board
-	void createGhosts(vector<Ghost>& ghosts, GameConfig& board);
-	static bool isInLegend(Point& p, GameConfig& currBoard);
+	void createGhosts(vector<Ghost>& ghosts, GameConfig& board); //creates a vector containing all ghosts data
+	static bool isInLegend(Point& p, GameConfig& currBoard);  //checks if mario runs over the Legend
 };
 
 #endif

@@ -12,18 +12,18 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
 
     location.diff_x = direction ? 1 : -1;
 
-    checkCollision(ghosts);
+    checkCollision(ghosts, board);
 
-    if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '-'&& (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
+    if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '=' ||( p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == 'Q' && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
     {
         if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == GHOST_CH)
         {
             direction = !direction;
             location.diff_x = direction ? 1 : -1;
-            if (board.GetCurrentChar(p.x + location.diff_x, p.y) == '|')
+            if (board.GetCurrentChar(p.x + location.diff_x, p.y) == 'Q')
                 location.diff_x = 0;
         }
-        else if (board.GetCurrentChar(p.x + location.diff_x, p.y) != '|')
+        else if (board.GetCurrentChar(p.x + location.diff_x, p.y) != 'Q')
         {
             randomDirection();
         }
@@ -43,17 +43,30 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
     p.draw(GHOST_CH, location);
 }
 
-void Ghost::checkCollision(std::vector<Ghost>& ghosts)
+void Ghost::checkCollision(std::vector<Ghost>& ghosts, GameConfig& board)
 {
     for (Ghost& otherGhost : ghosts)
     {
         if (this != &otherGhost && otherGhost.location.x == this->location.x + location.diff_x && otherGhost.location.y == this->location.y)
         {
-            // Swap directions when two ghosts meet
-            direction = !direction;
-            otherGhost.direction = !otherGhost.direction;
-            location.diff_x = direction ? 1 : -1;
-            otherGhost.location.diff_x = otherGhost.direction ? 1 : -1;
+            // Check if swapping directions would lead to a wall
+            int newDiffX = direction ? -1 : 1;
+            int otherNewDiffX = otherGhost.direction ? -1 : 1;
+            if (board.GetCurrentChar(location.x + newDiffX, location.y) != '=' && board.GetCurrentChar(location.x + newDiffX, location.y) != '<' && board.GetCurrentChar(location.x + newDiffX, location.y) != '>' && board.GetCurrentChar(location.x + newDiffX, location.y) != 'Q')
+            {
+                direction = !direction;
+                location.diff_x = newDiffX;
+            }
+            else 
+                location.diff_x = 0;
+
+            if (board.GetCurrentChar(otherGhost.location.x + otherNewDiffX, otherGhost.location.y) != '=' && board.GetCurrentChar(otherGhost.location.x + otherNewDiffX, otherGhost.location.y) != '<' && board.GetCurrentChar(otherGhost.location.x + otherNewDiffX, otherGhost.location.y) != '>' && board.GetCurrentChar(otherGhost.location.x + otherNewDiffX, otherGhost.location.y) != 'Q')
+            {
+                otherGhost.direction = !otherGhost.direction;
+                otherGhost.location.diff_x = otherNewDiffX;
+            }
+            else
+                otherGhost.location.diff_x = 0;
         }
     }
 }
