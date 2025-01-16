@@ -9,10 +9,10 @@
 #include <algorithm>
 #include <fstream>
 
-Point GameConfig::marioPos(0, 0);
-Point GameConfig::donkeyPos(0, 0);
-Point GameConfig::hammerPos(0, 0);
-Point GameConfig::legendPos(0, 0);
+Point GameConfig::marioPos = { 0, 0 };
+Point GameConfig::donkeyPos = { 0, 0 };
+Point GameConfig::hammerPos = { 0, 0 };
+Point GameConfig::legendPos = { 0, 0 };
 
 void GameConfig::load(const std::string& filename, bool& error) 
 {
@@ -22,12 +22,16 @@ void GameConfig::load(const std::string& filename, bool& error)
 	char c;
 	GhostsPos.clear();
 	GhostsPos.shrink_to_fit();
-	while (!screen_file.get(c).eof() && curr_row < MAX_Y) 
+	initBoard();
+	ghostPosError = false;
+	legendError = false;
+	oversizeScreen = false;
+
+	while (!screen_file.get(c).eof() && curr_row <= MAX_Y) 
 	{
 		if (c == '\n') {
 			if (curr_col < MAX_X) 
 			{
-				// add spaces for missing cols
 #pragma warning(suppress : 4996) // to allow strcpy
 				strcpy(originalBoard[curr_row] + curr_col, std::string(MAX_X - curr_col - 1, ' ').c_str());
 			}
@@ -35,16 +39,32 @@ void GameConfig::load(const std::string& filename, bool& error)
 			curr_col = 0;
 			continue;
 		}
-		if (curr_col < MAX_X) {
-			// handle special chars
-			if (c == '@') 
+		if (curr_col <= MAX_X) {
+			if (curr_row == MAX_Y || curr_col == MAX_X)
 			{
-				marioPos = { curr_col, curr_row };
+				if (c != ' ')
+				{
+					oversizeScreen = true;
+				}
+			}
+			else if (c == '@') 
+			{
 				marioCounter++;
+				if (marioCounter > 1)
+				{
+					originalBoard[marioPos.y][marioPos.x] = DELETE_CH;
+					marioCounter--;
+				}
+				marioPos = { curr_col, curr_row };
 			}
 			else if (c == '&') 
 			{
-				donkeyPos = { curr_col, curr_row };
+				c = DELETE_CH;
+				if (donkeyCounter < 1)
+				{
+					donkeyPos = { curr_col, curr_row };
+					c = '&';
+				}
 				donkeyCounter++;
 			}
 			else if (c == 'x')
@@ -55,8 +75,13 @@ void GameConfig::load(const std::string& filename, bool& error)
 			}
 			else if (c == 'p')
 			{
-				hammerPos = { curr_col, curr_row };
 				hammerCounter++;
+				if (hammerCounter > 1)
+				{
+					originalBoard[hammerPos.y][hammerPos.x] = DELETE_CH;
+					hammerCounter--;
+				}
+				hammerPos = { curr_col, curr_row };
 			}
 			else if (c == 'L')
 			{
@@ -65,57 +90,113 @@ void GameConfig::load(const std::string& filename, bool& error)
 			}
 			else if (c == '$')
 			{
+				c = DELETE_CH;
+				if (PaulineCounter < 1)
+				{
+					c = '$';
+				}
 				PaulineCounter++;
 			}
+			else if(c != DELETE_CH && c!= 'H' && c!= '<' && c!= '>' && c!= '=')
+			{
+				c = DELETE_CH;
+			}
 
-			originalBoard[curr_row][curr_col++] = c;
+			if(curr_col < MAX_X && curr_row < MAX_Y)
+				originalBoard[curr_row][curr_col++] = c;
 		}
 	}
 	int last_row = (curr_row < MAX_Y ? curr_row : MAX_Y - 1);
-	if (marioCounter != 1 || legendCounter != 1 || PaulineCounter != 1 || hammerCounter > 1 || donkeyCounter > 1)
+	addFrame();
+
+	if (isGhostsOnFloor())
 		error = true;
-	
-	insertLegend();
+	if (marioCounter < 1 || legendCounter != 1 || PaulineCounter < 1)
+		error = true;
+	if (insertLegend())
+		error = true;
+}
+
+void GameConfig::initBoard()
+{
+	for (int i = 0; i < MAX_Y; ++i) 
+	{
+		for (int j = 0; j < MAX_X; ++j) 
+		{
+			originalBoard[i][j] = DELETE_CH;
+		}
+	}
+}
+
+void GameConfig::addFrame()
+{
+	for (int i = 0; i < MAX_X; ++i) 
+	{
+		originalBoard[0][i] = 'Q';
+		originalBoard[MAX_Y - 1][i] = 'Q';
+	}
+
+	for (int i = 0; i < MAX_Y; ++i) 
+	{
+		originalBoard[i][0] = 'Q';
+		originalBoard[i][MAX_X - 1] = 'Q';
+	}
+}
+
+bool GameConfig::isGhostsOnFloor()
+{
+	size_t size = GhostsPos.size();
+	for (size_t i = 0; i < size; i++)
+	{
+		char ch = originalBoard[GhostsPos[i].y + 1][GhostsPos[i].x];
+		if (ch != '<' && ch != '>' && ch != '=' && ch != 'Q')
+		{
+			ghostPosError = true;
+			return true;
+		}
+	}
+	return false;
+
 }
 
 void GameConfig::printErrors()
 {
 	clrscr();
+	if (oversizeScreen)
+	{
+		std::cout << "Error Message: The screen exceeds the authorized size: the next errors may happen due to screen resizing\n";
+	}
 	if (marioCounter < 1)
 	{
-		std::cout << "error message: mario char is missing\n";
+		std::cout << "Error Message: Mario char is missing\n";
 	}
 	if (legendCounter < 1)
 	{
-		std::cout << "error message: legend char is missing\n";
+		std::cout << "Error Message: Legend char is missing\n";
 	}
 	if (PaulineCounter < 1)
 	{
-		std::cout << "error message: Pauline char is missing\n";
+		std::cout << "Error Message: Pauline char is missing\n";
 	}
-	if (marioCounter > 1)
+	if (legendCounter > 1)
 	{
-		std::cout << "error message: more than 1 mario\n";
+		std::cout << "Error Message: More than one legend char\n";
 	}
-	if (hammerCounter > 1)
+	if (ghostPosError)
 	{
-		std::cout << "error message:  more than 1 hammer\n";
+		std::cout << "Error Message: A ghost is positioned off the floor\n";
 	}
-	if (donkeyCounter > 1)
+	if (legendError)
 	{
-		std::cout << "error message:  more than 1 donkeyKong\n";
-	}
-	if (PaulineCounter > 1)
-	{
-		std::cout << "error message: more than 1 pauline\n";
+		std::cout << "Error Message: Insufficient space for the Legend\n";
 	}
 	std::cout << "\npress any key to continue to next screen\n";
 	while (!_kbhit()) {}
 }
 
-void GameConfig::insertLegend()
+bool GameConfig::insertLegend()
 {
-	if (legendPos.x + Menu::LegendX <= MAX_X && legendPos.y + Menu::LegendY <= MAX_Y)
+	if (legendPos.x + Menu::LegendX < (MAX_X - 1) && legendPos.y + Menu::LegendY < (MAX_Y - 1))
 	{
 		for (int i = 0; i < Menu::LegendY; i++)
 		{
@@ -125,6 +206,14 @@ void GameConfig::insertLegend()
 			}
 		}
 	}
+	else
+	{
+		legendError = true;
+		return true;
+	}
+
+	return false;
+
 }
 
 void GameConfig::PrintBoard(bool& ifcolorMode) const//prints board
@@ -255,5 +344,6 @@ std::vector<std::string> GameConfig::getDkongScreens(const std::string& director
 	std::sort(screens.begin(), screens.end());
 	return screens;
 }
+
 
 

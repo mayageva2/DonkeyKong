@@ -77,7 +77,7 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 
 bool Mario::checkMove(GameConfig& currBoard, int x, int y)  //checks if mario hits a floor tile
 {
-	return currBoard.GetCurrentChar(x, y) != '<' && currBoard.GetCurrentChar(x, y) != '>';
+	return currBoard.GetCurrentChar(x, y) != '<' && currBoard.GetCurrentChar(x, y) != '>' && currBoard.GetCurrentChar(x, y) != '=';
 }
 
 bool Mario::isInBoard(GameConfig& currBoard, int x)  //checks if a point is on board
@@ -189,6 +189,8 @@ void Mario::up(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& fl
 
 		if (moveCounter == 4)
 			moveCounter = ENDJUMP;
+		if (moveCounter > 4)
+			climbUpAladder(moveCounter, currBoard);
 	}
 	else  //going up a ladder
 	{
@@ -241,16 +243,22 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump, boo
 		Sleep(80);
 		moveCounter++;
 	}
-	else
+	didMarioWin(currBoard, flag, mariowin);
+
+	if (isMarioOnFloor(currBoard))
 	{
+		state = MarioState::standing;
 		if (sideJump)
+		{
 			moveCounter -= 4;
-		stay(currBoard,ifcolorMode);
+			state = MarioState::moving;
+		}
 		if (moveCounter > 4)
 			collide(currBoard, flag, mariowin,ifcolorMode);
 		sideJump = false;
 		moveCounter = 0;
 	}
+  
 	didMarioWin(currBoard, flag, mariowin,ifcolorMode);
 }
 
@@ -267,6 +275,12 @@ void Mario::climbUpAladder(int& moveCounter, GameConfig& currBoard,bool& ifcolor
 		char way = currBoard.GetCurrentChar(this->location.x, this->location.y);
 		p.draw(way, this->location, ifcolorMode);
 		moveCounter = ENDJUMP;
+		
+		if (way != '>' && way != '=' && way != '<')
+		{
+			state = MarioState::standing;
+			this->location.y += 2;
+		}
 	}
 
 	this->location.y -= 1;
@@ -444,7 +458,6 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 		return;
 	}
 
-
 	if (moveCounter >= 0 && moveCounter < 2)
 	{
 		up(currBoard, moveCounter, sideJump, flag, mariowin,ifcolorMode);
@@ -489,7 +502,7 @@ bool Mario::isMarioOnFloor(GameConfig& currBoard) //checks if mario stands on a 
 {
 	Point p(this->location);
 
-	if (currBoard.GetCurrentChar(p.x, p.y + 1) != '<' && currBoard.GetCurrentChar(p.x, p.y + 1) != '>' && currBoard.GetCurrentChar(p.x, p.y + 1) != '-')
+	if (currBoard.GetCurrentChar(p.x, p.y + 1) != '<' && currBoard.GetCurrentChar(p.x, p.y + 1) != '>' && currBoard.GetCurrentChar(p.x, p.y + 1) != 'Q' && currBoard.GetCurrentChar(p.x, p.y + 1) != '=')
 		return false;
 }
 
@@ -559,6 +572,7 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin,bool& 
 		clrscr();
 		Menu menu;
 		Sleep(70);
+
 		if (ifcolorMode)
 		{
 			SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);

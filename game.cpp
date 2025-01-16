@@ -31,8 +31,12 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 	vector<Barrel> barrels;
 	ghosts.reserve(board.getGhostsAmount());
 	createGhosts(ghosts, board);
-	mario.draw(mario.findMarioLocation(),ifcolorMode);
-	mario.state = MarioState::standing;
+  
+	mario.draw(mario.findMarioLocation(), ifcolorMode);
+	if(!mario.isMarioOnFloor(board))
+		mario.state = MarioState::falling;
+	else
+		mario.state = MarioState::standing;
 
 	flag = true;
 	while (flag)
@@ -61,7 +65,9 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 				else
 				{
 					key = inputKey;
-					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode);
+					if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
+						lastKey = GameConfig::eKeys::STAY;
+					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
 				}
 			}
 			else if (mario.state != MarioState::standing)
@@ -183,6 +189,10 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 
 void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode) //moves each barrel
 {
+	Point p(0, 0);
+	if (board.getDonkeyKongPos() == p)
+		return;
+
 	bool marioKilled = false;
 	if (!flag) { return; }
 	if (interval % 10 == 0)
@@ -264,7 +274,7 @@ void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mar
 {
 	char ch = currBoard.GetCurrentChar(p.x, p.y);
 	bool returnCh = isInLegend(p, currBoard);
-	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '-' || ch == '|' || ch == 'Q' || ch == '$' || returnCh)
+	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '=' || ch == 'Q' || ch == '$' || returnCh)
 	{
 		currBoard.SetChar(p.x, p.y, object);
 		Point p1 = mario.findMarioLocation();

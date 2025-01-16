@@ -194,6 +194,12 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 		}
 	}
 	mario.resetMario();
+	if (mariowin)
+	{
+		clrscr();
+		printScreen(Menu::win);
+		Sleep(2000);
+	}
 }
 
 void Menu::loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode)
