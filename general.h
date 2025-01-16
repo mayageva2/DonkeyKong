@@ -3,5 +3,6 @@
 
 void gotoxy(int, int);
 void clrscr();
+void hideCursor();
 
 #endif

@@ -13,14 +13,15 @@
 using namespace std;
 
 
-void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)  //starts game
+void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,bool& ifcolorMode)  //starts game
 {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	clrscr();
 	GameConfig::eKeys lastKey = GameConfig::eKeys::STAY;
 	board.resetBoard();
-	board.PrintBoard();
-	board.printHearts(mario);
-	board.printScore(mario);
+	board.PrintBoard(ifcolorMode);
+	board.printHearts(mario,ifcolorMode);
+	board.printScore(mario,ifcolorMode);
 	int interval = 0;
 	int moveCounter = 0;
 	char key = (char)GameConfig::eKeys::STAY;
@@ -30,7 +31,8 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)
 	vector<Barrel> barrels;
 	ghosts.reserve(board.getGhostsAmount());
 	createGhosts(ghosts, board);
-	mario.draw(mario.findMarioLocation());
+  
+	mario.draw(mario.findMarioLocation(), ifcolorMode);
 	if(!mario.isMarioOnFloor(board))
 		mario.state = MarioState::falling;
 	else
@@ -40,9 +42,9 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)
 	while (flag)
 	{
 		for (int i = 0; i < ghosts.size(); i++)
-			ghosts[i].checkMove(board, mario, flag, ghosts, mariowin);
+			ghosts[i].checkMove(board, mario, flag, ghosts, mariowin,ifcolorMode);
 
-		barrelsMovement(barrels, board, interval, mario, flag, mariowin); // Move Barrels
+		barrelsMovement(barrels, board, interval, mario, flag, mariowin,ifcolorMode); // Move Barrels
 
 		if (moveCounter == 0)
 		{
@@ -54,21 +56,25 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)
 				char inputKey = _getch();
 				if ((GameConfig::eKeys)inputKey == GameConfig::eKeys::ESC)
 				{
-					pauseGame(board, mario);
+					if (ifcolorMode)
+					{
+						SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+					}
+					pauseGame(board, mario,ifcolorMode);
 				}
 				else
 				{
 					key = inputKey;
 					if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
 						lastKey = GameConfig::eKeys::STAY;
-					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts);
+					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
 				}
 			}
 			else if (mario.state != MarioState::standing)
-				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts);
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode);
 		}
 		else
-			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts);
+			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode);
 
 		if (mario.state == MarioState::standing) 
 		{
@@ -76,7 +82,7 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)
 			{
 				Point p1 = mario.findMarioLocation();
 				if (board.GetCurrentChar(p1.x, p1.y) == BARREL_CH || board.GetCurrentChar(p1.x, p1.y) == GHOST_CH)
-					mario.collide(board, flag, mariowin);
+					mario.collide(board, flag, mariowin,ifcolorMode);
 				Sleep(100);
 			}
 		}
@@ -92,6 +98,7 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin)
 	ghosts.clear();
 	ghosts.shrink_to_fit();
 	barrels.clear(); //Clear barrels array
+	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);//set default screen color
 }
 
 void Game::createGhosts(vector<Ghost>& ghosts, GameConfig& board)
@@ -105,7 +112,7 @@ void Game::createGhosts(vector<Ghost>& ghosts, GameConfig& board)
 	}
 }
 
-void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost>& ghosts)   //makes sure mario goes as he should 
+void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost>& ghosts,bool& ifcolorMode)   //makes sure mario goes as he should 
 {
 	if (sideJump == true)
 	{
@@ -113,18 +120,22 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 		{
 			char tmp = _getch();
 			if ((GameConfig::eKeys)tmp == GameConfig::eKeys::ESC)
-				pauseGame(board, mario);
+				pauseGame(board, mario,ifcolorMode);
 		}
-		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin);
+		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode);
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::KILL) || ((GameConfig::eKeys)key == GameConfig::eKeys::KILL2))//////NEED TO ADD LAST KEY TO MOVE/////////
 	{
 		MarioState prevState = mario.state;
-		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels);
+		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode);
 
-		if (prevState != MarioState::standing) // if mario was walking before kill then keep walking after
+		if (prevState == MarioState::moving) // if mario was walking before kill then keep walking after
 		{
 			key = (char)lastKey;
+		}
+		else
+		{
+			key = (char)GameConfig::eKeys::STAY; //maeio was staying before killing
 		}
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP) || ((GameConfig::eKeys)key == GameConfig::eKeys::UP2))
@@ -138,7 +149,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 				sideJump = true;
 				lastKey = (GameConfig::eKeys)key;
 				key = tmp;
-				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin);
+				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode);
 				if ((GameConfig::eKeys)key == GameConfig::eKeys::ESC)
 				{
 					key = (char)GameConfig::eKeys::UP;
@@ -154,11 +165,11 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 		{
 			moveCounter = 0;
 			key = (char)lastKey;
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode);
 		}
 		else
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode);
 			if (mario.state == MarioState::standing)
 				lastKey = GameConfig::eKeys::STAY;
 		}
@@ -167,16 +178,16 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 	{
 		if (mario.isMarioOnFloor(board) && mario.state != MarioState::falling)
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
 			lastKey = (GameConfig::eKeys)key;
 		}
 		else
-			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels);
+			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
 	}
 
 }
 
-void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin) //moves each barrel
+void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode) //moves each barrel
 {
 	Point p(0, 0);
 	if (board.getDonkeyKongPos() == p)
@@ -199,12 +210,12 @@ void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& inte
 		if (!flag) { break; }
 		if (barrels[i].isBarrelActive()) //Move barrel only if active
 		{
-			barrels[i].moveBarrel(board, mario, flag, mariowin);
+			barrels[i].moveBarrel(board, mario, flag, mariowin, ifcolorMode);
 
 			//Remove barrel from array if reached screen boundaries or became inactive
 			if (barrels[i].getLocation().x >= 78 || barrels[i].getLocation().x <= 1 || !barrels[i].isBarrelActive())
 			{
-				barrels[i].clearFromScreen(board, mario, flag,mariowin, marioKilled); //Print EXPLOSION
+				barrels[i].clearFromScreen(board, mario, flag,mariowin, marioKilled, ifcolorMode); //Print EXPLOSION
 				barrels.erase(barrels.begin() + i);
 			}
 			else
@@ -221,7 +232,7 @@ void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& inte
 
 
 
-void Game::pauseGame(GameConfig& board, Mario& mario)  //pause the game
+void Game::pauseGame(GameConfig& board, Mario& mario, bool& ifcolorMode)  //pause the game
 {
 	Menu menu;
 	clrscr();
@@ -240,9 +251,9 @@ void Game::pauseGame(GameConfig& board, Mario& mario)  //pause the game
 		}
 	}
 	clrscr();
-	board.PrintBoard();
-	board.printHearts(mario);
-	mario.draw(mario.findMarioLocation());
+	board.PrintBoard(ifcolorMode);
+	board.printHearts(mario,ifcolorMode);
+	mario.draw(mario.findMarioLocation(),ifcolorMode);
 }
 
 bool Game::isInLegend(Point& p, GameConfig& currBoard)
@@ -259,7 +270,7 @@ bool Game::isInLegend(Point& p, GameConfig& currBoard)
 		return false;
 }
 
-void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin) // checks if theres a ladder or floor and then goes to set char on board
+void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode) // checks if theres a ladder or floor and then goes to set char on board
 {
 	char ch = currBoard.GetCurrentChar(p.x, p.y);
 	bool returnCh = isInLegend(p, currBoard);
@@ -268,7 +279,7 @@ void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mar
 		currBoard.SetChar(p.x, p.y, object);
 		Point p1 = mario.findMarioLocation();
 		if (currBoard.GetCurrentChar(p1.x, p1.y) == BARREL_CH || currBoard.GetCurrentChar(p1.x, p1.y) == GHOST_CH)
-			mario.collide(currBoard, flag, mariowin);
+			mario.collide(currBoard, flag, mariowin,ifcolorMode);
 		currBoard.SetChar(p.x, p.y, ch);
 	}
 	else

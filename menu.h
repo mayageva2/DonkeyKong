@@ -200,6 +200,26 @@ public:
 		  "|                                                                           |",//15
 		  "|---------------------------------------------------------------------------|",//16
 	};
+	const char* colorModeScreen[MENU_Y] = {
+		// 01234567890123456789012345678901234567890123456789012345678901234567890123456
+		  "|---------------------------------------------------------------------------|",//0
+		  "|	                                                                       |",//1
+		  "|                                                                           |",//2
+		  "|                  CHOOSE MODE //MAYA HELP WITH DESIGN                      |",//3
+		  "|                                                                           |",//4
+		  "|                                                                           |",//5
+		  "|                                                                           |",//6
+		  "|                                                                           |",//7
+		  "|                                                                           |",//8
+		  "|                                                                           |",//9
+		  "|           =================                   =================           |",//10
+		  "|          |    Color Mode   |                 |   Regular Mode  |          |",//11
+		  "|           =================                   =================           |",//12
+		  "|               Press C/c                           Press R/r               |",//13
+		  "|                                                                           |",//14
+		  "|                                                                           |",//15
+		  "|---------------------------------------------------------------------------|",//16
+	};
 
 
 	const char* colorModeScreen[MENU_Y] = {
@@ -227,9 +247,10 @@ public:
 	void printScreen(const char** print);  //prints screen
 	void displayMenu(Mario& mario);        // displays main menu
 	void displayEnd_Game(Mario& mario);    //ends game
-	void loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario);
-	void loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario);
-	char printChooseScreen(std::vector<std::string> screens);
-	void addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens);
+	void loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario, char colorMode);
+	void loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode);
+	char printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode);
+	void addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens, bool& ifcolorMode);
+	char printCModeScreen();
 };
 #endif
