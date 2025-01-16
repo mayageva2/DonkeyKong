@@ -42,8 +42,8 @@ public:
 	void jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, bool& ifcolorMode); //makes mario jump and then move to side according to key
 	bool isMarioOnFloor(GameConfig& currBoard);   //checks if mario stands on a floor
 	Point findMarioLocation();   //return mario's position
-	int getNumOfHearts() { return num_of_hearts; }  //returns amount of lives left
-	int getScore() { return num_of_points; }  //returns amount of lives left
+	int getNumOfHearts() const { return num_of_hearts; }  //returns amount of lives left
+	int getScore() const { return num_of_points; }  //returns amount of lives left
 	void collide(GameConfig& currBoard, bool& flag, bool& mariowin,bool& ifcolorMode); //makes mario explode and restarts game
 	void didMarioLose(GameConfig& currBoard, bool& flag,  bool& ifcolorMode); //checks if mario lost all hearts
 	void didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode);  //checks if mario reached pauline

@@ -11,6 +11,8 @@ static constexpr char HAMMER = 'p';//const for hammer
 static const std::string EXPLOSION = "BOOM"; //const for explosion print*/
 static constexpr int MAX_X = 80;  //screen size
 static constexpr int MAX_Y = 25;  //screen size
+static constexpr int MIN_X = 1;  //screen size
+static constexpr int MIN_Y = 1;  //screen size
 
 class Mario;
 
@@ -47,15 +49,15 @@ public:
 	static Point getLegendPos() { return legendPos; } //returns legend's start position
 	static Point getHammerPos() { return hammerPos; } //returns hammer's start position
 	Point getGhostPos();  //returns all ghosts positions
-	int getGhostsAmount() { return ghostCounter; } //returns amount of ghosts
+	int getGhostsAmount() const { return ghostCounter; } //returns amount of ghosts
 	bool insertLegend();
-	void printHearts(Mario& mario, bool& ifcolorMode); //print amount of hearts
 	void init(); //initiallizes all counters
+	void printHearts(Mario& mario, bool& ifcolorMode); //print amount of hearts
 	bool isDkongScreenFile(const std::string& filename); //checks if files is a screen file
 	std::vector<std::string> getDkongScreens(const std::string& directoryPath); //get screens from file
-	void printErrors();  //prints errors in screen
+	void printErrors() ;  //prints errors in screen
 	void printHammer(bool& ifcolorMode);  //prints V in legend when mario has a hammer
-	void printScore(Mario& mario, bool& ifcolorMode); //prints score
+	void printScore(Mario& mario, bool& ifcolorMode) const; //prints score
 	void addFrame(); //add Q frame to screen
 	bool isGhostsOnFloor();  //checks if ghosts are in the air
 

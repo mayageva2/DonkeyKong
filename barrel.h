@@ -10,7 +10,6 @@
 
 using namespace std;
 
-
 class Mario;
 
 class Barrel : public movingObject

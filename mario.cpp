@@ -160,7 +160,6 @@ void Mario::right(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mar
 			Sleep(100);
 		}
 		Mario::draw(this->location,ifcolorMode);
-		//Sleep(100);
 	}
 	else
 		stay(currBoard,ifcolorMode);
@@ -533,8 +532,7 @@ void Mario::collide(GameConfig& currBoard, bool& flag, bool& mariowin,bool& ifco
 		hammer = false;
 		num_of_points = ZERO;
 		this->location = GameConfig::getMarioPos();
-		Game game;
-		game.startGame(*this, currBoard, flag, mariowin, ifcolorMode);  /************************ !!!need to change to Game:: but startgame cant be static!!! ****************************/
+		Game::startGame(*this, currBoard, flag, mariowin, ifcolorMode); 
 	}
 }
 
@@ -546,7 +544,6 @@ void Mario::didMarioLose(GameConfig& currBoard, bool& flag,bool&ifcolorMode)  //
 		num_of_points = ZERO;
 		stay(currBoard,ifcolorMode);
 		clrscr();
-		Menu menu;
 		if (ifcolorMode)
 		{
 			SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
@@ -555,7 +552,7 @@ void Mario::didMarioLose(GameConfig& currBoard, bool& flag,bool&ifcolorMode)  //
 		{
 			SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		}
-		menu.displayEnd_Game(*this);
+		Menu::displayEnd_Game(*this);
 		flag = false;
 	}
 	
@@ -566,11 +563,10 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin,bool& 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	Point p(this->location);
 
-	if (currBoard.GetCurrentChar(p.x, p.y) == '$')   //checks if you reached pauline
+	if (currBoard.GetCurrentChar(p.x, p.y) == PAULINE_CH)   //checks if you reached pauline
 	{
 		stay(currBoard,ifcolorMode);
 		clrscr();
-		Menu menu;
 		Sleep(70);
 
 		if (ifcolorMode)
@@ -581,7 +577,7 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin,bool& 
 		{
 			SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		}
-		menu.printScreen(menu.winLevel);
+		Menu::printScreen(Menu::winLevel);
 		Sleep(3000);
 		flag = false;
 		mariowin = true;

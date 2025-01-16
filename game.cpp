@@ -26,7 +26,6 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 	int moveCounter = 0;
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
-	Menu menu;
 	vector<Ghost> ghosts;
 	vector<Barrel> barrels;
 	ghosts.reserve(board.getGhostsAmount());
@@ -190,7 +189,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode) //moves each barrel
 {
 	Point p(0, 0);
-	if (board.getDonkeyKongPos() == p) //in case there isn't a donket kong char
+	if (board.getDonkeyKongPos() == p) //in case there isn't a donkey kong char
 		return;
 
 	bool marioKilled = false;
@@ -213,7 +212,7 @@ void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& inte
 			barrels[i].moveBarrel(board, mario, flag, mariowin, ifcolorMode);
 
 			//Remove barrel from array if reached screen boundaries or became inactive
-			if (barrels[i].getLocation().x >= 78 || barrels[i].getLocation().x <= 1 || !barrels[i].isBarrelActive())
+			if (barrels[i].getLocation().x >= MAX_X-2 || barrels[i].getLocation().x <= MIN_X || !barrels[i].isBarrelActive())
 			{
 				barrels[i].clearFromScreen(board, mario, flag,mariowin, marioKilled, ifcolorMode); //Print EXPLOSION
 				barrels.erase(barrels.begin() + i);
@@ -234,9 +233,8 @@ void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& inte
 
 void Game::pauseGame(GameConfig& board, Mario& mario, bool& ifcolorMode)  //pause the game
 {
-	Menu menu;
 	clrscr();
-	menu.printScreen(menu.pause);
+	Menu::printScreen(Menu::pause);
 
 	char inputKey2 = 0;
 	while (true)
@@ -267,9 +265,9 @@ bool Game::isInLegend(Point& p, GameConfig& currBoard) //checks if mario is runn
 {
 	Point legend = currBoard.getLegendPos();
 	int min_x = legend.x;
-	int max_x = legend.x + 19;
+	int max_x = legend.x + Menu::LegendX-1;
 	int min_y = legend.y;
-	int max_y = legend.y + 2;
+	int max_y = legend.y + Menu::LegendY-1;
 
 	if (p.x >= min_x && p.x <= max_x && p.y >= min_y && p.y <= max_y)
 		return true;
@@ -281,7 +279,7 @@ void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mar
 {
 	char ch = currBoard.GetCurrentChar(p.x, p.y);
 	bool returnCh = isInLegend(p, currBoard);
-	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '=' || ch == 'Q' || ch == '$' || returnCh)
+	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '=' || ch == 'Q' || ch == PAULINE_CH || returnCh)
 	{
 		currBoard.SetChar(p.x, p.y, object);
 		Point p1 = mario.findMarioLocation();

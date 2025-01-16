@@ -18,9 +18,9 @@ void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& 
 				location.x -= 2;
 		}
 
-		if (location.x == 78 && !marioKilled)
+		if (location.x == MAX_X-2 && !marioKilled)
 		{
-			location.x = 75;
+			location.x = MAX_X - 5;
 		}
 		Point::draw(DELETE_CH, location, ifcolorMode);
 		gotoxy(location.x, location.y);

@@ -2,6 +2,9 @@
 #include "mario.h"
 #include "game.h"
 
+constexpr int LEFT = -1;
+constexpr int RIGHT = 1;
+
 void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin,bool& ifcolorMode)  //move ghost according to conditions
 {
     Point p(location.x, location.y);
@@ -10,7 +13,7 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
     Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode);
     p.draw(originalChar, location,ifcolorMode);
 
-    location.diff_x = direction ? 1 : -1;
+    location.diff_x = direction ? RIGHT : LEFT;
 
     checkCollision(ghosts, board); //check if ghosts collide with one another
 
@@ -19,7 +22,7 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
         if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == GHOST_CH)
         {
             direction = !direction;
-            location.diff_x = direction ? 1 : -1;
+            location.diff_x = direction ? RIGHT : LEFT;
             if (board.GetCurrentChar(p.x + location.diff_x, p.y) == 'Q')
                 location.diff_x = 0;
         }
@@ -33,7 +36,7 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
     else
     {
         direction = !direction;
-        location.diff_x = direction ? 1 : -1;
+        location.diff_x = direction ? RIGHT : LEFT;
         if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == GHOST_CH)
             location.diff_x = 0;
     }
@@ -50,8 +53,8 @@ void Ghost::checkCollision(std::vector<Ghost>& ghosts, GameConfig& board)
         if (this != &otherGhost && otherGhost.location.x == this->location.x + location.diff_x && otherGhost.location.y == this->location.y)
         {
             // Check if swapping directions would lead to a wall
-            int newDiffX = direction ? -1 : 1;
-            int otherNewDiffX = otherGhost.direction ? -1 : 1;
+            int newDiffX = direction ? LEFT : 1;
+            int otherNewDiffX = otherGhost.direction ? LEFT : 1;
             if (board.GetCurrentChar(location.x + newDiffX, location.y) != '=' && board.GetCurrentChar(location.x + newDiffX, location.y) != '<' && board.GetCurrentChar(location.x + newDiffX, location.y) != '>' && board.GetCurrentChar(location.x + newDiffX, location.y) != 'Q')
             {
                 direction = !direction;
@@ -74,7 +77,7 @@ void Ghost::checkCollision(std::vector<Ghost>& ghosts, GameConfig& board)
 void Ghost::moveGhosts()
 {
 	if(location.diff_x != 0)
-		location.x += direction ? 1 : -1;
+		location.x += direction ? RIGHT : LEFT;
 }
 
 void Ghost::randomDirection()

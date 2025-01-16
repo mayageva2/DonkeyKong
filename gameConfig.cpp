@@ -42,12 +42,12 @@ void GameConfig::load(const std::string& filename, bool& error)
 		if (curr_col <= MAX_X) {
 			if (curr_row == MAX_Y || curr_col == MAX_X) //is screen oversize
 			{
-				if (c != ' ')
+				if (c != DELETE_CH)
 				{
 					oversizeScreen = true;
 				}
 			}
-			else if (c == '@') 
+			else if (c == MARIO_CH) 
 			{
 				marioCounter++;
 				if (marioCounter > 1) //if there's more than one Mario
@@ -57,23 +57,23 @@ void GameConfig::load(const std::string& filename, bool& error)
 				}
 				marioPos = { curr_col, curr_row };
 			}
-			else if (c == '&') 
+			else if (c == DONKEY_KONG_CH) 
 			{
 				c = DELETE_CH;
 				if (donkeyCounter < 1) //if there's more than one DonkeyKong
 				{
 					donkeyPos = { curr_col, curr_row };
-					c = '&';
+					c = DONKEY_KONG_CH;
 				}
 				donkeyCounter++;
 			}
-			else if (c == 'x')
+			else if (c == GHOST_CH)
 			{
 				Point p = { curr_col, curr_row };
 				GhostsPos.push_back(p);
 				ghostCounter++;
 			}
-			else if (c == 'p')
+			else if (c == HAMMER)
 			{
 				hammerCounter++;
 				if (hammerCounter > 1) //if there's more than one Hammer
@@ -88,16 +88,16 @@ void GameConfig::load(const std::string& filename, bool& error)
 				legendCounter++;
 				legendPos = { curr_col, curr_row };
 			}
-			else if (c == '$')
+			else if (c == PAULINE_CH)
 			{
 				c = DELETE_CH;
 				if (PaulineCounter < 1) //if there's more than one Pauline
 				{
-					c = '$';
+					c = PAULINE_CH;
 				}
 				PaulineCounter++;
 			}
-			else if(c != DELETE_CH && c!= 'H' && c!= '<' && c!= '>' && c!= '=')
+			else if(c != DELETE_CH && c!= LADDER_CH && c!= '<' && c!= '>' && c!= '=')
 			{
 				c = DELETE_CH;
 			}
@@ -217,7 +217,18 @@ bool GameConfig::insertLegend() //insert legend to screen
 
 }
 
-void GameConfig::PrintBoard(bool& ifcolorMode) const//prints board
+void GameConfig::printHearts(Mario& mario, bool& ifcolorMode) //this func print hearts on screen
+{
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	gotoxy(legendPos.x + 15, legendPos.y);
+	if (ifcolorMode)
+	{
+		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	}
+	std::cout << mario.getNumOfHearts();
+}
+
+void GameConfig::PrintBoard(bool& ifcolorMode) const //prints board
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(0, 0);
@@ -273,17 +284,6 @@ Point GameConfig::getGhostPos() //return ghosts positions
 	return ghostPos;
 }
 
-void GameConfig::printHearts(Mario& mario,bool& ifcolorMode) //this func print hearts on screen
-{
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	gotoxy(legendPos.x + 15, legendPos.y);
-	if (ifcolorMode)
-	{
-		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-	}
-	std::cout << mario.getNumOfHearts();
-}
-
 void GameConfig::printHammer(bool& ifcolorMode) //prints hammer on screen 
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -295,7 +295,7 @@ void GameConfig::printHammer(bool& ifcolorMode) //prints hammer on screen
 	std::cout << "V";
 }
 
-void GameConfig::printScore(Mario& mario, bool& ifcolorMode)  //prints score on screen
+void GameConfig::printScore(Mario& mario, bool& ifcolorMode) const//prints score on screen
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(legendPos.x + 15, legendPos.y + 1);

@@ -11,7 +11,6 @@ using namespace std;
 void main()
 {
 	hideCursor();
-	Menu menu;
 	Mario mario;
-	menu.displayMenu(mario);
+	Menu::displayMenu(mario);
 }
