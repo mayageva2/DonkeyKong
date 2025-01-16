@@ -2,7 +2,7 @@
 #include "mario.h"
 #include "game.h"
 
-void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin,bool& ifcolorMode)
+void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin,bool& ifcolorMode)  //move ghost according to conditions
 {
     Point p(location.x, location.y);
     Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode);
@@ -12,7 +12,7 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
 
     location.diff_x = direction ? 1 : -1;
 
-    checkCollision(ghosts, board);
+    checkCollision(ghosts, board); //check if ghosts collide with one another
 
     if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '=' ||( p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == 'Q' && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
     {

@@ -7,10 +7,10 @@ class Menu
 	Menu(const Menu&) = delete;
 public:
 	Menu() = default;
-	static constexpr int MENU_X = 75;
-	static constexpr int MENU_Y = 17;
-	static constexpr int LegendX = 20;
-	static constexpr int LegendY = 3;
+	static constexpr int MENU_X = 75; //menu size
+	static constexpr int MENU_Y = 17; //menu size
+	static constexpr int LegendX = 20;  //legend size
+	static constexpr int LegendY = 3;   //legend size
 	static const char legend[LegendY][LegendX+1];
 	const char* mainMenu[MENU_Y] = {
 	  // 012345678901a2345678901234567890123456789012345678901234567890123456789012345
@@ -247,10 +247,10 @@ public:
 	void printScreen(const char** print);  //prints screen
 	void displayMenu(Mario& mario);        // displays main menu
 	void displayEnd_Game(Mario& mario);    //ends game
-	void loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario, char colorMode);
-	void loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode);
-	char printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode);
-	void addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens, bool& ifcolorMode);
+	void loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario, char colorMode); //load each screen by order
+	void loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode); //load specific screen
+	char printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode); //prints board according to user's choice
+	void addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens, bool& ifcolorMode); //add names to choose screen
 	char printCModeScreen();
 };
 #endif

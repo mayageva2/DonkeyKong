@@ -50,15 +50,15 @@ public:
 	void resetMario();   //resets mario
 	void pickHammer(GameConfig& board, bool& ifcolorMode);
 	void deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode);
-	void setScore(int points) { num_of_points += points; }
-	void resetMarioPos();
+	void setScore(int points) { num_of_points += points; } //sets new score
+	void resetMarioPos();  //brings mario back to starting position
 
-	bool hasHammer() const
+	bool hasHammer() const //check if mario has a hammer
 	{
 		return hammer;
 	}
 
-	void setHammer(bool hasHammer)
+	void setHammer(bool hasHammer) //switch hammer to true
 	{
 		hammer = hasHammer;
 	}

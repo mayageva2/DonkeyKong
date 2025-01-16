@@ -33,7 +33,7 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 	createGhosts(ghosts, board);
   
 	mario.draw(mario.findMarioLocation(), ifcolorMode);
-	if(!mario.isMarioOnFloor(board))
+	if(!mario.isMarioOnFloor(board))  //incase mario is positioned in the air
 		mario.state = MarioState::falling;
 	else
 		mario.state = MarioState::standing;
@@ -41,12 +41,12 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 	flag = true;
 	while (flag)
 	{
-		for (int i = 0; i < ghosts.size(); i++)
+		for (int i = 0; i < ghosts.size(); i++)  //Move ghosts
 			ghosts[i].checkMove(board, mario, flag, ghosts, mariowin,ifcolorMode);
 
 		barrelsMovement(barrels, board, interval, mario, flag, mariowin,ifcolorMode); // Move Barrels
 
-		if (moveCounter == 0)
+		if (moveCounter == 0) //Move Mario
 		{
 			Sleep(80);
 			char inputKey = 0;
@@ -95,13 +95,13 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 		++interval;
 	}
 	gotoxy(0, MAX_Y + 2);
-	ghosts.clear();
+	ghosts.clear();  //Clear ghosts 
 	ghosts.shrink_to_fit();
 	barrels.clear(); //Clear barrels array
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);//set default screen color
 }
 
-void Game::createGhosts(vector<Ghost>& ghosts, GameConfig& board)
+void Game::createGhosts(vector<Ghost>& ghosts, GameConfig& board) //this func creates insert all ghosts into a vector
 {
 	int amountOfGhosts = board.getGhostsAmount();
 	for (int i = 0; i < amountOfGhosts; i++)
@@ -167,7 +167,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 			key = (char)lastKey;
 			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode);
 		}
-		else
+		else //mario is jumping
 		{
 			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode);
 			if (mario.state == MarioState::standing)
@@ -181,7 +181,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
 			lastKey = (GameConfig::eKeys)key;
 		}
-		else
+		else //incase mario is falling
 			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
 	}
 
@@ -190,7 +190,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode) //moves each barrel
 {
 	Point p(0, 0);
-	if (board.getDonkeyKongPos() == p)
+	if (board.getDonkeyKongPos() == p) //in case there isn't a donket kong char
 		return;
 
 	bool marioKilled = false;
@@ -253,10 +253,17 @@ void Game::pauseGame(GameConfig& board, Mario& mario, bool& ifcolorMode)  //paus
 	clrscr();
 	board.PrintBoard(ifcolorMode);
 	board.printHearts(mario,ifcolorMode);
-	mario.draw(mario.findMarioLocation(),ifcolorMode);
+	board.printScore(mario);
+	if (mario.hasHammer())
+	{
+		board.printHammer();
+		Point::draw(DELETE_CH, GameConfig::getHammerPos());
+	}
+	mario.draw(mario.findMarioLocation());
+	Point::draw(DELETE_CH, GameConfig::getMarioPos());
 }
 
-bool Game::isInLegend(Point& p, GameConfig& currBoard)
+bool Game::isInLegend(Point& p, GameConfig& currBoard) //checks if mario is running over the legend
 {
 	Point legend = currBoard.getLegendPos();
 	int min_x = legend.x;

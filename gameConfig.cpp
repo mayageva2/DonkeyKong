@@ -40,7 +40,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 			continue;
 		}
 		if (curr_col <= MAX_X) {
-			if (curr_row == MAX_Y || curr_col == MAX_X)
+			if (curr_row == MAX_Y || curr_col == MAX_X) //is screen oversize
 			{
 				if (c != ' ')
 				{
@@ -50,7 +50,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 			else if (c == '@') 
 			{
 				marioCounter++;
-				if (marioCounter > 1)
+				if (marioCounter > 1) //if there's more than one Mario
 				{
 					originalBoard[marioPos.y][marioPos.x] = DELETE_CH;
 					marioCounter--;
@@ -60,7 +60,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 			else if (c == '&') 
 			{
 				c = DELETE_CH;
-				if (donkeyCounter < 1)
+				if (donkeyCounter < 1) //if there's more than one DonkeyKong
 				{
 					donkeyPos = { curr_col, curr_row };
 					c = '&';
@@ -76,7 +76,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 			else if (c == 'p')
 			{
 				hammerCounter++;
-				if (hammerCounter > 1)
+				if (hammerCounter > 1) //if there's more than one Hammer
 				{
 					originalBoard[hammerPos.y][hammerPos.x] = DELETE_CH;
 					hammerCounter--;
@@ -91,7 +91,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 			else if (c == '$')
 			{
 				c = DELETE_CH;
-				if (PaulineCounter < 1)
+				if (PaulineCounter < 1) //if there's more than one Pauline
 				{
 					c = '$';
 				}
@@ -109,6 +109,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 	int last_row = (curr_row < MAX_Y ? curr_row : MAX_Y - 1);
 	addFrame();
 
+	//checking for errors in screen
 	if (isGhostsOnFloor())
 		error = true;
 	if (marioCounter < 1 || legendCounter != 1 || PaulineCounter < 1)
@@ -117,7 +118,7 @@ void GameConfig::load(const std::string& filename, bool& error)
 		error = true;
 }
 
-void GameConfig::initBoard()
+void GameConfig::initBoard()  //initialize board
 {
 	for (int i = 0; i < MAX_Y; ++i) 
 	{
@@ -128,7 +129,7 @@ void GameConfig::initBoard()
 	}
 }
 
-void GameConfig::addFrame()
+void GameConfig::addFrame() //add Q frame to screen
 {
 	for (int i = 0; i < MAX_X; ++i) 
 	{
@@ -143,7 +144,7 @@ void GameConfig::addFrame()
 	}
 }
 
-bool GameConfig::isGhostsOnFloor()
+bool GameConfig::isGhostsOnFloor()  //checks if ghosts are in the air
 {
 	size_t size = GhostsPos.size();
 	for (size_t i = 0; i < size; i++)
@@ -159,7 +160,7 @@ bool GameConfig::isGhostsOnFloor()
 
 }
 
-void GameConfig::printErrors()
+void GameConfig::printErrors() //prints errors on screens
 {
 	clrscr();
 	if (oversizeScreen)
@@ -194,7 +195,7 @@ void GameConfig::printErrors()
 	while (!_kbhit()) {}
 }
 
-bool GameConfig::insertLegend()
+bool GameConfig::insertLegend() //insert legend to screen
 {
 	if (legendPos.x + Menu::LegendX < (MAX_X - 1) && legendPos.y + Menu::LegendY < (MAX_Y - 1))
 	{
@@ -265,7 +266,7 @@ void GameConfig::resetBoard() //resets to original board
 	}
 }
 
-Point GameConfig::getGhostPos()
+Point GameConfig::getGhostPos() //return ghosts positions
 {
 	Point ghostPos = GhostsPos[currentGhostIndex];
 	currentGhostIndex = (currentGhostIndex + 1) % GhostsPos.size();
@@ -283,7 +284,7 @@ void GameConfig::printHearts(Mario& mario,bool& ifcolorMode) //this func print h
 	std::cout << mario.getNumOfHearts();
 }
 
-void GameConfig::printHammer(bool& ifcolorMode)
+void GameConfig::printHammer(bool& ifcolorMode) //prints hammer on screen 
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(legendPos.x + 15, legendPos.y + 2);
@@ -294,7 +295,7 @@ void GameConfig::printHammer(bool& ifcolorMode)
 	std::cout << "V";
 }
 
-void GameConfig::printScore(Mario& mario, bool& ifcolorMode)
+void GameConfig::printScore(Mario& mario, bool& ifcolorMode)  //prints score on screen
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(legendPos.x + 15, legendPos.y + 1);
@@ -306,7 +307,7 @@ void GameConfig::printScore(Mario& mario, bool& ifcolorMode)
 }
 
 
-void GameConfig::init()
+void GameConfig::init()  //initialize counters
 {
 	ghostCounter = 0;
 	marioCounter = 0;
@@ -316,7 +317,7 @@ void GameConfig::init()
 	PaulineCounter = 0;
 }
 
-bool GameConfig::isDkongScreenFile(const std::string& filename)
+bool GameConfig::isDkongScreenFile(const std::string& filename) //check if file is a screen file
 {
 	const std::string prefix = "dkong_";
 	const std::string suffix = ".screen";
