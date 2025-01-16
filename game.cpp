@@ -253,14 +253,14 @@ void Game::pauseGame(GameConfig& board, Mario& mario, bool& ifcolorMode)  //paus
 	clrscr();
 	board.PrintBoard(ifcolorMode);
 	board.printHearts(mario,ifcolorMode);
-	board.printScore(mario);
+	board.printScore(mario, ifcolorMode);
 	if (mario.hasHammer())
 	{
-		board.printHammer();
-		Point::draw(DELETE_CH, GameConfig::getHammerPos());
+		board.printHammer(ifcolorMode);
+		Point::draw(DELETE_CH, GameConfig::getHammerPos(), ifcolorMode);
 	}
-	mario.draw(mario.findMarioLocation());
-	Point::draw(DELETE_CH, GameConfig::getMarioPos());
+	mario.draw(mario.findMarioLocation(), ifcolorMode);
+	Point::draw(DELETE_CH, GameConfig::getMarioPos(), ifcolorMode);
 }
 
 bool Game::isInLegend(Point& p, GameConfig& currBoard) //checks if mario is running over the legend

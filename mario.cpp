@@ -190,7 +190,7 @@ void Mario::up(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& fl
 		if (moveCounter == 4)
 			moveCounter = ENDJUMP;
 		if (moveCounter > 4)
-			climbUpAladder(moveCounter, currBoard);
+			climbUpAladder(moveCounter, currBoard, ifcolorMode);
 	}
 	else  //going up a ladder
 	{
@@ -243,7 +243,7 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump, boo
 		Sleep(80);
 		moveCounter++;
 	}
-	didMarioWin(currBoard, flag, mariowin);
+	didMarioWin(currBoard, flag, mariowin, ifcolorMode);
 
 	if (isMarioOnFloor(currBoard))
 	{
@@ -581,7 +581,7 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin,bool& 
 		{
 			SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		}
-		menu.printScreen(menu.win);
+		menu.printScreen(menu.winLevel);
 		Sleep(3000);
 		flag = false;
 		mariowin = true;

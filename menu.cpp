@@ -15,6 +15,7 @@ const int EXIT = 9;
 
 void Menu::printScreen(const char** print) //prints screen
 {
+	clrscr();
 	Point p = startMenu;
 	for (int i = 0; i < MENU_Y; i++)
 	{

@@ -35,10 +35,11 @@ class GameConfig
 	bool oversizeScreen = false; //checks if screen given is larger than approved screen size
 	char originalBoard[MAX_Y][MAX_X + 1] = {};  //original board
 	char currentBoard[MAX_Y][MAX_X + 1] = {};   //current board
+public:
 	GameConfig() : marioCounter(0), donkeyCounter(0), ghostCounter(0), hammerCounter(0), legendCounter(0), PaulineCounter(0) {} //constructor
 	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27, KILL = 'p', KILL2 = 'P' }; //user's keys
 	void initBoard(); //initialize board
-  void load(const std::string& filename, bool& error); //load board
+    void load(const std::string& filename, bool& error); //load board
 	void PrintBoard(bool& ifcolorMode) const; //prints board on screen
 	void resetBoard();  //reset current board to original board
 	static Point getMarioPos() { return marioPos; }  //returns mario's position
@@ -47,7 +48,7 @@ class GameConfig
 	static Point getHammerPos() { return hammerPos; } //returns hammer's start position
 	Point getGhostPos();  //returns all ghosts positions
 	int getGhostsAmount() { return ghostCounter; } //returns amount of ghosts
-	void insertLegend();
+	bool insertLegend();
 	void printHearts(Mario& mario, bool& ifcolorMode); //print amount of hearts
 	void init(); //initiallizes all counters
 	bool isDkongScreenFile(const std::string& filename); //checks if files is a screen file
@@ -55,7 +56,9 @@ class GameConfig
 	void printErrors();  //prints errors in screen
 	void printHammer(bool& ifcolorMode);  //prints V in legend when mario has a hammer
 	void printScore(Mario& mario, bool& ifcolorMode); //prints score
-	
+	void addFrame(); //add Q frame to screen
+	bool isGhostsOnFloor();  //checks if ghosts are in the air
+
 	char GetCurrentChar(int x, int y) const// returns a char that is placed on given point on board
 	{
 		return currentBoard[y][x];

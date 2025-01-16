@@ -46,10 +46,10 @@ void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& 
 void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode)
 {
 	Point p(location.x, location.y);
-	Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin); //resets barrel's previous location
+	Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode); //resets barrel's previous location
 	char originalChar = board.GetCurrentChar(location.x, location.y); //Restore the original character at the barrel's current location
-	Game::setCharCheck(location, board, originalChar, mario, flag, mariowin);
-	p.draw(originalChar, location); //print original char on board
+	Game::setCharCheck(location, board, originalChar, mario, flag, mariowin, ifcolorMode);
+	p.draw(originalChar, location, ifcolorMode); //print original char on board
 
 	if (location == GameConfig::getDonkeyKongPos()) // if barrel crossed donkey kong
 	{
