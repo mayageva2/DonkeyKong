@@ -5,10 +5,6 @@
 #include <vector>
 #include "point.h"
 
-/*static constexpr char LADDER_CH = 'H'; //const for ladder
-static constexpr char DELETE_CH = ' ';  //const to clear pos
-static constexpr char HAMMER = 'p';//const for hammer 
-static const std::string EXPLOSION = "BOOM"; //const for explosion print*/
 static constexpr int MAX_X = 80;  //screen size
 static constexpr int MAX_Y = 25;  //screen size
 static constexpr int MIN_X = 1;  //screen size
@@ -50,7 +46,7 @@ public:
 	static Point getHammerPos() { return hammerPos; } //returns hammer's start position
 	Point getGhostPos();  //returns all ghosts positions
 	int getGhostsAmount() const { return ghostCounter; } //returns amount of ghosts
-	bool insertLegend();
+	bool insertLegend(); //inserts legend to board
 	void init(); //initiallizes all counters
 	void printHearts(Mario& mario, bool& ifcolorMode); //print amount of hearts
 	bool isDkongScreenFile(const std::string& filename); //checks if files is a screen file

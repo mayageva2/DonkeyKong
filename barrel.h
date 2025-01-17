@@ -14,14 +14,14 @@ class Mario;
 
 class Barrel : public movingObject
 {
-	int fallCount;
-	bool isActive;
+	int fallCount; //counts the amount of floors barrel falls
+	bool isActive; //checks if a barrel is active
 
 public:
 	bool dropDirection;      // Indicates if the barrel is dropping: true = down, false = no drop
 	Barrel(): movingObject(GameConfig::getDonkeyKongPos().x, GameConfig::getDonkeyKongPos().y, true), fallCount(0), isActive(false), dropDirection(true) {} //Constractor
 	Point getLocation() const { return location; } //Get barrel location
-	void moveBarrel(GameConfig& board, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode);
+	void moveBarrel(GameConfig& board, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode); //moves barrel
 	void clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& mariowin, bool& marioKilled,bool& ifcolorMode); // Clears the barrel from the screen and updates the game board
 	void deactivate() { isActive = false; } //Deactivate barrel
 	void activate() { isActive = true; } //Activate Barrel

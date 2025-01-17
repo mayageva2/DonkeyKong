@@ -313,7 +313,7 @@ void Menu::chooseColorScreen(char& colorModeKey, bool& ifcolorM)
 	}
 }
 
-char Menu::printCModeScreen()
+char Menu::printCModeScreen() //prints screen in color mode
 {
 	clrscr();
 	printScreen(colorModeScreen);
@@ -321,7 +321,7 @@ char Menu::printCModeScreen()
 	return key;
 }
 
-char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode)
+char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode) //prints chosen screen 
 {
 	size_t size = screens.size();
 	if (size == 0)
@@ -377,7 +377,7 @@ char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode)
 	}
 }
 
-void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens,bool& ifcolorMode)
+void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens,bool& ifcolorMode) //add file names to choosing screen 
 {
 	int j = 0;
 
@@ -401,7 +401,7 @@ void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPo
 }
 
 
-void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode)
+void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode) //load screens one by one
 {
 	bool mariowin = true;
 	bool ifcolorMode = false;
@@ -438,7 +438,7 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 	}
 }
 
-void Menu::loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode)
+void Menu::loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode) //load chosen screen
 {
 	int i = screenKey - '0' -1;
 	loadScreens(i, screens, board, screenError, mario,colorMode);

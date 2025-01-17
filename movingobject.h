@@ -10,7 +10,7 @@ protected:
 
 public:
 	movingObject (int x, int y, bool dir = true) : location(x, y), direction(dir) {} //Constractor
-	virtual ~movingObject() = default;
-	Point getLocation() const { return location; }
+	virtual ~movingObject() = default; //destructor
+	Point getLocation() const { return location; } //gets object's position
 };
 #endif

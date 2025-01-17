@@ -48,8 +48,8 @@ public:
 	void didMarioLose(GameConfig& currBoard, bool& flag,  bool& ifcolorMode); //checks if mario lost all hearts
 	void didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode);  //checks if mario reached pauline
 	void resetMario();   //resets mario
-	void pickHammer(GameConfig& board, bool& ifcolorMode);
-	void deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode);
+	void pickHammer(GameConfig& board, bool& ifcolorMode); //takes care of hammer when mario reaches it
+	void deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode); //deletesghosts andbarrels that were killed
 	void setScore(int points) { num_of_points += points; } //sets new score
 	void resetMarioPos();  //brings mario back to starting position
 

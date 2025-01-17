@@ -34,33 +34,39 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 	case GameConfig::eKeys::LEFT:
 	case GameConfig::eKeys::LEFT2:
 		state = MarioState::moving;
-		left(currBoard, moveCounter, flag, mariowin, ifcolorMode);
+		if(flag)
+			left(currBoard, moveCounter, flag, mariowin, ifcolorMode);
 		break;
 	case GameConfig::eKeys::RIGHT:
 	case GameConfig::eKeys::RIGHT2:
 		state = MarioState::moving;
-		right(currBoard, moveCounter, flag, mariowin, ifcolorMode);
+		if (flag)
+			right(currBoard, moveCounter, flag, mariowin, ifcolorMode);
 		break;
 	case GameConfig::eKeys::UP:
 	case GameConfig::eKeys::UP2:
 		state = MarioState::jumping;
-		up(currBoard, moveCounter, sideJump, flag, mariowin,ifcolorMode);
+		if (flag)
+			up(currBoard, moveCounter, sideJump, flag, mariowin,ifcolorMode);
 		break;
 
 	case GameConfig::eKeys::DOWN:
 	case GameConfig::eKeys::DOWN2:
 		state = MarioState::falling;
-		down(currBoard, moveCounter, sideJump, flag, mariowin,ifcolorMode);
+		if (flag)
+			down(currBoard, moveCounter, sideJump, flag, mariowin,ifcolorMode);
 		break;
 	case GameConfig::eKeys::STAY:
 	case GameConfig::eKeys::STAY2:
 		state = MarioState::standing;
-		stay(currBoard,ifcolorMode);
+		if (flag)
+			stay(currBoard,ifcolorMode);
 		break;
 	case GameConfig::eKeys::KILL:
 	case GameConfig::eKeys::KILL2:
 		state = MarioState::killing;
-		killEnemy(currBoard, *this, ghosts, barrels, flag, mariowin,ifcolorMode);
+		if (flag)
+			killEnemy(currBoard, *this, ghosts, barrels, flag, mariowin,ifcolorMode);
 		break;
 	}
 	
@@ -85,7 +91,7 @@ bool Mario::isInBoard(GameConfig& currBoard, int x)  //checks if a point is on b
 	return (x < MAX_X - 1 && x >= 1);
 }
 
-bool Mario::isMarioOnLadder(GameConfig& currBoard)
+bool Mario::isMarioOnLadder(GameConfig& currBoard)  //checks if mario is on a ladder
 {
 	return currBoard.GetCurrentChar(this->location.x, this->location.y) == LADDER_CH;
 }
@@ -269,7 +275,7 @@ void Mario::climbUpAladder(int& moveCounter, GameConfig& currBoard,bool& ifcolor
 	{
 		p.draw(LADDER_CH, this->location, ifcolorMode);
 	}
-	else
+	else //ends climbing
 	{
 		char way = currBoard.GetCurrentChar(this->location.x, this->location.y);
 		p.draw(way, this->location, ifcolorMode);
@@ -353,7 +359,7 @@ void Mario::stay(GameConfig& currBoard,bool&ifcolorMode) //stops mario's movemen
 	this->state = MarioState::standing;
 }
 
-void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode)
+void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode) //this func makes mario kill barrel or ghost
 {
 	if (hammer)
 	{
@@ -381,7 +387,7 @@ void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts
 	}
 }
 
-void Mario::deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode)
+void Mario::deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode) //delets a barrel or ghost that mario killed
 {
 	bool marioKilled = true;
 	for (size_t i = 0; i < barrels.size();)
@@ -592,7 +598,7 @@ void Mario::resetMario()  //this func initiallize mario's data members
 	this->location = GameConfig::getMarioPos();
 }
 
-void Mario::pickHammer(GameConfig& board, bool& ifcolorMode)
+void Mario::pickHammer(GameConfig& board, bool& ifcolorMode) //this func takes care of hammer when mario picks it up
 {
 	Point p(board.getLegendPos());
 	setHammer(true);

@@ -123,7 +123,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 		}
 		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode);
 	}
-	else if (((GameConfig::eKeys)key == GameConfig::eKeys::KILL) || ((GameConfig::eKeys)key == GameConfig::eKeys::KILL2))//////NEED TO ADD LAST KEY TO MOVE/////////
+	else if (((GameConfig::eKeys)key == GameConfig::eKeys::KILL) || ((GameConfig::eKeys)key == GameConfig::eKeys::KILL2))
 	{
 		MarioState prevState = mario.state;
 		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode);
@@ -134,7 +134,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 		}
 		else
 		{
-			key = (char)GameConfig::eKeys::STAY; //maeio was staying before killing
+			key = (char)GameConfig::eKeys::STAY; //mario was staying before killing
 		}
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP) || ((GameConfig::eKeys)key == GameConfig::eKeys::UP2))

@@ -3,7 +3,7 @@
 #include "game.h"
 #include "gameConfig.h"
 
-void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& mariowin, bool& marioKilled,bool& ifcolorMode)
+void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& mariowin, bool& marioKilled,bool& ifcolorMode) //this function clears barrels from the screen
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	Game::setCharCheck(location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode); //resets barrel's previous location
@@ -43,7 +43,7 @@ void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& 
 	deactivate();
 }
 
-void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode)
+void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode) //this func moves barrels
 {
 	Point p(location.x, location.y);
 	Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode); //resets barrel's previous location
@@ -124,7 +124,7 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariow
 	p.draw(BARREL_CH, location, ifcolorMode);//Draw the barrel at its new position on screen
 }
 
-bool Barrel::marioCloseToExplosion(GameConfig& board, Mario& mario)
+bool Barrel::marioCloseToExplosion(GameConfig& board, Mario& mario) //checks if mario is close to barrel's explosion
 {
 	Point marioPos = mario.findMarioLocation();
 	if (isInExplosionArea(this->location, marioPos))
@@ -133,7 +133,7 @@ bool Barrel::marioCloseToExplosion(GameConfig& board, Mario& mario)
 		return false;
 }
 
-bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos)
+bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos) //checks if mario is in an explosion area
 {
 	int min_x = barrelPos.x - 2;
 	int max_x = barrelPos.x + 2;

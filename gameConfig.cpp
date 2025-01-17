@@ -14,7 +14,7 @@ Point GameConfig::donkeyPos = { 0, 0 };
 Point GameConfig::hammerPos = { 0, 0 };
 Point GameConfig::legendPos = { 0, 0 };
 
-void GameConfig::load(const std::string& filename, bool& error) 
+void GameConfig::load(const std::string& filename, bool& error) //this func loads a screen 
 {
 	std::ifstream screen_file(filename);
 	int curr_row = 0;
@@ -327,7 +327,7 @@ bool GameConfig::isDkongScreenFile(const std::string& filename) //check if file 
 		filename.substr(filename.size() - suffix.size()) == suffix;
 }
 
-std::vector<std::string> GameConfig::getDkongScreens(const std::string& directoryPath) //chat GPT solution
+std::vector<std::string> GameConfig::getDkongScreens(const std::string& directoryPath) //chat GPT solution- gets screens
 {
 	std::vector<std::string> screens;
 

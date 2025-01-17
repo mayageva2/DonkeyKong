@@ -17,7 +17,7 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
 
     checkCollision(ghosts, board); //check if ghosts collide with one another
 
-    if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '=' ||( p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == 'Q' && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
+    if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '=' || board.GetCurrentChar( p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == 'Q' && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
     {
         if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == GHOST_CH)
         {
@@ -46,7 +46,7 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
     p.draw(GHOST_CH, location,ifcolorMode);
 }
 
-void Ghost::checkCollision(std::vector<Ghost>& ghosts, GameConfig& board)
+void Ghost::checkCollision(std::vector<Ghost>& ghosts, GameConfig& board) //check if ghosts meet each other
 {
     for (Ghost& otherGhost : ghosts)
     {
@@ -74,20 +74,20 @@ void Ghost::checkCollision(std::vector<Ghost>& ghosts, GameConfig& board)
     }
 }
 
-void Ghost::moveGhosts()
+void Ghost::moveGhosts() //moves ghost according to direction
 {
 	if(location.diff_x != 0)
 		location.x += direction ? RIGHT : LEFT;
 }
 
-void Ghost::randomDirection()
+void Ghost::randomDirection() //gives a random direction
 {
     int randomNum = (std::rand() % 100) + 1;
     if (randomNum > 95)
         direction = !direction;
 }
 
-void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin,bool& ifcolorMode)
+void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin,bool& ifcolorMode) //this func clears ghosts from screen
 {
     char originalChar = board.GetOriginalChar(location.x, location.y);
     Point::draw(originalChar, location,ifcolorMode);

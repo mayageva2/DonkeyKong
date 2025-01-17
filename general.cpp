@@ -21,7 +21,7 @@ void clrscr() //Clear screen
 	system("cls");
 }
 
-void hideCursor() // chatGPT solution
+void hideCursor() // chatGPT solution - get rid of cursor
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE); 
 	CONSOLE_CURSOR_INFO cursorInfo;
