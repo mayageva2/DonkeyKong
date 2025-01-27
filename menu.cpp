@@ -266,8 +266,10 @@ void Menu::displayMenu(Mario& mario) // displays main menu
 				Sleep(2000);
 			}
 			else
+			{
 				chooseColorScreen(colorModeKey, ifcolorM);
 				loadScreens(0, screens, board, screenError, mario, colorModeKey);
+			}
 			break;
 		case INSTRUCTIONS:
 			printScreen(instructions);
@@ -430,7 +432,7 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 		}
 	}
 	mario.resetMario();
-	if (mariowin)
+	if (mariowin && screens.size() != 0)
 	{
 		clrscr();
 		printScreen(Menu::win);

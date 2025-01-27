@@ -21,10 +21,10 @@ void Mario::draw(const Point& pos,bool& ifcolorMode) const  //this func draws ma
 	cout << MARIO_CH;
 }
 
-void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin, vector<Ghost>& ghosts, vector<Barrel>& barrels,bool& ifcolorMode) //this func moves mario according to user's key
+void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin, vector<Ghost*>& ghosts, vector<Barrel>& barrels,bool& ifcolorMode) //this func moves mario according to user's key
 {
 	bool sideJump = false;
-	if ((currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == GHOST_CH) && (char)key != 'p' && (char)key != 'P')
+	if ((currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH) && (char)key != 'p' && (char)key != 'P')
 		collide(currBoard, flag, mariowin,ifcolorMode);
 	if(flag)
 		Game::setCharCheck(this->location, currBoard, DELETE_CH, *this, flag, mariowin,ifcolorMode); //resets mario's previous location
@@ -74,7 +74,7 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
    {
 	    if (currBoard.GetCurrentChar(this->location.x, this->location.y) == HAMMER)//Mario reaches to hammer
 	    	pickHammer(currBoard,ifcolorMode);
-	    if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == GHOST_CH)
+	    if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH)
 	    	collide(currBoard, flag, mariowin,ifcolorMode);
 	    if (flag)
 		  	Game::setCharCheck(location, currBoard, MARIO_CH, *this, flag, mariowin,ifcolorMode);
@@ -359,7 +359,7 @@ void Mario::stay(GameConfig& currBoard,bool&ifcolorMode) //stops mario's movemen
 	this->state = MarioState::standing;
 }
 
-void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode) //this func makes mario kill barrel or ghost
+void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost*>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode) //this func makes mario kill barrel or ghost
 {
 	if (hammer)
 	{
@@ -368,7 +368,8 @@ void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts
 
 		for (int i = -2; i < 3; i++)
 		{
-			if (currBoard.GetCurrentChar(hammerUsePos.x + i, hammerUsePos.y) == GHOST_CH ||
+			if (currBoard.GetCurrentChar(hammerUsePos.x + i, hammerUsePos.y) == NON_CLIMBING_GHOST_CH ||
+				currBoard.GetCurrentChar(hammerUsePos.x + i, hammerUsePos.y) == CLIMBING_GHOST_CH ||
 				currBoard.GetCurrentChar(hammerUsePos.x + i, hammerUsePos.y) == BARREL_CH)
 			{
 				hammerUsePos.x += i;
@@ -387,7 +388,7 @@ void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts
 	}
 }
 
-void Mario::deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode) //delets a barrel or ghost that mario killed
+void Mario::deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost*>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode) //delets a barrel or ghost that mario killed
 {
 	bool marioKilled = true;
 	for (size_t i = 0; i < barrels.size();)
@@ -403,13 +404,13 @@ void Mario::deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost
 		}
 	}
 
-	if (currBoard.GetCurrentChar(killPos.x, killPos.y) == GHOST_CH) //Delete ghost
+	if (currBoard.GetCurrentChar(killPos.x, killPos.y) == NON_CLIMBING_GHOST_CH || currBoard.GetCurrentChar(killPos.x, killPos.y) == CLIMBING_GHOST_CH) //Delete ghost
 	{
 		for (size_t i = 0; i < ghosts.size();)
 		{
-			if (ghosts[i].getLocation() == killPos)
+			if (ghosts[i]->getLocation() == killPos)
 			{
-				ghosts[i].clearGhostFromScreen(currBoard, *this, flag, marioKilled, mariowin,ifcolorMode); // Delete ghost from screen
+				ghosts[i]->clearGhostFromScreen(currBoard, *this, flag, marioKilled, mariowin,ifcolorMode); // Delete ghost from screen
 				ghosts.erase(ghosts.begin() + i);
 				break;
 			}

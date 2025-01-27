@@ -5,7 +5,7 @@
 constexpr int LEFT = -1;
 constexpr int RIGHT = 1;
 
-void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin,bool& ifcolorMode)  //move ghost according to conditions
+void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin,bool& ifcolorMode)  //move ghost according to conditions
 {
     Point p(location.x, location.y);
     Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode);
@@ -17,9 +17,14 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
 
     checkCollision(ghosts, board); //check if ghosts collide with one another
 
-    if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '=' || board.GetCurrentChar( p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == 'Q' && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
+    if (canClimbLadders() && board.GetCurrentChar(location.x + location.diff_x, location.y) == LADDER_CH)
     {
-        if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == GHOST_CH)
+        //call for climb func in climbing ghost
+    }
+
+    if (isGhostOnFloor(board) && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
+    {
+        if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == CLIMBING_GHOST_CH)
         {
             direction = !direction;
             location.diff_x = direction ? RIGHT : LEFT;
@@ -37,24 +42,24 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
     {
         direction = !direction;
         location.diff_x = direction ? RIGHT : LEFT;
-        if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == GHOST_CH)
+        if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == CLIMBING_GHOST_CH)
             location.diff_x = 0;
     }
 
     moveGhosts();
-    Game::setCharCheck(location, board, GHOST_CH, mario, flag, mariowin,ifcolorMode);
-    p.draw(GHOST_CH, location,ifcolorMode);
+    Game::setCharCheck(location, board, this->ch, mario, flag, mariowin,ifcolorMode);
+    p.draw(this->ch, location,ifcolorMode);
 }
 
-void Ghost::checkCollision(std::vector<Ghost>& ghosts, GameConfig& board) //check if ghosts meet each other
+void Ghost::checkCollision(std::vector<Ghost*>& ghosts, GameConfig& board) //check if ghosts meet each other
 {
-    for (Ghost& otherGhost : ghosts)
+    for (Ghost* otherGhost : ghosts)
     {
-        if (this != &otherGhost && otherGhost.location.x == this->location.x + location.diff_x && otherGhost.location.y == this->location.y)
+        if (this != otherGhost && otherGhost->location.x == this->location.x + location.diff_x && otherGhost->location.y == this->location.y)
         {
             // Check if swapping directions would lead to a wall
             int newDiffX = direction ? LEFT : 1;
-            int otherNewDiffX = otherGhost.direction ? LEFT : 1;
+            int otherNewDiffX = otherGhost->direction ? LEFT : 1;
             if (board.GetCurrentChar(location.x + newDiffX, location.y) != '=' && board.GetCurrentChar(location.x + newDiffX, location.y) != '<' && board.GetCurrentChar(location.x + newDiffX, location.y) != '>' && board.GetCurrentChar(location.x + newDiffX, location.y) != 'Q')
             {
                 direction = !direction;
@@ -63,13 +68,13 @@ void Ghost::checkCollision(std::vector<Ghost>& ghosts, GameConfig& board) //chec
             else 
                 location.diff_x = 0;
 
-            if (board.GetCurrentChar(otherGhost.location.x + otherNewDiffX, otherGhost.location.y) != '=' && board.GetCurrentChar(otherGhost.location.x + otherNewDiffX, otherGhost.location.y) != '<' && board.GetCurrentChar(otherGhost.location.x + otherNewDiffX, otherGhost.location.y) != '>' && board.GetCurrentChar(otherGhost.location.x + otherNewDiffX, otherGhost.location.y) != 'Q')
+            if (board.GetCurrentChar(otherGhost->location.x + otherNewDiffX, otherGhost->location.y) != '=' && board.GetCurrentChar(otherGhost->location.x + otherNewDiffX, otherGhost->location.y) != '<' && board.GetCurrentChar(otherGhost->location.x + otherNewDiffX, otherGhost->location.y) != '>' && board.GetCurrentChar(otherGhost->location.x + otherNewDiffX, otherGhost->location.y) != 'Q')
             {
-                otherGhost.direction = !otherGhost.direction;
-                otherGhost.location.diff_x = otherNewDiffX;
+                otherGhost->direction = !otherGhost->direction;
+                otherGhost->location.diff_x = otherNewDiffX;
             }
             else
-                otherGhost.location.diff_x = 0;
+                otherGhost->location.diff_x = 0;
         }
     }
 }
@@ -92,4 +97,12 @@ void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bo
     char originalChar = board.GetOriginalChar(location.x, location.y);
     Point::draw(originalChar, location,ifcolorMode);
     Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode);
+}
+
+bool Ghost::isGhostOnFloor(GameConfig& board)
+{
+    if (board.GetCurrentChar(location.x, location.y + 1) == '=' || board.GetCurrentChar(location.x, location.y + 1) == '<' || board.GetCurrentChar(location.x, location.y + 1) == '>' || board.GetCurrentChar(location.x, location.y + 1) == 'Q')
+        return true;
+    else
+        return false;
 }
