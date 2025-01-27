@@ -2,6 +2,7 @@
 #include "mario.h"
 #include "game.h"
 
+
 void Ghost::checkCollision(std::vector<Ghost*>& ghosts, GameConfig& board) //check if ghosts meet each other
 {
     for (Ghost* otherGhost : ghosts)
@@ -53,6 +54,14 @@ void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bo
 bool Ghost::isGhostOnFloor(GameConfig& board)
 {
     if (board.GetCurrentChar(location.x, location.y + 1) == '=' || board.GetCurrentChar(location.x, location.y + 1) == '<' || board.GetCurrentChar(location.x, location.y + 1) == '>' || board.GetCurrentChar(location.x, location.y + 1) == 'Q')
+        return true;
+    else
+        return false;
+}
+
+bool Ghost::isGhostReachingCliff(GameConfig& board)
+{
+    if (board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == '=' || board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == '<' || board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == '>' || board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == 'Q')
         return true;
     else
         return false;

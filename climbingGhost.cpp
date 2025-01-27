@@ -1,7 +1,7 @@
 #include "climbingGhost.h"
 #include "game.h"
 
-void ClimbingGhost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode)  //move ghost according to conditions
+void ClimbingGhost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode) 
 {
     Point p(location.x, location.y);
     Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode);
@@ -11,49 +11,72 @@ void ClimbingGhost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::
 
     location.diff_x = direction ? RIGHT : LEFT;
 
-    checkCollision(ghosts, board); //check if ghosts collide with one another
+    checkCollision(ghosts, board); // Check if ghosts collide with one another
 
-    if (board.GetCurrentChar(location.x, location.y) == LADDER_CH || climbing == true)
+    // Handle climbing logic based on state
+    if (climbingState == NONE) 
     {
-        climbing = true;
-        climbUp(board);
+        if (board.GetCurrentChar(location.x, location.y + 2) == LADDER_CH) 
+            climbingState = CLIMBING_DOWN;
+        else if (board.GetCurrentChar(location.x, location.y) == LADDER_CH) 
+            climbingState = CLIMBING_UP;
     }
-    else if (isGhostOnFloor(board) && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
+
+    if (climbingState == CLIMBING_UP) 
     {
-        if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == CLIMBING_GHOST_CH)
+        climbUp(board);       
+    }
+    else if (climbingState == CLIMBING_DOWN) 
+    {
+        climbDown(board);
+    }
+    else 
+    {
+        // Normal ghost movement when not climbing
+        if (isGhostReachingCliff(board) && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
+        {
+            if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == CLIMBING_GHOST_CH) 
+            {
+                direction = !direction;
+                location.diff_x = direction ? RIGHT : LEFT;
+                if (board.GetCurrentChar(p.x + location.diff_x, p.y) == 'Q')
+                    location.diff_x = 0;
+            }
+            else if (board.GetCurrentChar(p.x + location.diff_x, p.y) != 'Q') 
+                randomDirection();
+            else 
+                direction = !direction;
+        }
+        else 
         {
             direction = !direction;
             location.diff_x = direction ? RIGHT : LEFT;
-            if (board.GetCurrentChar(p.x + location.diff_x, p.y) == 'Q')
+            if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == CLIMBING_GHOST_CH) 
                 location.diff_x = 0;
         }
-        else if (board.GetCurrentChar(p.x + location.diff_x, p.y) != 'Q')
-        {
-            randomDirection();
-        }
-        else
-            direction = !direction;
-    }
-    else
-    {
-        direction = !direction;
-        location.diff_x = direction ? RIGHT : LEFT;
-        if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == CLIMBING_GHOST_CH)
-            location.diff_x = 0;
+
+        moveGhosts();
+        climbingState = NONE;
     }
 
-    moveGhosts();
     Game::setCharCheck(location, board, this->ch, mario, flag, mariowin, ifcolorMode);
     p.draw(this->ch, location, ifcolorMode);
 }
 
-void ClimbingGhost::climbUp(GameConfig& board)
+void ClimbingGhost::climbUp(GameConfig& board) 
 {
-	this->location.y--;
+    this->location.y--;
     this->location.diff_x = 0;
-	if (isGhostOnFloor(board))
-	{
-		climbing = false;
-	}
-	
+
+    if (isGhostOnFloor(board))
+        climbingState = FINISHED_CLIMBING;
+}
+
+void ClimbingGhost::climbDown(GameConfig& board)
+{
+    this->location.y++;
+    this->location.diff_x = 0;
+
+    if (isGhostOnFloor(board))
+        climbingState = FINISHED_CLIMBING;
 }

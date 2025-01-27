@@ -26,6 +26,7 @@ public:
 	void moveGhosts(); //moving ghosts according to direction
 	void clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin, bool& ifcolorMode); //clear ghosts from screen
 	bool isGhostOnFloor(GameConfig& board);
+	bool isGhostReachingCliff(GameConfig& board);
 };
 
 #endif
