@@ -10,6 +10,7 @@ static constexpr int MAX_Y = 25;  //screen size
 static constexpr int MIN_X = 1;  //screen size
 static constexpr int MIN_Y = 1;  //screen size
 
+
 class Mario;
 
 class GameConfig

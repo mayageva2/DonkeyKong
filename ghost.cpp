@@ -1,23 +1,26 @@
 #include "ghost.h"
 #include "mario.h"
-#include "game.h"
+#include "gameWithKeys.h"
 
 constexpr int LEFT = -1;
 constexpr int RIGHT = 1;
 
-void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin,bool& ifcolorMode)  //move ghost according to conditions
+void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost>& ghosts, bool& mariowin, bool& ifcolorMode)  //move ghost according to conditions
 {
     Point p(location.x, location.y);
-    Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode);
+    GameWithKeys::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode);
     char originalChar = board.GetCurrentChar(location.x, location.y);
-    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode);
-    p.draw(originalChar, location,ifcolorMode);
+    GameWithKeys::setCharCheck(location, board, originalChar, mario, flag, mariowin, ifcolorMode);
+ 
+        p.draw(originalChar, location, ifcolorMode);
+ 
+    
 
     location.diff_x = direction ? RIGHT : LEFT;
 
     checkCollision(ghosts, board); //check if ghosts collide with one another
 
-    if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '=' || board.GetCurrentChar( p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == 'Q' && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
+    if (board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '=' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '<' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == '>' || board.GetCurrentChar(p.x + location.diff_x, p.y + 1) == 'Q' && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '=') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '<') && (board.GetCurrentChar(p.x + location.diff_x, p.y) != '>'))
     {
         if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == GHOST_CH)
         {
@@ -42,10 +45,23 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
     }
 
     moveGhosts();
-    Game::setCharCheck(location, board, GHOST_CH, mario, flag, mariowin,ifcolorMode);
-    p.draw(GHOST_CH, location,ifcolorMode);
+    GameWithKeys::setCharCheck(location, board, GHOST_CH, mario, flag, mariowin, ifcolorMode);
+   
+        p.draw(GHOST_CH, location, ifcolorMode);
+   
+  
 }
 
+void Ghost::createGhosts(std::vector<Ghost>& ghosts, GameConfig& board) //this func creates insert all ghosts into a vector
+{
+    int amountOfGhosts = board.getGhostsAmount();
+    for (int i = 0; i < amountOfGhosts; i++)
+    {
+        Point p1 = board.getGhostPos();
+        Ghost ghost(p1.x, p1.y);
+        ghosts.push_back(ghost);
+    }
+}
 void Ghost::checkCollision(std::vector<Ghost>& ghosts, GameConfig& board) //check if ghosts meet each other
 {
     for (Ghost& otherGhost : ghosts)
@@ -91,5 +107,7 @@ void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bo
 {
     char originalChar = board.GetOriginalChar(location.x, location.y);
     Point::draw(originalChar, location,ifcolorMode);
-    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode);
+    GameWithKeys::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode);
 }
+
+

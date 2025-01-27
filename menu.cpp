@@ -5,7 +5,7 @@
 #include "menu.h"
 #include "point.h"
 #include "general.h"
-#include "game.h"
+#include "gameWithKeys.h"
 
 const Point startMenu(8, 5);
 bool flag = true;
@@ -403,6 +403,7 @@ void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPo
 
 void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode) //load screens one by one
 {
+	GameWithKeys game;
 	bool mariowin = true;
 	bool ifcolorMode = false;
 	for (i; i < screens.size(); i++)
@@ -420,7 +421,7 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 				{
 					ifcolorMode = true;
 				}
-				Game::startGame(mario, board, flag, mariowin, ifcolorMode);
+				game.startGame(mario, board, flag, mariowin, ifcolorMode);
 			}
 			else 
 			{

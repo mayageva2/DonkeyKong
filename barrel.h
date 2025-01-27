@@ -28,6 +28,7 @@ public:
 	bool isBarrelActive() const { return isActive; }  //checks if a barrel is active
 	bool marioCloseToExplosion(GameConfig& board, Mario& mario); //checks if mario is in the barrel explosion area
 	bool isInExplosionArea(Point& barrelPos, Point& marioPos);   //helper func to checks if mario is in the barrel explosion area
+	static void barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode); //moves each barrel
 };
 
 #endif

@@ -3,7 +3,7 @@
 #include "general.h"
 #include "gameConfig.h"
 #include "menu.h"
-#include "game.h"
+#include "gameWithKeys.h"
 
 #include <iostream>
 #include <Windows.h>
@@ -27,7 +27,7 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 	if ((currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == GHOST_CH) && (char)key != 'p' && (char)key != 'P')
 		collide(currBoard, flag, mariowin,ifcolorMode);
 	if(flag)
-		Game::setCharCheck(this->location, currBoard, DELETE_CH, *this, flag, mariowin,ifcolorMode); //resets mario's previous location
+		GameWithKeys::setCharCheck(this->location, currBoard, DELETE_CH, *this, flag, mariowin,ifcolorMode); //resets mario's previous location
 
 	switch (key)
 	{
@@ -77,7 +77,7 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 	    if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == GHOST_CH)
 	    	collide(currBoard, flag, mariowin,ifcolorMode);
 	    if (flag)
-		  	Game::setCharCheck(location, currBoard, MARIO_CH, *this, flag, mariowin,ifcolorMode);
+			GameWithKeys::setCharCheck(location, currBoard, MARIO_CH, *this, flag, mariowin,ifcolorMode);
     }
 }
 
@@ -104,14 +104,17 @@ void Mario::left(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mari
 	this->location.diff_x = -1;
 	this->location.diff_y = 0;
 
-	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)  //checks if there's a ladder
+	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH )  //checks if there's a ladder
 	{
-		p.draw(LADDER_CH, this->location,ifcolorMode);
+		
+			p.draw(LADDER_CH, this->location, ifcolorMode);
+		
+		
 		isH = true;
 	}
-	else if (Game::isInLegend(p, currBoard))
+	else if (GameWithKeys::isInLegend(p, currBoard))
 		p.draw(currBoard.GetCurrentChar(p.x, p.y), this->location, ifcolorMode);
-	else
+	else 
 		p.draw(DELETE_CH, this->location, ifcolorMode);
 
 	if (checkMove(currBoard, p.x + this->location.diff_x, p.y + this->location.diff_y))
@@ -122,7 +125,10 @@ void Mario::left(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mari
 		didMarioWin(currBoard, flag, mariowin,ifcolorMode);
 		if (flag)
 		{
-			Mario::draw(this->location,ifcolorMode);
+			
+			
+				Mario::draw(this->location, ifcolorMode);
+			
 			Sleep(100);
 		}
 	}
@@ -142,10 +148,13 @@ void Mario::right(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mar
 
 	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)
 	{
-		p.draw(LADDER_CH, this->location,ifcolorMode);
+		
+			p.draw(LADDER_CH, this->location, ifcolorMode);
+		
+		
 		isH = true;
 	}
-	else if (Game::isInLegend(p, currBoard))
+	else if (GameWithKeys::isInLegend(p, currBoard))
 		p.draw(currBoard.GetCurrentChar(p.x, p.y), this->location, ifcolorMode);
 	else
 		p.draw(DELETE_CH, this->location, ifcolorMode);
@@ -162,10 +171,16 @@ void Mario::right(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mar
 		didMarioWin(currBoard, flag, mariowin,ifcolorMode);
 		if (flag)
 		{
-			Mario::draw(this->location,ifcolorMode);
+		
+				Mario::draw(this->location, ifcolorMode);
+			
+			
 			Sleep(100);
 		}
-		Mario::draw(this->location,ifcolorMode);
+		
+		
+			Mario::draw(this->location, ifcolorMode);
+		
 	}
 	else
 		stay(currBoard,ifcolorMode);
@@ -209,13 +224,15 @@ void Mario::jumpUp(int& moveCounter, GameConfig& currBoard, bool& sideJump, bool
 
 	if (isInBoard(currBoard, p.y - 1) && checkMove(currBoard, this->location.x, p.y - 1)) //checks if the desination is outside boundries and checks for ceiling
 	{
-		if (Game::isInLegend(p, currBoard))
+		if (GameWithKeys::isInLegend(p, currBoard))
 			p.draw(currBoard.GetCurrentChar(p.x, p.y), this->location, ifcolorMode);
-		else
+		else 
 			p.draw(DELETE_CH, this->location,ifcolorMode);
 		this->location.y -= 1;
-		Mario::draw(this->location,ifcolorMode);
-		Sleep(70);
+		
+			Mario::draw(this->location, ifcolorMode);
+			Sleep(70);
+		
 		moveCounter++;
 	}
 	else
@@ -239,13 +256,17 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump, boo
 
 	if (!isMarioOnFloor(currBoard))
 	{
-		if(Game::isInLegend(p, currBoard))
+		if(GameWithKeys::isInLegend(p, currBoard))
 			p.draw(currBoard.GetCurrentChar(p.x, p.y), this->location, ifcolorMode);
-		else
+		else 
 			p.draw(DELETE_CH, this->location, ifcolorMode);
 		this->location.y += 1;
-		Mario::draw(this->location,ifcolorMode);
-		Sleep(80);
+		
+		
+			Mario::draw(this->location, ifcolorMode);
+			Sleep(80);
+		
+		
 		moveCounter++;
 	}
 	didMarioWin(currBoard, flag, mariowin, ifcolorMode);
@@ -271,14 +292,17 @@ void Mario::climbUpAladder(int& moveCounter, GameConfig& currBoard,bool& ifcolor
 {
 	Point p(this->location);
 
-	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)
+	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH )
 	{
 		p.draw(LADDER_CH, this->location, ifcolorMode);
 	}
 	else //ends climbing
 	{
 		char way = currBoard.GetCurrentChar(this->location.x, this->location.y);
-		p.draw(way, this->location, ifcolorMode);
+		
+			p.draw(way, this->location, ifcolorMode);
+		
+		
 		moveCounter = ENDJUMP;
 		
 		if (way != '>' && way != '=' && way != '<')
@@ -290,8 +314,11 @@ void Mario::climbUpAladder(int& moveCounter, GameConfig& currBoard,bool& ifcolor
 
 	this->location.y -= 1;
 
-	Mario::draw(this->location,ifcolorMode);
-	Sleep(80);
+
+		Mario::draw(this->location, ifcolorMode);
+		Sleep(80);
+	
+	
 	moveCounter++;
 	if (isMarioOnFloor(currBoard))
 		stay(currBoard,ifcolorMode);
@@ -306,7 +333,10 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& 
 	{
 		if (!isMarioOnFloor(currBoard))
 		{
-			p.draw(LADDER_CH, this->location,ifcolorMode);
+		
+				p.draw(LADDER_CH, this->location, ifcolorMode);
+			
+			
 			this->location.y += 1;
 		}
 		else
@@ -318,7 +348,11 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& 
 	else if ((currBoard.GetCurrentChar(p.x, p.y + 1) == LADDER_CH || currBoard.GetCurrentChar(p.x, p.y + 2) == LADDER_CH) && sideJump == false)
 	{
 		char way = currBoard.GetCurrentChar(this->location.x, this->location.y);
-		p.draw(way, this->location, ifcolorMode);
+		
+		
+			p.draw(way, this->location, ifcolorMode);
+		
+		
 		this->location.y += 1;
 	}
 	else
@@ -329,8 +363,11 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& 
 
 	if (!_kbhit())
 	{
-		Mario::draw(this->location,ifcolorMode);
-		Sleep(80);
+		
+			Mario::draw(this->location, ifcolorMode);
+			Sleep(80);
+		
+	
 		moveCounter++;
 	}
 	else
@@ -355,7 +392,10 @@ void Mario::stay(GameConfig& currBoard,bool&ifcolorMode) //stops mario's movemen
 	this->location.diff_x = 0;
 	this->location.diff_y = 0;
 
-	Mario::draw(this->location,ifcolorMode);
+	
+		Mario::draw(this->location, ifcolorMode);
+	
+	
 	this->state = MarioState::standing;
 }
 
@@ -380,7 +420,9 @@ void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost>& ghosts
 		if (enemyKilled)
 		{
 			num_of_points += 1000;
-			currBoard.printScore(mario,ifcolorMode);
+			
+				currBoard.printScore(mario, ifcolorMode);
+			
 			deleteKilledEnemy(currBoard, hammerUsePos, ghosts, barrels, flag, mariowin,ifcolorMode); // Delete killed enemy
 		}
 
@@ -458,7 +500,7 @@ void Mario::jumpToSide(GameConfig::eKeys key, GameConfig& currBoard, int& moveCo
 	}
 	else if (key == GameConfig::eKeys::ESC)
 	{
-		Game::pauseGame(currBoard, *this,ifcolorMode);
+		GameWithKeys::pauseGame(currBoard, *this,ifcolorMode);
 		sideJump = false;
 		return;
 	}
@@ -524,11 +566,15 @@ void Mario::collide(GameConfig& currBoard, bool& flag, bool& mariowin,bool& ifco
 		location.x = 75;
 	}
 	gotoxy(location.x, location.y);
-	if (ifcolorMode)
-	{
-		SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
-	}
-	cout << EXPLOSION;
+	
+		if (ifcolorMode)
+		{
+			SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
+		}
+		
+			cout << EXPLOSION;
+		
+		
 	this->num_of_hearts--;
 	Sleep(2000);
 
@@ -538,13 +584,15 @@ void Mario::collide(GameConfig& currBoard, bool& flag, bool& mariowin,bool& ifco
 		hammer = false;
 		num_of_points = ZERO;
 		this->location = GameConfig::getMarioPos();
-		Game::startGame(*this, currBoard, flag, mariowin, ifcolorMode); 
+		GameWithKeys game;
+		game.startGame(*this, currBoard, flag, mariowin, ifcolorMode);
 	}
 }
 
 void Mario::didMarioLose(GameConfig& currBoard, bool& flag,bool&ifcolorMode)  //checks if mario lost and if so returns to main menu
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
 	if (num_of_hearts == 0)
 	{
 		num_of_points = ZERO;
@@ -602,7 +650,9 @@ void Mario::pickHammer(GameConfig& board, bool& ifcolorMode) //this func takes c
 {
 	Point p(board.getLegendPos());
 	setHammer(true);
-	board.printHammer(ifcolorMode);
+	
+		board.printHammer(ifcolorMode);
+	
 	board.SetChar(this->location.x, this->location.y, DELETE_CH);
 }
 
