@@ -73,14 +73,14 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 					key = inputKey;
 					if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
 						lastKey = GameConfig::eKeys::STAY;
-					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, steps, results);
+					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, steps, results, counter);
 				}
 			}
 			else if (mario.state != MarioState::standing)
-				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode, steps, results);
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode, steps, results, counter);
 		}
 		else
-			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode, steps, results);
+			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode, steps, results, counter);
 
 		if (mario.state == MarioState::standing) 
 		{
@@ -123,7 +123,7 @@ void Game::createGhosts(vector<Ghost*>& ghosts, GameConfig& board) //this func c
 	}
 }
 
-void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts,bool& ifcolorMode, Steps& steps, Results& results)   //makes sure mario goes as he should 
+void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts,bool& ifcolorMode, Steps& steps, Results& results, int& counter)   //makes sure mario goes as he should 
 {
 	if (sideJump == true)
 	{
@@ -133,12 +133,12 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 			if ((GameConfig::eKeys)tmp == GameConfig::eKeys::ESC)
 				pauseGame(board, mario,ifcolorMode);
 		}
-		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode, results, steps);
+		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode, results, steps, counter);
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::KILL) || ((GameConfig::eKeys)key == GameConfig::eKeys::KILL2))
 	{
 		MarioState prevState = mario.state;
-		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode, results, steps);
+		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode, results, steps, counter);
 
 		if (prevState == MarioState::moving) // if mario was walking before kill then keep walking after
 		{
@@ -160,7 +160,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 				sideJump = true;
 				lastKey = (GameConfig::eKeys)key;
 				key = tmp;
-				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode, results, steps);
+				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode, results, steps, counter);
 				if ((GameConfig::eKeys)key == GameConfig::eKeys::ESC)
 				{
 					key = (char)GameConfig::eKeys::UP;
@@ -176,11 +176,11 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 		{
 			moveCounter = 0;
 			key = (char)lastKey;
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode, results, steps);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode, results, steps, counter);
 		}
 		else //mario is jumping
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode, results, steps);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode, results, steps, counter);
 			if (mario.state == MarioState::standing)
 				lastKey = GameConfig::eKeys::STAY;
 		}
@@ -189,11 +189,11 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 	{
 		if (mario.isMarioOnFloor(board) && mario.state != MarioState::falling)
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, counter);
 			lastKey = (GameConfig::eKeys)key;
 		}
 		else //incase mario is falling
-			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps);
+			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, counter);
 	}
 
 }

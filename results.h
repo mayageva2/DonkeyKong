@@ -6,7 +6,7 @@
 class Results
 {
 public:
-	enum ResultValue { hitGhost, hitBarrel, finished, noResult };
+	enum ResultValue { hitGhost, hitBarrel, finished, falling, noResult };
 private:
 	std::list<std::pair<size_t, ResultValue>> results; // pair: iteration, result
 public:
