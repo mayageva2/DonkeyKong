@@ -1,6 +1,6 @@
 #include "ghost.h"
 #include "mario.h"
-#include "game.h"
+#include "gameWithKeys.h"
 
 
 void Ghost::checkCollision(std::vector<Ghost*>& ghosts, GameConfig& board) //check if ghosts meet each other
@@ -48,7 +48,7 @@ void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bo
 {
     char originalChar = board.GetOriginalChar(location.x, location.y);
     Point::draw(originalChar, location,ifcolorMode);
-    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results);
+    GameWithKeys::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results);
 }
 
 bool Ghost::isGhostOnFloor(GameConfig& board)
