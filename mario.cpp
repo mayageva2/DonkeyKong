@@ -28,12 +28,12 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 	{
 		if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH)
 		{
-			results.addResult(counter, results.hitBarrel);
+			results.addResult(counter, results.hitBarrel, num_of_points);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 		else if(currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH)
 		{
-			results.addResult(counter, results.hitGhost);
+			results.addResult(counter, results.hitGhost, num_of_points);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 	}
@@ -88,12 +88,12 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 		
 		if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH)
 		{
-			results.addResult(counter, results.hitBarrel);
+			results.addResult(counter, results.hitBarrel, num_of_points);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 		else if (currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH)
 		{
-			results.addResult(counter, results.hitGhost);
+			results.addResult(counter, results.hitGhost, num_of_points);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 
@@ -281,7 +281,7 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump, boo
 		}
 		if (moveCounter > 4)
 		{
-			results.addResult(counter, results.falling);
+			results.addResult(counter, results.falling, num_of_points);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 		sideJump = false;
@@ -612,7 +612,7 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin,bool& 
 		Sleep(3000);
 		flag = false;
 		mariowin = true;
-		results.addResult(counter, Results::finished);
+		results.addResult(counter, Results::finished, num_of_points);
 	}
 }
 
