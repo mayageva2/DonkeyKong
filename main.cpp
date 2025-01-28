@@ -6,11 +6,15 @@
 #include "mario.h"
 #include "menu.h"
 #include "barrel.h"
+#include "steps.h"
 using namespace std;
 
-void main()
+int main(int argc, char** argv)
 {
 	hideCursor();
 	Mario mario;
-	Menu::displayMenu(mario);
+	bool saveMode = Steps::checkSaveMode(argc, argv);
+	Menu::displayMenu(mario, saveMode);
+	
 }
+

@@ -15,8 +15,10 @@ class Mario;
 class GameConfig
 {
 	std::vector<Point> GhostsPos;         //a vector containing all of ghosts positions
+	std::vector<char> GhostsType;
 	std::vector<std::string> screenFiles; //a vector containing all the screen files names
-	size_t currentGhostIndex = 0;         //ghosts vector index
+	size_t currentGhostIndex = 0;         //ghosts pos vector index
+	size_t currentTypeIndex = 0;          //ghosts type vector index
 	size_t currentScreenIndex = 0;        //screen files vector index
 	static Point marioPos;      //mario's position
 	static Point donkeyPos;     //donkeyKong's position
@@ -45,6 +47,7 @@ public:
 	static Point getLegendPos() { return legendPos; } //returns legend's start position
 	static Point getHammerPos() { return hammerPos; } //returns hammer's start position
 	Point getGhostPos();  //returns all ghosts positions
+	char getGhostType();
 	int getGhostsAmount() const { return ghostCounter; } //returns amount of ghosts
 	bool insertLegend(); //inserts legend to board
 	void init(); //initiallizes all counters

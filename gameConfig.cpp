@@ -67,10 +67,11 @@ void GameConfig::load(const std::string& filename, bool& error) //this func load
 				}
 				donkeyCounter++;
 			}
-			else if (c == GHOST_CH)
+			else if (c == NON_CLIMBING_GHOST_CH || c == CLIMBING_GHOST_CH)
 			{
 				Point p = { curr_col, curr_row };
 				GhostsPos.push_back(p);
+				GhostsType.push_back(c);
 				ghostCounter++;
 			}
 			else if (c == HAMMER)
@@ -282,6 +283,13 @@ Point GameConfig::getGhostPos() //return ghosts positions
 	Point ghostPos = GhostsPos[currentGhostIndex];
 	currentGhostIndex = (currentGhostIndex + 1) % GhostsPos.size();
 	return ghostPos;
+}
+
+char GameConfig::getGhostType()
+{
+	char type = GhostsType[currentTypeIndex];
+	currentTypeIndex = (currentTypeIndex + 1) % GhostsType.size();
+	return type;
 }
 
 void GameConfig::printHammer(bool& ifcolorMode) //prints hammer on screen 

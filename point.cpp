@@ -26,7 +26,11 @@ void Point::draw(char ch, Point pos,bool& iscolorMode) //draws point on screen
 		{
 			SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);
 		}
-		else if (ch == GHOST_CH)
+		else if (ch == NON_CLIMBING_GHOST_CH)
+		{
+			SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+		}
+		else if (ch == CLIMBING_GHOST_CH)
 		{
 			SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 		}

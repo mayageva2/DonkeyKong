@@ -5,6 +5,10 @@
 #include "gameConfig.h"
 #include "menu.h"
 #include "ghost.h"
+#include "climbingGhost.h"
+#include "nonClimbingGhost.h"
+#include "results.h"
+#include "steps.h"
 
 #include <conio.h>
 #include <Windows.h>
@@ -13,7 +17,7 @@
 using namespace std;
 
 
-void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,bool& ifcolorMode)  //starts game
+void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results)  //starts game
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	clrscr();
@@ -26,10 +30,11 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 	int moveCounter = 0;
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
-	vector<Ghost> ghosts;
+	vector<Ghost*> ghosts;
 	vector<Barrel> barrels;
 	ghosts.reserve(board.getGhostsAmount());
 	createGhosts(ghosts, board);
+	int counter = 0;
   
 	mario.draw(mario.findMarioLocation(), ifcolorMode);
 	if(!mario.isMarioOnFloor(board))  //incase mario is positioned in the air
@@ -40,10 +45,11 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 	flag = true;
 	while (flag)
 	{
+		counter++;
 		for (int i = 0; i < ghosts.size(); i++)  //Move ghosts
-			ghosts[i].checkMove(board, mario, flag, ghosts, mariowin,ifcolorMode);
+			ghosts[i]->checkMove(board, mario, flag, ghosts, mariowin,ifcolorMode, steps, results);
 
-		barrelsMovement(barrels, board, interval, mario, flag, mariowin,ifcolorMode); // Move Barrels
+		barrelsMovement(barrels, board, interval, mario, flag, mariowin,ifcolorMode, steps, results); // Move Barrels
 
 		if (moveCounter == 0) //Move Mario
 		{
@@ -63,25 +69,26 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 				}
 				else
 				{
+					steps.addStep(counter, inputKey);
 					key = inputKey;
 					if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
 						lastKey = GameConfig::eKeys::STAY;
-					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
+					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, steps, results, counter);
 				}
 			}
 			else if (mario.state != MarioState::standing)
-				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode);
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode, steps, results, counter);
 		}
 		else
-			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode);
+			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts,ifcolorMode, steps, results, counter);
 
 		if (mario.state == MarioState::standing) 
 		{
 			if (flag)
 			{
 				Point p1 = mario.findMarioLocation();
-				if (board.GetCurrentChar(p1.x, p1.y) == BARREL_CH || board.GetCurrentChar(p1.x, p1.y) == GHOST_CH)
-					mario.collide(board, flag, mariowin,ifcolorMode);
+				if (board.GetCurrentChar(p1.x, p1.y) == BARREL_CH || board.GetCurrentChar(p1.x, p1.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(p1.x, p1.y) == CLIMBING_GHOST_CH)
+					mario.collide(board, flag, mariowin,ifcolorMode, results, steps);
 				Sleep(100);
 			}
 		}
@@ -100,18 +107,23 @@ void Game::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);//set default screen color
 }
 
-void Game::createGhosts(vector<Ghost>& ghosts, GameConfig& board) //this func creates insert all ghosts into a vector
+void Game::createGhosts(vector<Ghost*>& ghosts, GameConfig& board) //this func creates insert all ghosts into a vector
 {
 	int amountOfGhosts = board.getGhostsAmount();
 	for (int i = 0; i < amountOfGhosts; i++)
 	{
 		Point p1 = board.getGhostPos();
-		Ghost ghost(p1.x, p1.y);
-		ghosts.push_back(ghost);
+		char ch = board.getGhostType();
+	
+		if (ch == NON_CLIMBING_GHOST_CH)
+			ghosts.push_back(new NonClimbingGhost(p1.x, p1.y));
+		else
+			ghosts.push_back(new ClimbingGhost(p1.x, p1.y));
+	
 	}
 }
 
-void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost>& ghosts,bool& ifcolorMode)   //makes sure mario goes as he should 
+void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts,bool& ifcolorMode, Steps& steps, Results& results, int& counter)   //makes sure mario goes as he should 
 {
 	if (sideJump == true)
 	{
@@ -121,12 +133,12 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 			if ((GameConfig::eKeys)tmp == GameConfig::eKeys::ESC)
 				pauseGame(board, mario,ifcolorMode);
 		}
-		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode);
+		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode, results, steps, counter);
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::KILL) || ((GameConfig::eKeys)key == GameConfig::eKeys::KILL2))
 	{
 		MarioState prevState = mario.state;
-		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode);
+		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode, results, steps, counter);
 
 		if (prevState == MarioState::moving) // if mario was walking before kill then keep walking after
 		{
@@ -148,7 +160,7 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 				sideJump = true;
 				lastKey = (GameConfig::eKeys)key;
 				key = tmp;
-				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode);
+				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin,ifcolorMode, results, steps, counter);
 				if ((GameConfig::eKeys)key == GameConfig::eKeys::ESC)
 				{
 					key = (char)GameConfig::eKeys::UP;
@@ -164,11 +176,11 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 		{
 			moveCounter = 0;
 			key = (char)lastKey;
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode, results, steps, counter);
 		}
 		else //mario is jumping
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels,ifcolorMode, results, steps, counter);
 			if (mario.state == MarioState::standing)
 				lastKey = GameConfig::eKeys::STAY;
 		}
@@ -177,16 +189,16 @@ void Game::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& las
 	{
 		if (mario.isMarioOnFloor(board) && mario.state != MarioState::falling)
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, counter);
 			lastKey = (GameConfig::eKeys)key;
 		}
 		else //incase mario is falling
-			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
+			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, counter);
 	}
 
 }
 
-void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode) //moves each barrel
+void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results) //moves each barrel
 {
 	Point p(0, 0);
 	if (board.getDonkeyKongPos() == p) //in case there isn't a donkey kong char
@@ -209,12 +221,12 @@ void Game::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& inte
 		if (!flag) { break; }
 		if (barrels[i].isBarrelActive()) //Move barrel only if active
 		{
-			barrels[i].moveBarrel(board, mario, flag, mariowin, ifcolorMode);
+			barrels[i].moveBarrel(board, mario, flag, mariowin, ifcolorMode, steps, results);
 
 			//Remove barrel from array if reached screen boundaries or became inactive
 			if (barrels[i].getLocation().x >= MAX_X-2 || barrels[i].getLocation().x <= MIN_X || !barrels[i].isBarrelActive())
 			{
-				barrels[i].clearFromScreen(board, mario, flag,mariowin, marioKilled, ifcolorMode); //Print EXPLOSION
+				barrels[i].clearFromScreen(board, mario, flag,mariowin, marioKilled, ifcolorMode, steps, results); //Print EXPLOSION
 				barrels.erase(barrels.begin() + i);
 			}
 			else
@@ -275,7 +287,7 @@ bool Game::isInLegend(Point& p, GameConfig& currBoard) //checks if mario is runn
 		return false;
 }
 
-void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode) // checks if theres a ladder or floor and then goes to set char on board
+void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results) // checks if theres a ladder or floor and then goes to set char on board
 {
 	char ch = currBoard.GetCurrentChar(p.x, p.y);
 	bool returnCh = isInLegend(p, currBoard);
@@ -283,11 +295,13 @@ void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mar
 	{
 		currBoard.SetChar(p.x, p.y, object);
 		Point p1 = mario.findMarioLocation();
-		if (currBoard.GetCurrentChar(p1.x, p1.y) == BARREL_CH || currBoard.GetCurrentChar(p1.x, p1.y) == GHOST_CH)
-			mario.collide(currBoard, flag, mariowin,ifcolorMode);
+		if (currBoard.GetCurrentChar(p1.x, p1.y) == BARREL_CH || currBoard.GetCurrentChar(p1.x, p1.y) == NON_CLIMBING_GHOST_CH || currBoard.GetCurrentChar(p1.x, p1.y) == CLIMBING_GHOST_CH)
+			mario.collide(currBoard, flag, mariowin,ifcolorMode, results, steps);
 		currBoard.SetChar(p.x, p.y, ch);
 	}
 	else
 		currBoard.SetChar(p.x, p.y, object);
 }
+
+
 
