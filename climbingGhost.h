@@ -2,6 +2,10 @@
 #define _CLIMBINGGHOST_H
 #include "ghost.h"
 
+class Mario; //declaration
+class Steps;
+class Results;
+
 class ClimbingGhost: public Ghost
 {
 public:
@@ -14,7 +18,7 @@ public:
 	};
 	ClimbingState climbingState = NONE;
 	bool canClimbLadders() const override { return true; }
-	void checkMove (GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode) override;
+	void checkMove (GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results) override;
 	void climbUp(GameConfig& board);
 	void climbDown(GameConfig& board);
 };

@@ -433,7 +433,7 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 				{
 					ifcolorMode = true;
 				}
-				Game::startGame(mario, board, flag, mariowin, ifcolorMode);
+				Game::startGame(mario, board, flag, mariowin, ifcolorMode, steps, results);
 			}
 			else 
 			{

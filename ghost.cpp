@@ -44,11 +44,11 @@ void Ghost::randomDirection() //gives a random direction
         direction = !direction;
 }
 
-void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin,bool& ifcolorMode) //this func clears ghosts from screen
+void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results) //this func clears ghosts from screen
 {
     char originalChar = board.GetOriginalChar(location.x, location.y);
     Point::draw(originalChar, location,ifcolorMode);
-    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode);
+    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results);
 }
 
 bool Ghost::isGhostOnFloor(GameConfig& board)
