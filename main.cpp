@@ -7,15 +7,16 @@
 #include "menu.h"
 #include "barrel.h"
 #include "loadGame.h"
+#include "steps.h"
 using namespace std;
 
-              /// ARANGE SLEEPING MODE///
-int main(int argc, char** argv) ///ARRANGE LOAD FROM FILES///
+int main(int argc, char** argv)
 {
 	hideCursor();
 	bool isLoad = argc > 1 && std::string(argv[1]) == "-load";
 	bool isSilent = isLoad && argc > 2 && std::string(argv[2]) == "-silent";
 	Mario mario;
+  bool saveMode = Steps::checkSaveMode(argc, argv);
 	loadGame loadGame;
 	if (isLoad)
 	{
@@ -23,6 +24,7 @@ int main(int argc, char** argv) ///ARRANGE LOAD FROM FILES///
 	}
 	else
 	{
-		Menu::displayMenu(mario);
+		Menu::displayMenu(mario, saveMode);
 	}
 }
+
