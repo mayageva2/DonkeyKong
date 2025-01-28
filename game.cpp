@@ -298,3 +298,5 @@ void Game::setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mar
 		currBoard.SetChar(p.x, p.y, object);
 }
 
+
+
