@@ -2,38 +2,6 @@
 #include "ghost.h"
 #include "barrel.h"
 
-std::list<std::pair<size_t, char>> loadGame::loadResults(const std::string& filename)
-{
-	std::ifstream results_file(filename);
-	std::list<std::pair<size_t, char>> results;
-	size_t size;
-	results_file >> size;
-	while (!results_file.eof() && size-- != 0) {
-		size_t iteration;
-		int result;
-		results_file >> iteration >> result;
-		results.push_back({ iteration, result });
-	}
-	return results;
-}
-
-loadGame loadGame::loadSteps(const std::string& filename) {
-	loadGame steps;
-	std::ifstream steps_file(filename);
-	steps_file >> steps.randomSeed; //read randomSeed
-	steps_file >> steps.colorModeGame; //read colorMode
-	size_t size;
-	steps_file >> size;// read number of steps
-	while (!steps_file.eof() && size-- != 0) {
-		size_t iteration;
-		char step;
-		steps_file >> iteration >> step;
-		steps.addStep(iteration, step);
-	}
-	steps_file.close();
-	return steps;
-}
-
 void loadGame::getAllBoardFileNames(std::vector<std::string>& vec_to_fill)
 {
 	namespace fs = std::filesystem;
@@ -47,9 +15,9 @@ void loadGame::getAllBoardFileNames(std::vector<std::string>& vec_to_fill)
 	}
 }
 
-void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost>& ghosts, bool& ifcolorMode)
+void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts, bool& ifcolorMode)
 {
-	if (steps.empty()) //no more commands, end game
+	if (steps.isEmpty()) //no more commands, end game
 	{
 		flag = false; 
 		return;
@@ -57,12 +25,12 @@ void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys&
 
 	if (sideJump == true) 
 	{
-		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin, ifcolorMode);
+		mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin, ifcolorMode, results, steps, currentIteration);
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::KILL) || ((GameConfig::eKeys)key == GameConfig::eKeys::KILL2)) 
 	{
 		MarioState prevState = mario.state;
-		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
+		mario.move(GameConfig::eKeys::KILL, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, currentIteration);
 
 		if (prevState == MarioState::moving) 
 		{
@@ -75,15 +43,15 @@ void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys&
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP) || ((GameConfig::eKeys)key == GameConfig::eKeys::UP2))
 	{
-		if (isNextStepOnIteration(this->currentIteration + 1) && moveCounter != ENDJUMP)
+		if (steps.isNextStepOnIteration(this->currentIteration + 1) && moveCounter != ENDJUMP)
 		{
-			char tmp = popStep();
+			char tmp = steps.popStep();
 			if ((GameConfig::eKeys)tmp != GameConfig::eKeys::UP && (GameConfig::eKeys)tmp != GameConfig::eKeys::UP2)
 			{
 				sideJump = true;
 				lastKey = (GameConfig::eKeys)key;
 				key = tmp;
-				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin, ifcolorMode);
+				mario.jumpToSide((GameConfig::eKeys)key, board, moveCounter, sideJump, flag, mariowin, ifcolorMode, results, steps, currentIteration);
 			}
 			else
 			{
@@ -94,11 +62,11 @@ void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys&
 		{
 			moveCounter = 0;
 			key = (char)lastKey;
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, currentIteration);
 		}
 		else 
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, currentIteration);
 			if (mario.state == MarioState::standing) 
 			{
 				lastKey = GameConfig::eKeys::STAY;
@@ -109,18 +77,18 @@ void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys&
 	{
 		if (mario.isMarioOnFloor(board) && mario.state != MarioState::falling) 
 		{
-			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
+			mario.move((GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, currentIteration);
 			lastKey = (GameConfig::eKeys)key;
 		}
 		else 
 		{
-			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode);
+			mario.move(GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, currentIteration);
 		}
 	}
 }
 
 
-void loadGame::recorded_game(bool& _silent, Mario& mario )
+void loadGame::recorded_game(bool& _silent, Mario& mario)
 {
 	std::vector<std::string> fileNames;
 	getAllBoardFileNames(fileNames);
@@ -139,9 +107,10 @@ void loadGame::recorded_game(bool& _silent, Mario& mario )
 		std::string resultsFilename = filename_prefix + ".result";
 		bool colorMode = false;
 	
-		*this = loadSteps(stepsFilename); //load steps
-		this->results = loadResults(resultsFilename); // load results
-		if (this->colorModeGame == 'c' || this->colorModeGame == 'C')
+		steps.loadSteps(stepsFilename); //load steps
+		results.loadResults(resultsFilename); // load results
+		char ch = steps.getColorMode();
+		if (ch == 'c' || ch == 'C')
 		{
 			colorMode = true;
 		}
@@ -154,10 +123,10 @@ void loadGame::startGame(Mario& mario, GameConfig& board, bool& flag, bool& mari
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	clrscr();
-	vector<Ghost> ghosts;
+	vector<Ghost*> ghosts;
 	vector<Barrel> barrels;
 	ghosts.reserve(board.getGhostsAmount());
-	Ghost::createGhosts(ghosts, board);
+	createGhosts(ghosts, board);
 	int interval = 0;
 	int moveCounter = 0;
 	
@@ -177,25 +146,25 @@ void loadGame::startGame(Mario& mario, GameConfig& board, bool& flag, bool& mari
 		mario.state = MarioState::standing;
 
 	flag = true;
-	while (flag && !steps.empty())
+	while (flag && !steps.isEmpty())
 	{
 		for (int i = 0; i < ghosts.size(); i++)  //Move ghosts
-			ghosts[i].checkMove(board, mario, flag, ghosts, mariowin, ifcolorMode);
-		Barrel::barrelsMovement(barrels, board, interval, mario, flag, mariowin, ifcolorMode); // Move Barrels
+			ghosts[i]->checkMove(board, mario, flag, ghosts, mariowin, ifcolorMode, steps, results);
+		Barrel::barrelsMovement(barrels, board, interval, mario, flag, mariowin, ifcolorMode, steps, results); // Move Barrels
 
 		if (moveCounter == 0)
 		{
 			//move mario according to steps file in this iteration
-			if (isNextStepOnIteration(this->currentIteration))
+			if (steps.isNextStepOnIteration(this->currentIteration))
 			{
-				key = popStep();
+				key = steps.popStep();
 				if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
 					lastKey = GameConfig::eKeys::STAY;
 				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
 			}
 			else if(mario.state != MarioState::standing)
 			{
-			   marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
 			}
 		}
 		else
@@ -206,8 +175,8 @@ void loadGame::startGame(Mario& mario, GameConfig& board, bool& flag, bool& mari
 			if (flag)
 			{
 				Point p1 = mario.findMarioLocation();
-				if (board.GetCurrentChar(p1.x, p1.y) == BARREL_CH || board.GetCurrentChar(p1.x, p1.y) == GHOST_CH)
-					mario.collide(board, flag, mariowin, ifcolorMode);
+				if (board.GetCurrentChar(p1.x, p1.y) == BARREL_CH || board.GetCurrentChar(p1.x, p1.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(p1.x, p1.y) == CLIMBING_GHOST_CH)
+					mario.collide(board, flag, mariowin, ifcolorMode, results, steps);
 				Sleep(100);
 			}
 		}

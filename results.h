@@ -11,11 +11,12 @@ public:
 private:
 	std::list<std::tuple<size_t, ResultValue, int>> results; // pair: iteration, result
 public:
+	void loadResults(const std::string& filename);
 	void saveResults(const std::string& filename) const;
-	void addResult(size_t iteration, ResultValue result, int score) {
+	void addResult(size_t iteration, ResultValue result, size_t score) {
 		results.push_back({ iteration, result, score });
 	}
-	std::tuple<size_t, ResultValue, int> popResult() {
+	std::tuple<size_t, ResultValue, size_t> popResult() {
 		if (results.empty()) return { 0, Results::noResult, 0 };
 		auto result = results.front();
 		results.pop_front();

@@ -63,7 +63,7 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariow
 	{
 		GameWithKeys::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode, steps, results); //resets barrel's previous location
 		char originalChar = board.GetCurrentChar(location.x, location.y); //Restore the original character at the barrel's current location
-		Game::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results);
+		GameWithKeys::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results);
 		p.draw(originalChar, location, ifcolorMode); //print original char on board
 	}
 	
@@ -152,7 +152,7 @@ bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos) //checks if ma
 		return false;
 }
 
-void Barrel::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode) //moves each barrel
+void Barrel::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results) //moves each barrel
 {
 	Point p(0, 0);
 	if (board.getDonkeyKongPos() == p) //in case there isn't a donkey kong char
@@ -175,12 +175,12 @@ void Barrel::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& in
 		if (!flag) { break; }
 		if (barrels[i].isBarrelActive()) //Move barrel only if active
 		{
-			barrels[i].moveBarrel(board, mario, flag, mariowin, ifcolorMode);
+			barrels[i].moveBarrel(board, mario, flag, mariowin, ifcolorMode, steps, results);
 
 			//Remove barrel from array if reached screen boundaries or became inactive
 			if (barrels[i].getLocation().x >= MAX_X - 2 || barrels[i].getLocation().x <= MIN_X || !barrels[i].isBarrelActive())
 			{
-				barrels[i].clearFromScreen(board, mario, flag, mariowin, marioKilled, ifcolorMode); //Print EXPLOSION
+				barrels[i].clearFromScreen(board, mario, flag, mariowin, marioKilled, ifcolorMode, steps, results); //Print EXPLOSION
 				barrels.erase(barrels.begin() + i);
 			}
 			else

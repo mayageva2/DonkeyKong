@@ -1,12 +1,13 @@
 #include "climbingGhost.h"
-#include "game.h"
+#include "gameWithKeys.h"
 
 void ClimbingGhost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results)
 {
+    GameWithKeys game;
     Point p(location.x, location.y);
-    Game::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode, steps, results);
+    game.setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode, steps, results);
     char originalChar = board.GetCurrentChar(location.x, location.y);
-    Game::setCharCheck(location, board, originalChar, mario, flag, mariowin, ifcolorMode, steps, results);
+    game.setCharCheck(location, board, originalChar, mario, flag, mariowin, ifcolorMode, steps, results);
     p.draw(originalChar, location, ifcolorMode);
 
     location.diff_x = direction ? RIGHT : LEFT;
@@ -59,7 +60,7 @@ void ClimbingGhost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::
         climbingState = NONE;
     }
 
-    Game::setCharCheck(location, board, this->ch, mario, flag, mariowin, ifcolorMode, steps, results);
+    game.setCharCheck(location, board, this->ch, mario, flag, mariowin, ifcolorMode, steps, results);
     p.draw(this->ch, location, ifcolorMode);
 }
 

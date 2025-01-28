@@ -415,8 +415,6 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 	GameWithKeys game;
 	bool mariowin = true;
 	bool ifcolorMode = false;
-	Steps steps;
-	Results results;
 	for (i; i < screens.size(); i++)
 	{
 		board.init();
@@ -435,7 +433,7 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 				{
 					ifcolorMode = true;
 				}
-				Game::startGame(mario, board, flag, mariowin, ifcolorMode, steps, results);
+				game.startGame(mario, board, flag, mariowin, ifcolorMode);
 			}
 			else 
 			{
@@ -445,8 +443,12 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 
 			if (save)
 			{
+				Steps steps;
+				Results results;
 				steps.saveSteps(stepsFilename);
 				results.saveResults(resultsFilename);
+				game.setSteps(steps);
+				game.setResults(results);
 			}
 		}
 	}

@@ -66,3 +66,4 @@ bool Ghost::isGhostReachingCliff(GameConfig& board)
     else
         return false;
 }
+

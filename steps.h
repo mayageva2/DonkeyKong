@@ -6,10 +6,12 @@
 class Steps
 {
 	long randomSeed = 0;
+	char colorModeGame;
 	std::list<std::pair<size_t, char>> steps; // pair: iteration, step
 public:
 	void saveSteps(const std::string& filename) const;
 	static bool checkSaveMode(int argc, char** argv);
+	void loadSteps(const std::string& filename);
 	long getRandomSeed() const {
 		return randomSeed;
 	}
@@ -27,5 +29,7 @@ public:
 		steps.pop_front();
 		return step;
 	}
+	char getColorMode() {return colorModeGame;}
+	bool isEmpty() {return steps.empty();}
 };
 #endif
