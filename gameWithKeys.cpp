@@ -17,7 +17,7 @@
 using namespace std;
 
 
-void GameWithKeys::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,bool& ifcolorMode)   //starts game
+void GameWithKeys::startGame(Mario& mario,GameConfig& board, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, Steps& steps)   //starts game
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	clrscr();
@@ -34,7 +34,6 @@ void GameWithKeys::startGame(Mario& mario,GameConfig& board, bool& flag, bool& m
 	vector<Barrel> barrels;
 	ghosts.reserve(board.getGhostsAmount());
 	createGhosts(ghosts, board);
-	int counter = 0;
   
 	mario.draw(mario.findMarioLocation(), ifcolorMode);
 	if(!mario.isMarioOnFloor(board))  //incase mario is positioned in the air
@@ -45,7 +44,7 @@ void GameWithKeys::startGame(Mario& mario,GameConfig& board, bool& flag, bool& m
 	flag = true;
 	while (flag)
 	{
-		counter++;
+		currentIteration++;
 		for (int i = 0; i < ghosts.size(); i++)  //Move ghosts
 			ghosts[i]->checkMove(board, mario, flag, ghosts, mariowin, ifcolorMode, steps, results);
 
@@ -69,26 +68,34 @@ void GameWithKeys::startGame(Mario& mario,GameConfig& board, bool& flag, bool& m
 				}
 				else
 				{
-					steps.addStep(counter, inputKey);
+					steps.addStep(currentIteration, inputKey);
 					key = inputKey;
 					if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
 						lastKey = GameConfig::eKeys::STAY;
-					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
+					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps);
 				}
 			}
 			else if (mario.state != MarioState::standing)
-				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps);
 		}
 		else
-			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
+			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps);
 
 		if (mario.state == MarioState::standing)
 		{
 			if (flag)
 			{
 				Point p1 = mario.findMarioLocation();
-				if (board.GetCurrentChar(p1.x, p1.y) == BARREL_CH || board.GetCurrentChar(p1.x, p1.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(p1.x, p1.y) == CLIMBING_GHOST_CH)
+				if (board.GetCurrentChar(p1.x, p1.y) == BARREL_CH)
+				{
+					results.addResult(currentIteration, results.hitBarrel, mario.getScore());
 					mario.collide(board, flag, mariowin, ifcolorMode, results, steps);
+				}
+				else if(board.GetCurrentChar(p1.x, p1.y) == NON_CLIMBING_GHOST_CH || board.GetCurrentChar(p1.x, p1.y) == CLIMBING_GHOST_CH)
+				{
+					results.addResult(currentIteration, results.hitGhost, mario.getScore());
+					mario.collide(board, flag, mariowin, ifcolorMode, results, steps);
+				}
 				Sleep(100);
 			}
 		}
@@ -108,9 +115,8 @@ void GameWithKeys::startGame(Mario& mario,GameConfig& board, bool& flag, bool& m
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);//set default screen color
 }
 
-void GameWithKeys::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts,bool& ifcolorMode)   //makes sure mario goes as he should 
+void GameWithKeys::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts,bool& ifcolorMode, Results& results, Steps& steps)   //makes sure mario goes as he should 
 {
-	
 	if (sideJump == true)
 	{
 		if (_kbhit())
@@ -236,8 +242,16 @@ void GameWithKeys::setCharCheck(Point& p, GameConfig& currBoard, char object, Ma
 	{
 		currBoard.SetChar(p.x, p.y, object);
 		Point p1 = mario.findMarioLocation();
-		if (currBoard.GetCurrentChar(p1.x, p1.y) == BARREL_CH || currBoard.GetCurrentChar(p1.x, p1.y) == NON_CLIMBING_GHOST_CH || currBoard.GetCurrentChar(p1.x, p1.y) == CLIMBING_GHOST_CH)
+		if (currBoard.GetCurrentChar(p1.x, p1.y) == BARREL_CH)
+		{
+			results.addResult(currentIteration, results.hitBarrel, mario.getScore());
 			mario.collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
+		}
+		else if(currBoard.GetCurrentChar(p1.x, p1.y) == NON_CLIMBING_GHOST_CH || currBoard.GetCurrentChar(p1.x, p1.y) == CLIMBING_GHOST_CH)
+		{
+			results.addResult(currentIteration, results.hitGhost, mario.getScore());
+			mario.collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
+		}
 		currBoard.SetChar(p.x, p.y, ch);
 	}
 	else

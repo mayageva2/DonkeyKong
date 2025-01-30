@@ -5,7 +5,7 @@
 void Steps::saveSteps(const std::string& filename) const 
 {
 	std::ofstream steps_file(filename);
-	steps_file << randomSeed << '\n' << steps.size() << '\n' << colorModeGame << '\n';
+	steps_file << randomSeed << '\n' << steps.size() << '\n' << colorModeGame;
 	for (const auto& step : steps) {
 		steps_file << '\n' << step.first << ' ' << step.second;
 	}

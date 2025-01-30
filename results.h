@@ -16,7 +16,7 @@ public:
 	void addResult(size_t iteration, ResultValue result, size_t score) {
 		results.push_back({ iteration, result, score });
 	}
-	std::tuple<size_t, ResultValue, size_t> popResult() {
+	std::tuple<size_t, ResultValue, int> popResult() {
 		if (results.empty()) return { 0, Results::noResult, 0 };
 		auto result = results.front();
 		results.pop_front();
@@ -25,5 +25,6 @@ public:
 	bool isFinishedBy(size_t iteration) const {
 		return results.empty() || std::get<0>(results.back()) <= iteration;
 	}
+	void clear() { results.clear(); }
 };
 #endif

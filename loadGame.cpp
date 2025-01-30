@@ -15,9 +15,9 @@ void loadGame::getAllBoardFileNames(std::vector<std::string>& vec_to_fill)
 	}
 }
 
-void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts, bool& ifcolorMode)
+void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps)
 {
-	if (steps.isEmpty()) //no more commands, end game
+	if (step.isEmpty()) //no more commands, end game
 	{
 		flag = false; 
 		return;
@@ -43,9 +43,9 @@ void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys&
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP) || ((GameConfig::eKeys)key == GameConfig::eKeys::UP2))
 	{
-		if (steps.isNextStepOnIteration(this->currentIteration + 1) && moveCounter != ENDJUMP)
+		if (step.isNextStepOnIteration(this->currentIteration + 1) && moveCounter != ENDJUMP)
 		{
-			char tmp = steps.popStep();
+			char tmp = step.popStep();
 			if ((GameConfig::eKeys)tmp != GameConfig::eKeys::UP && (GameConfig::eKeys)tmp != GameConfig::eKeys::UP2)
 			{
 				sideJump = true;
@@ -107,19 +107,19 @@ void loadGame::recorded_game(bool& _silent, Mario& mario)
 		std::string resultsFilename = filename_prefix + ".result";
 		bool colorMode = false;
 	
-		steps.loadSteps(stepsFilename); //load steps
-		results.loadResults(resultsFilename); // load results
-		char ch = steps.getColorMode();
+		step.loadSteps(stepsFilename); //load steps
+		result.loadResults(resultsFilename); // load results
+		char ch = step.getColorMode();
 		if (ch == 'c' || ch == 'C')
 		{
 			colorMode = true;
 		}
 		
-		this->startGame(mario, board, flag, mariowin, colorMode);//start recorded game
+		this->startGame(mario, board, flag, mariowin, colorMode, result, step);//start recorded game
 	}
 }
 
-void loadGame::startGame(Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode)
+void loadGame::startGame(Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps)
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	clrscr();
@@ -160,15 +160,15 @@ void loadGame::startGame(Mario& mario, GameConfig& board, bool& flag, bool& mari
 				key = steps.popStep();
 				if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
 					lastKey = GameConfig::eKeys::STAY;
-				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps);
 			}
 			else if(mario.state != MarioState::standing)
 			{
-				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
+				marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps);
 			}
 		}
 		else
-			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode);
+			marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps);
 		
 		if (mario.state == MarioState::standing)
 		{
