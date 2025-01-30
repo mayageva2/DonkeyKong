@@ -2,6 +2,66 @@
 #include "mario.h"
 #include "gameWithKeys.h"
 
+void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results)  //move ghost according to conditions
+{
+    GameWithKeys game;
+    Point p(location.x, location.y);
+    game.setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode, steps, results);
+    char originalChar = board.GetCurrentChar(location.x, location.y);
+    game.setCharCheck(location, board, originalChar, mario, flag, mariowin, ifcolorMode, steps, results);
+    p.draw(originalChar, location, ifcolorMode);
+
+    location.diff_x = direction ? RIGHT : LEFT;
+
+    checkCollision(ghosts, board); //check if ghosts collide with one another
+    bool isClimbing = canClimbLadders();
+    if (isClimbing)
+    {
+        handleClimbing(board, p, ghosts);
+    }
+    else
+    {
+        handleMovement(board, p, ghosts);
+    }
+
+    moveGhosts();
+    game.setCharCheck(location, board, this->ch, mario, flag, mariowin, ifcolorMode, steps, results);
+    p.draw(this->ch, location, ifcolorMode);
+}
+
+void Ghost::handleMovement(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts)
+{
+    if (isGhostReachingCliff(board) && board.GetCurrentChar(p.x + location.diff_x, p.y) != '=' &&
+        board.GetCurrentChar(p.x + location.diff_x, p.y) != '<' && board.GetCurrentChar(p.x + location.diff_x, p.y) != '>')
+    {
+        if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == NON_CLIMBING_GHOST_CH ||
+            board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == CLIMBING_GHOST_CH)
+        {
+            direction = !direction;
+            location.diff_x = direction ? RIGHT : LEFT;
+            if (board.GetCurrentChar(p.x + location.diff_x, p.y) == 'Q')
+                location.diff_x = 0;
+        }
+        else if (board.GetCurrentChar(p.x + location.diff_x, p.y) != 'Q')
+        {
+            randomDirection();
+        }
+        else
+        {
+            direction = !direction;
+        }
+    }
+    else
+    {
+        direction = !direction;
+        location.diff_x = direction ? RIGHT : LEFT;
+        if (board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == NON_CLIMBING_GHOST_CH ||
+            board.GetCurrentChar(this->location.x + location.diff_x, this->location.y) == CLIMBING_GHOST_CH)
+        {
+            location.diff_x = 0;
+        }
+    }
+}
 
 void Ghost::checkCollision(std::vector<Ghost*>& ghosts, GameConfig& board) //check if ghosts meet each other
 {

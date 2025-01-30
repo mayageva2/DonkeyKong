@@ -18,8 +18,8 @@ public:
 	};
 	ClimbingState climbingState = NONE;
 	bool canClimbLadders() const override { return true; }
-	void checkMove (GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results) override;
 	void climbUp(GameConfig& board);
 	void climbDown(GameConfig& board);
+	void handleClimbing(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts) override;
 };
 #endif
