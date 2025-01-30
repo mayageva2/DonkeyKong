@@ -28,12 +28,12 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 	{
 		if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH)
 		{
-			results.addResult(counter, results.hitBarrel, num_of_points);
+			results.addResult(counter, results.hitBarrel, curr_score);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 		else if(currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH)
 		{
-			results.addResult(counter, results.hitGhost, num_of_points);
+			results.addResult(counter, results.hitGhost, curr_score);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 	}
@@ -88,12 +88,12 @@ void Mario::move(GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter,
 		
 		if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH)
 		{
-			results.addResult(counter, results.hitBarrel, num_of_points);
+			results.addResult(counter, results.hitBarrel, curr_score);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 		else if (currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH)
 		{
-			results.addResult(counter, results.hitGhost, num_of_points);
+			results.addResult(counter, results.hitGhost, curr_score);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 
@@ -125,12 +125,12 @@ void Mario::left(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mari
 	this->location.diff_x = -1;
 	this->location.diff_y = 0;
 
+	if (currBoard.GetCurrentChar(p.x, p.y) == DONKEY_KONG_CH)
+		p.draw(DONKEY_KONG_CH, this->location, ifcolorMode);
+
 	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH )  //checks if there's a ladder
 	{
-		
-			p.draw(LADDER_CH, this->location, ifcolorMode);
-		
-		
+		p.draw(LADDER_CH, this->location, ifcolorMode);
 		isH = true;
 	}
 	else if (GameWithKeys::isInLegend(p, currBoard))
@@ -167,12 +167,12 @@ void Mario::right(GameConfig& currBoard, int& moveCounter, bool& flag, bool& mar
 	this->location.diff_x = 1;
 	this->location.diff_y = 0;
 
+	if (currBoard.GetCurrentChar(p.x, p.y) == DONKEY_KONG_CH)
+		p.draw(DONKEY_KONG_CH, this->location, ifcolorMode);
+
 	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)
 	{
-		
-			p.draw(LADDER_CH, this->location, ifcolorMode);
-		
-		
+		p.draw(LADDER_CH, this->location, ifcolorMode);
 		isH = true;
 	}
 	else if (GameWithKeys::isInLegend(p, currBoard))
@@ -302,7 +302,7 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump, boo
 		}
 		if (moveCounter > 4)
 		{
-			results.addResult(counter, results.falling, num_of_points);
+			results.addResult(counter, results.falling, curr_score);
 			collide(currBoard, flag, mariowin, ifcolorMode, results, steps);
 		}
 		sideJump = false;
@@ -315,6 +315,9 @@ void Mario::falling(int& moveCounter, GameConfig& currBoard, bool& sideJump, boo
 void Mario::climbUpAladder(int& moveCounter, GameConfig& currBoard,bool& ifcolorMode) //this func makes mario climb up on a ladder
 {
 	Point p(this->location);
+
+	if (currBoard.GetCurrentChar(p.x, p.y) == DONKEY_KONG_CH)
+		p.draw(DONKEY_KONG_CH, this->location, ifcolorMode);
 
 	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH )
 	{
@@ -353,14 +356,14 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& 
 {
 	Point p(this->location);
 
+	if (currBoard.GetCurrentChar(p.x, p.y) == DONKEY_KONG_CH)
+		p.draw(DONKEY_KONG_CH, this->location, ifcolorMode);
+
 	if (currBoard.GetCurrentChar(p.x, p.y) == LADDER_CH)
 	{
 		if (!isMarioOnFloor(currBoard))
 		{
-		
-				p.draw(LADDER_CH, this->location, ifcolorMode);
-			
-			
+			p.draw(LADDER_CH, this->location, ifcolorMode);
 			this->location.y += 1;
 		}
 		else
@@ -372,11 +375,7 @@ void Mario::down(GameConfig& currBoard, int& moveCounter, bool& sideJump, bool& 
 	else if ((currBoard.GetCurrentChar(p.x, p.y + 1) == LADDER_CH || currBoard.GetCurrentChar(p.x, p.y + 2) == LADDER_CH) && sideJump == false)
 	{
 		char way = currBoard.GetCurrentChar(this->location.x, this->location.y);
-		
-		
-			p.draw(way, this->location, ifcolorMode);
-		
-		
+		p.draw(way, this->location, ifcolorMode);
 		this->location.y += 1;
 	}
 	else
@@ -444,7 +443,7 @@ void Mario::killEnemy(GameConfig& currBoard, Mario& mario, vector<Ghost*>& ghost
 
 		if (enemyKilled)
 		{
-			num_of_points += 1000;
+			curr_score += 1000;
 			currBoard.printScore(mario,ifcolorMode);
 			deleteKilledEnemy(currBoard, hammerUsePos, ghosts, barrels, flag, mariowin,ifcolorMode, results, steps); // Delete killed enemy
 		}
@@ -606,9 +605,9 @@ void Mario::collide(GameConfig& currBoard, bool& flag, bool& mariowin,bool& ifco
 	if (flag)
 	{
 		hammer = false;
-		num_of_points = ZERO;
+		curr_score = last_score;
 		this->location = GameConfig::getMarioPos();
-		game.startGame(*this, currBoard, flag, mariowin, ifcolorMode);
+		game.startGame(*this, currBoard, flag, mariowin, ifcolorMode, results, steps);
 	}
 }
 
@@ -618,7 +617,7 @@ void Mario::didMarioLose(GameConfig& currBoard, bool& flag,bool&ifcolorMode)  //
 
 	if (num_of_hearts == 0)
 	{
-		num_of_points = ZERO;
+		curr_score = ZERO;
 		stay(currBoard,ifcolorMode);
 		clrscr();
 		if (ifcolorMode)
@@ -658,7 +657,8 @@ void Mario::didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin,bool& 
 		Sleep(3000);
 		flag = false;
 		mariowin = true;
-		results.addResult(counter, Results::finished, num_of_points);
+		results.addResult(counter, Results::finished, curr_score);
+		this->setLastScore();
 	}
 }
 

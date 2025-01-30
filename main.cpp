@@ -18,13 +18,15 @@ int main(int argc, char** argv)
 	Mario mario;
 	bool saveMode = Steps::checkSaveMode(argc, argv);
 	loadGame loadGame;
+	Results results;
+	Steps steps;
 	if (isLoad)
 	{
-		loadGame.recorded_game(isSilent, mario);
+		loadGame.recorded_game(isSilent, mario, results, steps);
 	}
 	else
 	{
-		Menu::displayMenu(mario, saveMode);
+		Menu::displayMenu(mario, saveMode, results, steps);
 	}
 }
 

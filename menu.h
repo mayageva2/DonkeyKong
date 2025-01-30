@@ -24,10 +24,10 @@ public:
 	static const char* choose1Screen[MENU_Y]; //choose a board out of 1 board screen
 	static const char* colorModeScreen[MENU_Y]; //choose a color mode
 	static void printScreen(const char** print);  //prints screen
-	static void displayMenu(Mario& mario, bool& save);        // displays main menu
+	static void displayMenu(Mario& mario, bool& save, Results& results, Steps& steps);        // displays main menu
 	static void displayEnd_Game(Mario& mario);    //ends game
-	static void loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario, char colorMode, bool& save); //load each screen by order
-	static void loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode, bool& save); //load specific screen
+	static void loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario, char colorMode, bool& save, Results& results, Steps& steps); //load each screen by order
+	static void loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode, bool& save, Results& results, Steps& steps); //load specific screen
 	static char printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode); //prints board according to user's choice
 	static void addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens, bool& ifcolorMode); //add names to choose screen
 	static char printCModeScreen(); //print color mode 

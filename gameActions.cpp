@@ -2,6 +2,8 @@
 #include "nonClimbingGhost.h"
 #include "climbingGhost.h"
 
+size_t gameActions::currentIteration = 0;
+
 void gameActions::createGhosts(vector<Ghost*>& ghosts, GameConfig& board) //this func creates insert all ghosts into a vector
 {
 	int amountOfGhosts = board.getGhostsAmount();
