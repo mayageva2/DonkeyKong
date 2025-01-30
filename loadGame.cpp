@@ -17,7 +17,7 @@ void loadGame::getAllBoardFileNames(std::vector<std::string>& vec_to_fill)
 
 void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps)
 {
-	if (step.isEmpty()) //no more commands, end game
+	if (steps.isEmpty()) //no more commands, end game
 	{
 		flag = false; 
 		return;
@@ -43,9 +43,9 @@ void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys&
 	}
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP) || ((GameConfig::eKeys)key == GameConfig::eKeys::UP2))
 	{
-		if (step.isNextStepOnIteration(this->currentIteration + 1) && moveCounter != ENDJUMP)
+		if (steps.isNextStepOnIteration(this->currentIteration + 1) && moveCounter != ENDJUMP)
 		{
-			char tmp = step.popStep();
+			char tmp = steps.popStep();
 			if ((GameConfig::eKeys)tmp != GameConfig::eKeys::UP && (GameConfig::eKeys)tmp != GameConfig::eKeys::UP2)
 			{
 				sideJump = true;
@@ -88,7 +88,7 @@ void loadGame::marioMovement(Mario& mario, GameConfig& board, GameConfig::eKeys&
 }
 
 
-void loadGame::recorded_game(bool& _silent, Mario& mario)
+void loadGame::recorded_game(bool& _silent, Mario& mario, Results& results, Steps& steps)
 {
 	std::vector<std::string> fileNames;
 	getAllBoardFileNames(fileNames);
@@ -107,15 +107,15 @@ void loadGame::recorded_game(bool& _silent, Mario& mario)
 		std::string resultsFilename = filename_prefix + ".result";
 		bool colorMode = false;
 	
-		step.loadSteps(stepsFilename); //load steps
-		result.loadResults(resultsFilename); // load results
-		char ch = step.getColorMode();
+		steps.loadSteps(stepsFilename); //load steps
+		results.loadResults(resultsFilename); // load results
+		char ch = steps.getColorMode();
 		if (ch == 'c' || ch == 'C')
 		{
 			colorMode = true;
 		}
 		
-		this->startGame(mario, board, flag, mariowin, colorMode, result, step);//start recorded game
+		this->startGame(mario, board, flag, mariowin, colorMode, results, steps);//start recorded game
 	}
 }
 

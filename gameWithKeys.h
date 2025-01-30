@@ -10,8 +10,6 @@ using namespace std;
 
 class GameWithKeys: public gameActions
 {
-	Steps step;
-	Results result;
 	GameWithKeys(const GameWithKeys&) = delete;
 public:
 	GameWithKeys() = default;
@@ -20,11 +18,6 @@ public:
 	static void pauseGame(GameConfig& board, Mario& mario,bool&ifcolorMode); //pause the game
 	static void setCharCheck(Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results); // checks if theres a ladder or floor and then goes to set char on board
 	static bool isInLegend(Point& p, GameConfig& currBoard); //checks if mario runs over the Legend
-	void setResults(Results res) { result = res; }
-	Results getResults() { return result; }
-	void setSteps(Steps s) { step = s; }
-	Steps getSteps() { return step; }
-
 };
 
 #endif

@@ -584,8 +584,6 @@ Point Mario::findMarioLocation() //this func returns mario's location
 void Mario::collide(GameConfig& currBoard, bool& flag, bool& mariowin,bool& ifcolorMode,Results& results, Steps& steps)  //this func takes care of mario's explosion
 {
 	GameWithKeys game;
-	game.setResults(results);
-	game.setSteps(steps);
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (location.x >= 77)
 	{
