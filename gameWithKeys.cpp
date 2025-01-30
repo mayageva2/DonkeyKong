@@ -57,22 +57,26 @@ void GameWithKeys::startGame(Mario& mario,GameConfig& board, bool& flag, bool& m
 
 			if (_kbhit())
 			{
-				char inputKey = _getch();
-				if ((GameConfig::eKeys)inputKey == GameConfig::eKeys::ESC)
+				inputKey = _getch();
+
+				if (board.isValidKey(inputKey))
 				{
-					if (ifcolorMode)
+					if ((GameConfig::eKeys)inputKey == GameConfig::eKeys::ESC)
 					{
-						SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+						if (ifcolorMode)
+						{
+							SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+						}
+						pauseGame(board, mario, ifcolorMode);
 					}
-					pauseGame(board, mario, ifcolorMode);
-				}
-				else
-				{
-					steps.addStep(currentIteration, inputKey);
-					key = inputKey;
-					if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
-						lastKey = GameConfig::eKeys::STAY;
-					marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps);
+					else
+					{
+						steps.addStep(currentIteration, inputKey);
+						key = inputKey;
+						if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
+							lastKey = GameConfig::eKeys::STAY;
+						marioMovement(mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps);
+					}
 				}
 			}
 			else if (mario.state != MarioState::standing)
@@ -122,6 +126,7 @@ void GameWithKeys::marioMovement(Mario& mario, GameConfig& board, GameConfig::eK
 		if (_kbhit())
 		{
 			char tmp = _getch();
+
 			if ((GameConfig::eKeys)tmp == GameConfig::eKeys::ESC)
 				pauseGame(board, mario, ifcolorMode);
 		}
@@ -147,6 +152,7 @@ void GameWithKeys::marioMovement(Mario& mario, GameConfig& board, GameConfig::eK
 		if (_kbhit() && moveCounter != ENDJUMP)
 		{
 			char tmp = _getch();
+	
 			if ((GameConfig::eKeys)tmp != GameConfig::eKeys::UP && (GameConfig::eKeys)tmp != GameConfig::eKeys::UP2)
 			{
 				sideJump = true;

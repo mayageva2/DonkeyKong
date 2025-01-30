@@ -61,6 +61,29 @@ public:
 	void addFrame(); //add Q frame to screen
 	bool isGhostsOnFloor();  //checks if ghosts are in the air
 
+	bool isValidKey(char& key) 
+	{
+		switch (static_cast<eKeys>(key)) 
+		{
+		case eKeys::LEFT: 
+		case eKeys::LEFT2:
+		case eKeys::RIGHT: 
+		case eKeys::RIGHT2:
+		case eKeys::UP: 
+		case eKeys::UP2:
+		case eKeys::DOWN: 
+		case eKeys::DOWN2:
+		case eKeys::STAY: 
+		case eKeys::STAY2:
+		case eKeys::ESC:
+		case eKeys::KILL: 
+		case eKeys::KILL2:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	char GetCurrentChar(int x, int y) const// returns a char that is placed on given point on board
 	{
 		return currentBoard[y][x];
