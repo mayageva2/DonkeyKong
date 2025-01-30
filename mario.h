@@ -21,7 +21,8 @@ class Mario
 {
 	Point location;                  // mario's location
 	int num_of_hearts = FULL_LIFE;   // num of lives
-	int num_of_points = ZERO;        // mario's score
+	int curr_score = ZERO;           // mario's current score
+	int last_score = ZERO;           // mario's former score
 	bool hammer = false;             //checks if mario has hammer
 
 public:
@@ -46,14 +47,15 @@ public:
 	bool isMarioOnFloor(GameConfig& currBoard);   //checks if mario stands on a floor
 	Point findMarioLocation();   //return mario's position
 	int getNumOfHearts() const { return num_of_hearts; }  //returns amount of lives left
-	int getScore() const { return num_of_points; }  //returns amount of lives left
+	int getScore() const { return curr_score; }  //returns amount of lives left
 	void collide(GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps); //makes mario explode and restarts game
 	void didMarioLose(GameConfig& currBoard, bool& flag,  bool& ifcolorMode); //checks if mario lost all hearts
 	void didMarioWin(GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, size_t& counter);  //checks if mario reached pauline
 	void resetMario();   //resets mario
 	void pickHammer(GameConfig& board, bool& ifcolorMode); //takes care of hammer when mario reaches it
 	void deleteKilledEnemy(GameConfig& currBoard, Point killPos, vector<Ghost*>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, Steps& steps); //deletesghosts andbarrels that were killed
-	void setScore(int points) { num_of_points += points; } //sets new score
+	void setScore(int points) { curr_score += points; } //sets new score
+	void setLastScore() { last_score = curr_score; } //sets new score
 	void resetMarioPos();  //brings mario back to starting position
 
 	bool hasHammer() const //check if mario has a hammer

@@ -238,7 +238,7 @@ void GameWithKeys::setCharCheck(Point& p, GameConfig& currBoard, char object, Ma
 {
 	char ch = currBoard.GetCurrentChar(p.x, p.y);
 	bool returnCh = isInLegend(p, currBoard);
-	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '=' || ch == 'Q' || ch == PAULINE_CH || returnCh)
+	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '=' || ch == 'Q' || ch == PAULINE_CH || ch == DONKEY_KONG_CH || returnCh)
 	{
 		currBoard.SetChar(p.x, p.y, object);
 		Point p1 = mario.findMarioLocation();

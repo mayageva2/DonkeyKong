@@ -333,6 +333,7 @@ char Menu::printCModeScreen() //prints screen in color mode
 char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode) //prints chosen screen 
 {
 	size_t size = screens.size();
+	int origin_size = screens.size();
 	if (size == 0)
 	{
 		clrscr();
@@ -380,9 +381,11 @@ char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode)
 			gotoxy(61, 20);
 			std::cout << "press 0 to next screens";
 		}
-		char key = _getch();
-		if (key != '0')
-			return key;
+		char key = '0';
+		while (key == '0' || key - '0' > origin_size)
+			key = _getch();
+		
+		return key;
 	}
 }
 
