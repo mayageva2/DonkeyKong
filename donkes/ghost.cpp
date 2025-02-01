@@ -10,18 +10,21 @@ void Ghost::checkMove(GameActions& game, GameRenderer& renderer, GameConfig& boa
     char originalChar = board.GetCurrentChar(location.x, location.y);
     game.setCharCheck(game,renderer,location, board, originalChar, mario, flag, mariowin, ifcolorMode, steps, results, saveMode);
     renderer.draw(originalChar, location, ifcolorMode);
-
+    if (saveMode && steps.getRandomSeed() == 0)
+    {
+        steps.setSeed();
+    }
     location.diff_x = direction ? RIGHT : LEFT;
 
     checkCollision(ghosts, board); //check if ghosts collide with one another
     bool isClimbing = canClimbLadders();
     if (isClimbing)
     {
-        handleClimbing(board, p, ghosts);
+        handleClimbing(board, p, ghosts,steps);
     }
     else
     {
-        handleMovement(board, p, ghosts);
+        handleMovement(board, p, ghosts,steps);
     }
 
     moveGhosts();
@@ -29,7 +32,7 @@ void Ghost::checkMove(GameActions& game, GameRenderer& renderer, GameConfig& boa
     renderer.draw(this->ch, location, ifcolorMode);
 }
 
-void Ghost::handleMovement(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts)
+void Ghost::handleMovement(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts, Steps& steps)
 {
     if (isGhostReachingCliff(board) && board.GetCurrentChar(p.x + location.diff_x, p.y) != '=' &&
         board.GetCurrentChar(p.x + location.diff_x, p.y) != '<' && board.GetCurrentChar(p.x + location.diff_x, p.y) != '>')
@@ -44,7 +47,7 @@ void Ghost::handleMovement(GameConfig& board, Point& p, std::vector<Ghost*>& gho
         }
         else if (board.GetCurrentChar(p.x + location.diff_x, p.y) != 'Q')
         {
-            randomDirection();
+            randomDirection(steps.getRandomSeed());
         }
         else
         {
@@ -97,9 +100,10 @@ void Ghost::moveGhosts() //moves ghost according to direction
 		location.x += direction ? RIGHT : LEFT;
 }
 
-void Ghost::randomDirection() //gives a random direction
+void Ghost::randomDirection(long seed) //gives a random direction
 {
-    int randomNum = (std::rand() % 100) + 1;
+    std::srand(seed);
+    long randomNum=std::rand() % 100 + 1;
     if (randomNum > 95)
         direction = !direction;
 }

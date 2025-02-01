@@ -2,6 +2,7 @@
 #define _STEPS_H
 #include <list>
 #include <string>
+#include <ctime>
 
 class Steps
 {
@@ -29,6 +30,7 @@ public:
 		steps.pop_front();
 		return step;
 	}
+	void setSeed() { randomSeed = static_cast<int>(time(0)); }
 	char getColorMode() {return colorModeGame;}
 	void setColorMode(char colorMode) { colorModeGame=colorMode; }
 	bool isEmpty() {return steps.empty();}

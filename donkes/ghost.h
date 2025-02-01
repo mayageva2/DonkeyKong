@@ -28,10 +28,10 @@ public:
 	virtual ~Ghost() = default;
 	virtual bool canClimbLadders() const = 0;
 	void checkMove(GameActions& game, GameRenderer& renderer, GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results, bool& saveMode); //check ghost's move
-	virtual void handleClimbing(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts) {};
-	virtual void handleMovement(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts);
+	virtual void handleClimbing(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts,Steps& steps) {};
+	virtual void handleMovement(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts, Steps& steps);
 	void checkCollision(std::vector<Ghost*>& ghosts, GameConfig& board);  //check if a ghost is meeting another ghost
-	void randomDirection();//changing direction randomly
+	void randomDirection(long seed);//changing direction randomly
 	void moveGhosts(); //moving ghosts according to direction
 	void clearGhostFromScreen(GameActions& game, GameRenderer& renderer, GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results, bool& saveMode); //clear ghosts from screen
 	bool isGhostOnFloor(GameConfig& board);

@@ -26,9 +26,9 @@ void Steps::loadSteps(const std::string& filename)
 {
 	std::ifstream steps_file(filename);
 	steps_file >> randomSeed; //read randomSeed
-	steps_file >> colorModeGame; //read colorMode
 	size_t size; 
 	steps_file >> size;// read number of steps
+	steps_file >> colorModeGame; //read colorMode
 	while (!steps_file.eof() && size >0 ) {
 		size_t iteration;
 		char step;
