@@ -3,13 +3,14 @@
 #include "gameWithKeys.h"
 #include "gameConfig.h"
 
-void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& mariowin, bool& marioKilled,bool& ifcolorMode, Steps& steps, Results& results) //this function clears barrels from the screen
+
+void Barrel::clearFromScreen(GameActions& game, GameRenderer& renderer, GameConfig& board, Mario& mario, bool& flag, bool& mariowin, bool& marioKilled,bool& ifcolorMode, Steps& steps, Results& results, bool& saveMode) //this function clears barrels from the screen
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	GameWithKeys::setCharCheck(location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode, steps, results); //resets barrel's previous location
+	game.setCharCheck(game,renderer,location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode, steps, results,saveMode); //resets barrel's previous location
 
 	if (mario.findMarioLocation().x == this->location.x && mario.findMarioLocation().y == this->location.y)
-		mario.collide(board, flag, mariowin,ifcolorMode, results, steps);
+		mario.collide(game,renderer,board, flag, mariowin,ifcolorMode, results, steps,saveMode);
 	else
 	{
 		if (marioKilled) //don't explode on mario
@@ -23,48 +24,44 @@ void Barrel::clearFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& 
 			location.x = MAX_X - 5;
 		}
 		
-			Point::draw(DELETE_CH, location, ifcolorMode);
-			gotoxy(location.x, location.y);
-			if (ifcolorMode)
-			{
-				SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);
-			}
-			cout << EXPLOSION;
-			Sleep(80);
+			renderer.draw(DELETE_CH, location, ifcolorMode);
+			
+			renderer.drawString(EXPLOSION, BARREL_CH, this->location, ifcolorMode);
+			renderer.sleep(80);
 			for (int i = 0; i < 4; i++) // CLEANS 'BOOM' from screen
 			{
 				char originalCh = board.GetCurrentChar(location.x + i, location.y);
 				Point tmp = location;
 				tmp.x += i;
-				Point::draw(originalCh, tmp, ifcolorMode);
+				renderer.draw(originalCh, tmp, ifcolorMode);
 			}
 		
 		if (marioCloseToExplosion(board, mario) && mario.state != MarioState::killing)
-			mario.collide(board, flag, mariowin,ifcolorMode, results, steps);
+			mario.collide(game,renderer,board, flag, mariowin,ifcolorMode, results, steps,saveMode);
 	}
 	deactivate();
 }
 
-void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results) //this func moves barrels
+void Barrel::moveBarrel(GameActions& game,GameRenderer& renderer, GameConfig& board,Mario& mario, bool& flag, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) //this func moves barrels
 {
 	Point p(location.x, location.y);
 
-	GameWithKeys::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode, steps, results); //resets barrel's previous location
+	game.setCharCheck(game,renderer,this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode, steps, results,saveMode); //resets barrel's previous location
 	char originalChar = board.GetCurrentChar(location.x, location.y); //Restore the original character at the barrel's current location
-	GameWithKeys::setCharCheck(location, board, originalChar, mario, flag, mariowin, ifcolorMode, steps, results);
-	p.draw(originalChar, location, ifcolorMode); //print original char on board
+	game.setCharCheck(game,renderer,location, board, originalChar, mario, flag, mariowin, ifcolorMode, steps, results, saveMode);
+	renderer.draw(originalChar, location, ifcolorMode); //print original char on board
 
 	if (location == GameConfig::getDonkeyKongPos()) // if barrel crossed donkey kong
 	{
-		GameWithKeys::setCharCheck(location, board, DONKEY_KONG_CH, mario, flag, mariowin,ifcolorMode, steps, results);
-		p.draw(DONKEY_KONG_CH, location, ifcolorMode); //return donkey kong's char
+		game.setCharCheck(game,renderer,location, board, DONKEY_KONG_CH, mario, flag, mariowin,ifcolorMode, steps, results, saveMode);
+		renderer.draw(DONKEY_KONG_CH, location, ifcolorMode); //return donkey kong's char
 	}
 	else
 	{
-		GameWithKeys::setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode, steps, results); //resets barrel's previous location
+		game.setCharCheck(game,renderer,this->location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode, steps, results, saveMode); //resets barrel's previous location
 		char originalChar = board.GetCurrentChar(location.x, location.y); //Restore the original character at the barrel's current location
-		GameWithKeys::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results);
-		p.draw(originalChar, location, ifcolorMode); //print original char on board
+		game.setCharCheck(game,renderer,location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results, saveMode);
+		renderer.draw(originalChar, location, ifcolorMode); //print original char on board
 	}
 	
 	char floor = board.GetCurrentChar(location.x, location.y + 1);//Check the char below the barrel to determine the floor type
@@ -125,8 +122,8 @@ void Barrel::moveBarrel(GameConfig& board,Mario& mario, bool& flag, bool& mariow
 	}
 	if (flag)
 	{
-		GameWithKeys::setCharCheck(location, board, BARREL_CH, mario, flag, mariowin, ifcolorMode, steps, results); //Update barrel's new position on the game board.
-		p.draw(BARREL_CH, location, ifcolorMode);//Draw the barrel at its new position on screen
+		game.setCharCheck(game,renderer,location, board, BARREL_CH, mario, flag, mariowin, ifcolorMode, steps, results, saveMode); //Update barrel's new position on the game board.
+		renderer.draw(BARREL_CH, location, ifcolorMode);//Draw the barrel at its new position on screen
 	}
 }
 
@@ -152,7 +149,7 @@ bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos) //checks if ma
 		return false;
 }
 
-void Barrel::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results) //moves each barrel
+void Barrel::barrelsMovement(GameActions& game, GameRenderer& renderer, vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) //moves each barrel
 {
 	Point p(0, 0);
 	if (board.getDonkeyKongPos() == p) //in case there isn't a donkey kong char
@@ -175,12 +172,12 @@ void Barrel::barrelsMovement(vector<Barrel>& barrels, GameConfig& board, int& in
 		if (!flag) { break; }
 		if (barrels[i].isBarrelActive()) //Move barrel only if active
 		{
-			barrels[i].moveBarrel(board, mario, flag, mariowin, ifcolorMode, steps, results);
+			barrels[i].moveBarrel(game,renderer,board, mario, flag, mariowin, ifcolorMode, steps, results,saveMode);
 
 			//Remove barrel from array if reached screen boundaries or became inactive
 			if (barrels[i].getLocation().x >= MAX_X - 2 || barrels[i].getLocation().x <= MIN_X || !barrels[i].isBarrelActive())
 			{
-				barrels[i].clearFromScreen(board, mario, flag, mariowin, marioKilled, ifcolorMode, steps, results); //Print EXPLOSION
+				barrels[i].clearFromScreen(game,renderer,board, mario, flag, mariowin, marioKilled, ifcolorMode, steps, results,saveMode); //Print EXPLOSION
 				barrels.erase(barrels.begin() + i);
 			}
 			else

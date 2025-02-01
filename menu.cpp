@@ -13,7 +13,7 @@
 #include "results.h"
 
 
-const Point startMenu(8, 5);
+
 bool flag = true;
 constexpr char START_GAME = '1';
 constexpr char CHOOSE_SCREEN = '2';
@@ -21,6 +21,7 @@ constexpr char INSTRUCTIONS = '8';
 constexpr char EXIT = '9';
 constexpr size_t FIRST_SCREEN = 1;
 constexpr size_t SECOND_SCREEN = 2;
+
 
 const char* Menu::winLevel[Menu::MENU_Y] = {
 	// 012345678901a2345678901234567890123456789012345678901234567890123456789012345
@@ -43,7 +44,7 @@ const char* Menu::winLevel[Menu::MENU_Y] = {
 		"|---------------------------------------------------------------------------|",//16
 };
 
-const char* Menu::pause[Menu:: MENU_Y] = {
+const char* Menu::pause[Menu::MENU_Y] = {
 	// 012345678901a2345678901234567890123456789012345678901234567890123456789012345
 	  "|---------------------------------------------------------------------------|",//0
 	  "|   _____          __  __ ______   _____       _    _  _____ ______ _____   |",//1
@@ -232,19 +233,9 @@ const char* Menu::colorModeScreen[Menu::MENU_Y] = {
 	  "|---------------------------------------------------------------------------|"//16
 };
 
-void Menu::printScreen(const char** print) //prints screen
-{
-	clrscr();
-	Point p = startMenu;
-	for (int i = 0; i < MENU_Y; i++)
-	{
-		gotoxy(p.x, p.y);
-		std::cout << print[i];
-		p.y++;
-	}
-}
 
-void Menu::displayMenu(Mario& mario, bool& save, Results& results, Steps& steps) // displays main menu
+
+void Menu::displayMenu(GameRenderer& renderer, Mario& mario, bool& save, Results& results, Steps& steps,GameActions& game) // displays main menu
 {
 	GameConfig board;
 	bool exitMenu = false; //chatGPT solution
@@ -259,8 +250,8 @@ void Menu::displayMenu(Mario& mario, bool& save, Results& results, Steps& steps)
 
 	while (!exitMenu)
 	{
-		clrscr();
-		printScreen(mainMenu);
+		renderer.clearScreen();
+		renderer.printScreen(mainMenu);
 		board.init();
 		char key = _getch();
 		switch (key)
@@ -268,24 +259,24 @@ void Menu::displayMenu(Mario& mario, bool& save, Results& results, Steps& steps)
 		case START_GAME:
 			if (screens.size() == 0)
 			{
-				clrscr();
+				renderer.clearScreen();
 				std::cout << "Error Message: no screen files found";
-				Sleep(2000);
+				renderer.sleep(2000);
 			}
 			else
 			{
-				chooseColorScreen(colorModeKey, ifcolorM);
-				loadScreens(0, screens, board, screenError, mario, colorModeKey, save, results, steps);
+				chooseColorScreen(renderer,colorModeKey, ifcolorM);
+				loadScreens(renderer,0, screens, board, screenError, mario, colorModeKey, save, results, steps,game);
 			}
 			break;
 		case INSTRUCTIONS:
-			printScreen(instructions);
+			renderer.printScreen(instructions);
 			while (!_kbhit()) {}
 			break;
 		case CHOOSE_SCREEN:
-			chooseColorScreen(colorModeKey, ifcolorM);
-			screenKey = printChooseScreen(screens, ifcolorM);
-			loadChosenScreen(screenKey, screens, board, screenError, mario, colorModeKey, save, results, steps);
+			chooseColorScreen(renderer,colorModeKey, ifcolorM);
+			screenKey = printChooseScreen(renderer,screens, ifcolorM);
+			loadChosenScreen(renderer,screenKey, screens, board, screenError, mario, colorModeKey, save, results, steps,game);
 			break;
 		case EXIT:
 			exitMenu = true;
@@ -294,9 +285,9 @@ void Menu::displayMenu(Mario& mario, bool& save, Results& results, Steps& steps)
 	}
 }
 
-void Menu::chooseColorScreen(char& colorModeKey, bool& ifcolorM)
+void Menu::chooseColorScreen(GameRenderer& renderer, char& colorModeKey, bool& ifcolorM)
 {
-	colorModeKey = printCModeScreen();
+	colorModeKey = printCModeScreen(renderer);
 	while (colorModeKey != 'c' && colorModeKey != 'C' && colorModeKey != 'R' && colorModeKey != 'r')
 	{
 		switch (colorModeKey)
@@ -322,23 +313,24 @@ void Menu::chooseColorScreen(char& colorModeKey, bool& ifcolorM)
 	}
 }
 
-char Menu::printCModeScreen() //prints screen in color mode
+char Menu::printCModeScreen(GameRenderer& renderer) //prints screen in color mode
 {
-	clrscr();
-	printScreen(colorModeScreen);
+	
+	renderer.clearScreen();
+	renderer.printScreen(colorModeScreen);
 	char key = _getch();
 	return key;
 }
 
-char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode) //prints chosen screen 
+char Menu::printChooseScreen(GameRenderer& renderer,std::vector<std::string> screens,bool& ifcolorMode) //prints chosen screen 
 {
 	size_t size = screens.size();
 	int origin_size = screens.size();
 	if (size == 0)
 	{
-		clrscr();
+		renderer.clearScreen();
 		std::cout << "Error Message: no screen files found";
-		Sleep(2000);
+		renderer.sleep(2000);
 		return DELETE_CH;
 	}
 	int i = 0, j = 0;
@@ -351,8 +343,8 @@ char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode)
 			Point namePoints[1] = { Point(38, 16) };
 			Point counterPoints[1] ={ Point(49, 18) }; //check place
 			j = 0;
-			printScreen(choose1Screen);
-			addNames(1, counter, namePoints, counterPoints, screens,ifcolorMode);
+			renderer.printScreen(choose1Screen);
+			addNames(renderer,1, counter, namePoints, counterPoints, screens,ifcolorMode);
 			size--;
 			break;
 		}
@@ -360,8 +352,8 @@ char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode)
 			Point namePoints[2] = { Point(20, 16), Point(56, 16) }; //check place
 			Point counterPoints[2] = { Point(31, 18),  Point(67, 18) }; //check place
 			j = 0;
-			printScreen(choose2Screen);
-			addNames(2, counter, namePoints, counterPoints, screens, ifcolorMode);
+			renderer.printScreen(choose2Screen);
+			addNames(renderer,2, counter, namePoints, counterPoints, screens, ifcolorMode);
 			size = size - 2;
 			break;
 		}
@@ -369,9 +361,9 @@ char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode)
 			Point namePoints[3] = { Point(13, 16), Point(38, 16), Point(63, 16) };
 			Point counterPoints[3] = { Point(24, 18), Point(49, 18), Point(74, 18) }; //check place
 			j = 0;
-			printScreen(choose3Screen);
-			namePoints[i].draw(screens[i][j], namePoints[i], ifcolorMode);
-			addNames(3, counter, namePoints, counterPoints, screens, ifcolorMode);
+			renderer.printScreen(choose3Screen);
+			renderer.draw(screens[i][j], namePoints[i], ifcolorMode);
+			addNames(renderer,3, counter, namePoints, counterPoints, screens, ifcolorMode);
 			size = size - 3;
 			break;
 		}
@@ -389,7 +381,7 @@ char Menu::printChooseScreen(std::vector<std::string> screens,bool& ifcolorMode)
 	}
 }
 
-void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens,bool& ifcolorMode) //add file names to choosing screen 
+void Menu::addNames(GameRenderer& renderer, int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens,bool& ifcolorMode) //add file names to choosing screen 
 {
 	int j = 0;
 
@@ -397,11 +389,11 @@ void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPo
 	{
 		while (screens[i][j] != '\0')
 		{
-			namePoints[i].draw(screens[i][j], namePoints[i], ifcolorMode);
+			renderer.draw(screens[i][j], namePoints[i], ifcolorMode);
 			namePoints[i].x++;
 			j++;
 		}
-		counterPoints[i].draw(counter, counterPoints[i], ifcolorMode);
+		renderer.draw(counter, counterPoints[i], ifcolorMode);
 		counter++;
 		j = 0;
 	}
@@ -413,9 +405,8 @@ void Menu::addNames(int size, char& counter, Point* namePoints, Point* counterPo
 }
 
 
-void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode, bool& save, Results& results, Steps& steps) //load screens one by one
+void Menu::loadScreens(GameRenderer& renderer, size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode, bool& save, Results& results, Steps& steps,GameActions& game) //load screens one by one
 {
-	GameWithKeys game;
 	bool mariowin = true;
 	bool ifcolorMode = false;
 	for (i; i < screens.size(); i++)
@@ -439,7 +430,7 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 				}
 				else
 					steps.setColorMode(colorMode);
-				game.startGame(mario, board, flag, mariowin, ifcolorMode, results, steps);
+				game.startGame(game,renderer,mario, board, flag, mariowin, ifcolorMode, results, steps,save);
 			}
 			else 
 			{
@@ -459,23 +450,23 @@ void Menu::loadScreens(size_t i, std::vector<std::string>& screens, GameConfig& 
 	mario.resetMario();
 	if (mariowin && screens.size() != 0)
 	{
-		clrscr();
-		printScreen(Menu::win);
-		Sleep(2000);
+		renderer.clearScreen();
+		renderer.printScreen(Menu::win);
+		renderer.sleep(2000);
 	}
 }
 
-void Menu::loadChosenScreen(char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode, bool& save, Results& results, Steps& steps) //load chosen screen
+void Menu::loadChosenScreen(GameRenderer& renderer, char& screenKey, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode, bool& save, Results& results, Steps& steps, GameActions& game) //load chosen screen
 {
 	int i = screenKey - '0' -1;
-	loadScreens(i, screens, board, screenError, mario,colorMode, save, results, steps);
+	loadScreens(renderer, i, screens, board, screenError, mario,colorMode, save, results, steps,game);
 }
 
-void Menu::displayEnd_Game(Mario& mario)  //ends game
+void Menu::displayEnd_Game(GameRenderer& renderer, Mario& mario)  //ends game
 {
-	printScreen(end_game);
-	Sleep(2500);
-	clrscr();
+	renderer.printScreen(end_game);
+	renderer.sleep(2000);
+	renderer.clearScreen();
 }
 
 const char Menu::legend[Menu::LegendY][Menu::LegendX + 1] = {

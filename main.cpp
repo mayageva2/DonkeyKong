@@ -7,7 +7,9 @@
 #include "menu.h"
 #include "barrel.h"
 #include "loadGame.h"
+#include "gameWithKeys.h"
 #include "steps.h"
+#include "consoleRenderer.h"
 using namespace std;
 
 int main(int argc, char** argv)
@@ -17,16 +19,21 @@ int main(int argc, char** argv)
 	bool isSilent = isLoad && argc > 2 && std::string(argv[2]) == "-silent";
 	Mario mario;
 	bool saveMode = Steps::checkSaveMode(argc, argv);
-	loadGame loadGame;
+	GameActions* game;
+	GameRenderer* renderer=new ConsoleRenderer();
 	Results results;
 	Steps steps;
 	if (isLoad)
 	{
-		loadGame.recorded_game(isSilent, mario, results, steps);
+		game = new loadGame();
+		static_cast<loadGame*>(game)->load_game(*game,isSilent, mario, results, steps,saveMode);
+	
 	}
 	else
 	{
-		Menu::displayMenu(mario, saveMode, results, steps);
+		game = new GameWithKeys();
+		Menu::displayMenu(*renderer,mario, saveMode, results, steps, *game);
 	}
+	
 }
 
