@@ -1,7 +1,7 @@
 #include "climbingGhost.h"
 #include "gameWithKeys.h"
 
-void ClimbingGhost::handleClimbing(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts)
+void ClimbingGhost::handleClimbing(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts, Steps& steps)
 {
     if (climbingState == NONE)
     {
@@ -21,7 +21,7 @@ void ClimbingGhost::handleClimbing(GameConfig& board, Point& p, std::vector<Ghos
     }
     else
     {
-        handleMovement(board, p, ghosts);
+        handleMovement(board, p, ghosts, steps);
         climbingState = NONE;
     }
 }

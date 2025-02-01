@@ -446,7 +446,6 @@ void Mario::deleteKilledEnemy(GameActions& game, GameRenderer& renderer, GameCon
 		for (size_t i = 0; i < ghosts.size();)
 		{
 			if (ghosts[i]->getLocation() == killPos)
-			if (ghosts[i]->getLocation() == killPos)
 			{
 				ghosts[i]->clearGhostFromScreen(game,renderer,currBoard, *this, flag, marioKilled, mariowin,ifcolorMode, steps, results,saveMode); // Delete ghost from screen
 				ghosts.erase(ghosts.begin() + i);

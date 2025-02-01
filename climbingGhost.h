@@ -20,6 +20,6 @@ public:
 	bool canClimbLadders() const override { return true; }
 	void climbUp(GameConfig& board);
 	void climbDown(GameConfig& board);
-	void handleClimbing(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts) override;
+	void handleClimbing(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts, Steps& steps) override;
 };
 #endif

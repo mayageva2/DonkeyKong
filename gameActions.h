@@ -2,6 +2,7 @@
 #include "gameConfig.h"
 #include "mario.h"
 #include "gameRenderer.h"
+#include "ghost.h"
 
 static constexpr int ENDJUMP = -1;
 

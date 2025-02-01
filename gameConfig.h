@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include "point.h"
-#include "gameRenderer.h"
 
 static constexpr int MAX_X = 80;  //screen size
 static constexpr int MAX_Y = 25;  //screen size
@@ -14,6 +13,7 @@ static constexpr char INVALID_KEY = '!';
 
 
 class Mario;
+class GameRenderer;
 
 class GameConfig
 {

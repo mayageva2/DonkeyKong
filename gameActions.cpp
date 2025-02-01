@@ -22,6 +22,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	vector<Barrel> barrels;
 	ghosts.reserve(board.getGhostsAmount());
 	createGhosts(ghosts, board);
+	this->currentIteration = 0;
 
 	renderer.draw(MARIO_CH, mario.findMarioLocation(), ifcolorMode);
 	if (!mario.isMarioOnFloor(board))  //incase mario is positioned in the air
@@ -57,10 +58,6 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 				}
 				else
 				{
-					if (saveMode)
-					{
-						steps.addStep(currentIteration, inputKey);
-					}
 					key = inputKey;
 					if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
 						lastKey = GameConfig::eKeys::STAY;
@@ -86,6 +83,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	gotoxy(0, MAX_Y + 2);
 	cleanUp(ghosts, barrels, hConsole);
 }
+
 void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)   //makes sure mario goes as he should 
 {
 	if (sideJump == true)
