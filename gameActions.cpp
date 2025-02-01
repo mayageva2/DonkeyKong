@@ -3,7 +3,12 @@
 #include "climbingGhost.h"
 #include "menu.h"
 
-size_t GameActions::currentIteration;
+
+size_t GameActions::currentIteration = 0;
+bool GameActions::hitByBarrel = false;
+bool GameActions::hitByGhost = false;
+bool GameActions::fellToDeath = false;
+bool GameActions::MarioFinished = false;
 
 void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)   //starts game
 {
@@ -16,6 +21,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	board.printScore(renderer, mario, ifcolorMode);
 	int interval = 0;
 	int moveCounter = 0;
+	bool unmatched_result = false;
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
 	std::vector<Ghost*> ghosts;
@@ -33,22 +39,22 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	flag = true;
 	while (flag)
 	{
-		this->currentIteration++;
 		for (int i = 0; i < ghosts.size(); i++)  //Move ghosts
 			ghosts[i]->checkMove(game, renderer, board, mario, flag, ghosts, mariowin, ifcolorMode, steps, results,saveMode);
 
-		Barrel::barrelsMovement(game, renderer, barrels, board, interval, mario, flag, mariowin, ifcolorMode, steps, results, saveMode); // Move Barrels
+		Barrel::barrelsMovement(game, renderer, currentIteration, barrels, board, interval, mario, flag, mariowin, ifcolorMode, steps, results, saveMode); // Move Barrels
 
 		if (moveCounter == 0 && mario.state != MarioState::falling) //Move Mario
 		{
-			char inputKey = game.getNextMove(renderer, currentIteration, steps, flag, lastKey);
+			char inputKey = game.getNextMove(mario, renderer, currentIteration, steps, flag, lastKey);
 			if (!flag) // no more steps for mario
 			{
 				break;
 			}
 			if (board.isValidKey(inputKey))
 			{
-				if (((GameConfig::eKeys)inputKey == GameConfig::eKeys::DOWN || (GameConfig::eKeys)inputKey == GameConfig::eKeys::DOWN2) && mario.isMarioOnFloor(board))
+				Point p(mario.findMarioLocation());
+				if (((GameConfig::eKeys)inputKey == GameConfig::eKeys::DOWN || (GameConfig::eKeys)inputKey == GameConfig::eKeys::DOWN2) && board.GetCurrentChar(p.x, p.y + 2) !=  LADDER_CH)
 					inputKey = (char)GameConfig::eKeys::STAY;
 
 				if ((GameConfig::eKeys)inputKey == GameConfig::eKeys::ESC)
@@ -73,7 +79,10 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 		else
 			marioMovement(game, renderer, mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps, saveMode);
 
-		checkCollisions(game, renderer, mario, board, flag, mariowin, ifcolorMode, results, steps,saveMode);
+		checkCollisions(game, renderer, currentIteration, mario, board, flag, mariowin, ifcolorMode, results, steps, saveMode);
+		if (isSilent && !results.isEmpty())
+			checkErrors(mario, results, flag);
+
 		if (mario.state == MarioState::falling)
 		{
 			if (flag)
@@ -81,17 +90,71 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 		}
 
 		++interval;
+		++currentIteration;
+		hitByBarrel = false;
+		hitByGhost = false;
+		fellToDeath = false;
+		MarioFinished = false;
 	}
+
+	if (isSilent)
+	{
+		std::cout << results.getSize();
+		checkErrorsEndOfGame(mario, results, steps);
+		gotoxy(0, 0);
+	}
+
 	this->currentIteration = 0;
 	gotoxy(0, MAX_Y + 2);
-	cleanUp(ghosts, barrels, hConsole);
+	cleanUp(ghosts, barrels, hConsole, hitByBarrel, hitByGhost, fellToDeath, MarioFinished);
+}
+
+void GameActions::checkErrors(Mario& mario, Results& results, bool& flag)
+{
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+	gotoxy(0, 0);
+
+	std::tuple<size_t, Results::ResultValue, int> expectedResult = results.getFirstResult();
+	size_t nextResultIteration = std::get<0>(expectedResult);
+	int expectedScore = std::get<2>(expectedResult);
+	Results::ResultValue expectedEvent = std::get<1>(expectedResult);
+
+	if (results.isFinishedBy(currentIteration))
+		results.reportResultError("Results file reached finish while game hadn't!", results.filename, this->currentIteration);
+
+	if (nextResultIteration == currentIteration)
+	{
+		if (expectedEvent == Results::hitBarrel && !hitByBarrel)
+			results.reportResultError("Error: Expected Mario to be hit by barrel, but he was not!", results.filename, currentIteration);
+
+		if (expectedEvent == Results::hitGhost && !hitByGhost)
+			results.reportResultError("Error: Expected Mario to be hit by ghost, but he was not!", results.filename, currentIteration);
+
+		if (expectedEvent == Results::falling && !fellToDeath)
+			results.reportResultError("Error: Expected Mario to fall to death, but he did not!", results.filename, currentIteration);
+
+		if (expectedEvent == Results::finished && !MarioFinished)
+			results.reportResultError("Error: Expected Mario to win, but he did not!", results.filename, currentIteration);
+
+		if (expectedScore != mario.getScore())
+			results.reportResultError("Error: Marios score didn't match!", results.filename, currentIteration);
+
+		expectedResult = results.popResult();
+	}
+}
+
+void GameActions::checkErrorsEndOfGame(Mario& mario, Results& results, Steps& steps)
+{
+	if (!results.isEmpty())
+		results.reportResultError("Results file has additional events after finish event!", results.filename, currentIteration);
 }
 
 void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, std::vector<Barrel>& barrels, std::vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)   //makes sure mario goes as he should 
 {
 	if (sideJump == true)
 	{
-			char tmp = game.getNextMove(renderer, currentIteration, steps, flag, lastKey);
+			char tmp = game.getNextMove(mario, renderer, currentIteration, steps, flag, lastKey);
 			if (board.isValidKey(tmp))
 			{
 				if ((GameConfig::eKeys)tmp == GameConfig::eKeys::ESC)
@@ -116,7 +179,7 @@ void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario&
 	else if (((GameConfig::eKeys)key == GameConfig::eKeys::UP) || ((GameConfig::eKeys)key == GameConfig::eKeys::UP2))
 	{
 		renderer.sleep(50);
-		char tmp = game.getNextMove(renderer, currentIteration, steps, flag, lastKey);
+		char tmp = game.getNextMove(mario, renderer, currentIteration, steps, flag, lastKey);
 		if (board.isValidKey(tmp) && moveCounter != ENDJUMP)
 		{
 			if ((GameConfig::eKeys)tmp != GameConfig::eKeys::UP && (GameConfig::eKeys)tmp != GameConfig::eKeys::UP2)
@@ -159,12 +222,16 @@ void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario&
 	}
 }
 
-void GameActions::cleanUp(std::vector<Ghost*>& ghosts, std::vector<Barrel>& barrels, HANDLE hConsole) 
+void GameActions::cleanUp(std::vector<Ghost*>& ghosts, std::vector<Barrel>& barrels, HANDLE hConsole, bool& fellToDeath, bool& hitByBarrel, bool& hitByGhost, bool& marioFinished)
 {
 	ghosts.clear();
 	ghosts.shrink_to_fit();
 	barrels.clear();
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+	fellToDeath = false;
+	hitByBarrel = false;
+	hitByGhost = false;
+	marioFinished = false;
 }
 
 void GameActions::pauseGame(GameRenderer& renderer,GameConfig& board, Mario& mario, bool& ifcolorMode) //pause the game
@@ -197,14 +264,29 @@ void GameActions::pauseGame(GameRenderer& renderer,GameConfig& board, Mario& mar
 	renderer.draw(DELETE_CH, GameConfig::getMarioPos(), ifcolorMode);
 }
 
-void GameActions::checkCollisions(GameActions& game,GameRenderer& renderer, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps,bool& saveMode)
+void GameActions::checkCollisions(GameActions& game, GameRenderer& renderer, size_t& counter, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)
 {
-	if (mario.state == MarioState::standing && flag) 
+	if (mario.state == MarioState::standing && flag)
 	{
 		Point p1 = mario.findMarioLocation();
 		char currentChar = board.GetCurrentChar(p1.x, p1.y);
-		if (currentChar == BARREL_CH || currentChar == NON_CLIMBING_GHOST_CH || currentChar == CLIMBING_GHOST_CH) {
-			mario.collide(game,renderer,board, flag, mariowin, ifcolorMode, results, steps, saveMode);
+		if (currentChar == BARREL_CH || currentChar == NON_CLIMBING_GHOST_CH || currentChar == CLIMBING_GHOST_CH) 
+		{
+			if (currentChar == BARREL_CH)
+			{
+				if (saveMode)
+					results.addResult(counter, results.hitBarrel, mario.getScore());
+
+				GameActions::hitByBarrel = true;
+			}
+			else
+			{
+				if (saveMode)
+					results.addResult(counter, results.hitGhost, mario.getScore());
+
+				GameActions::hitByGhost = true;
+			}
+			mario.collide(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, saveMode);
 		}
 		renderer.sleep(100);
 	}
@@ -251,12 +333,16 @@ void GameActions::setCharCheck(GameActions& game, GameRenderer& renderer, Point&
 		Point p1 = mario.findMarioLocation();
 		if (currBoard.GetCurrentChar(p1.x, p1.y) == BARREL_CH)
 		{
-			results.addResult(currentIteration, results.hitBarrel, mario.getScore());
+			if (saveMode)
+				results.addResult(currentIteration, results.hitBarrel, mario.getScore());
+			GameActions::hitByBarrel = true;
 			mario.collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
 		}
 		else if (currBoard.GetCurrentChar(p1.x, p1.y) == NON_CLIMBING_GHOST_CH || currBoard.GetCurrentChar(p1.x, p1.y) == CLIMBING_GHOST_CH)
 		{
-			results.addResult(currentIteration, results.hitGhost, mario.getScore());
+			if (saveMode)
+				results.addResult(currentIteration, results.hitGhost, mario.getScore());
+			GameActions::hitByGhost = true;
 			mario.collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, saveMode);
 		}
 		currBoard.SetChar(p.x, p.y, ch);

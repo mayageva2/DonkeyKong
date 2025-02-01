@@ -11,7 +11,7 @@ void Ghost::checkMove(GameActions& game, GameRenderer& renderer, GameConfig& boa
     game.setCharCheck(game,renderer,location, board, originalChar, mario, flag, mariowin, ifcolorMode, steps, results, saveMode);
     renderer.draw(originalChar, location, ifcolorMode);
 
-    if(saveMode)
+    if (saveMode && steps.getRandomSeed() == 0)
         steps.setSeed();
     location.diff_x = direction ? RIGHT : LEFT;
 

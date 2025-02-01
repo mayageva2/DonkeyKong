@@ -16,7 +16,7 @@
 #include <iostream>
 using namespace std;
 
-char GameWithKeys::getNextMove(GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag,GameConfig::eKeys lastKey) const
+char GameWithKeys::getNextMove(Mario& mario, GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag,GameConfig::eKeys lastKey) const
 {
 	renderer.sleep(50);
 	if (_kbhit()) 

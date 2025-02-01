@@ -12,8 +12,6 @@
 #include "steps.h"
 #include "results.h"
 
-
-
 bool flag = true;
 constexpr char START_GAME = '1';
 constexpr char CHOOSE_SCREEN = '2';
@@ -411,6 +409,7 @@ void Menu::addNames(GameRenderer& renderer, int size, char& counter, Point* name
 
 void Menu::loadScreens(GameRenderer& renderer, size_t i, std::vector<std::string>& screens, GameConfig& board, bool& screenError, Mario& mario,char colorMode, bool& save, Results& results, Steps& steps,GameActions& game) //load screens one by one
 {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	bool mariowin = true;
 	bool ifcolorMode = false;
 	for (i; i < screens.size(); i++)
@@ -454,9 +453,13 @@ void Menu::loadScreens(GameRenderer& renderer, size_t i, std::vector<std::string
 	mario.resetMario();
 	if (mariowin && screens.size() != 0)
 	{
+		if (ifcolorMode)
+			SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);
+
 		renderer.clearScreen();
 		renderer.printScreen(Menu::win);
 		renderer.sleep(2000);
+		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	}
 }
 

@@ -12,7 +12,6 @@ class GameWithKeys: public GameActions
 	GameWithKeys(const GameWithKeys&) = delete;
 public:
 	GameWithKeys() = default;
-	virtual char getNextMove(GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const override;
+	virtual char getNextMove(Mario& mario, GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const override;
 };
-
 #endif

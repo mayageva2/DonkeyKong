@@ -4,13 +4,21 @@
 #include "gameConfig.h"
 
 
-void Barrel::clearFromScreen(GameActions& game, GameRenderer& renderer, GameConfig& board, Mario& mario, bool& flag, bool& mariowin, bool& marioKilled,bool& ifcolorMode, Steps& steps, Results& results, bool& saveMode) //this function clears barrels from the screen
+void Barrel::clearFromScreen(GameActions& game, GameRenderer& renderer, size_t& counter, GameConfig& board, Mario& mario, bool& flag, bool& mariowin, bool& marioKilled,bool& ifcolorMode, Steps& steps, Results& results, bool& saveMode) //this function clears barrels from the screen
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	game.setCharCheck(game,renderer,location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode, steps, results,saveMode); //resets barrel's previous location
 
 	if (mario.findMarioLocation().x == this->location.x && mario.findMarioLocation().y == this->location.y)
-		mario.collide(game,renderer,board, flag, mariowin,ifcolorMode, results, steps,saveMode);
+	{
+		if (saveMode)
+		{
+			results.addResult(counter, results.hitBarrel, mario.getScore());
+		}
+
+		GameActions::hitByBarrel = true;
+		mario.collide(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, saveMode);
+	}
 	else
 	{
 		if (marioKilled) //don't explode on mario
@@ -24,20 +32,28 @@ void Barrel::clearFromScreen(GameActions& game, GameRenderer& renderer, GameConf
 			location.x = MAX_X - 5;
 		}
 		
-			renderer.draw(DELETE_CH, location, ifcolorMode);
+		renderer.draw(DELETE_CH, location, ifcolorMode);
 			
-			renderer.drawString(EXPLOSION, BARREL_CH, this->location, ifcolorMode);
-			renderer.sleep(80);
-			for (int i = 0; i < 4; i++) // CLEANS 'BOOM' from screen
-			{
-				char originalCh = board.GetCurrentChar(location.x + i, location.y);
-				Point tmp = location;
-				tmp.x += i;
-				renderer.draw(originalCh, tmp, ifcolorMode);
-			}
+		renderer.drawString(EXPLOSION, BARREL_CH, this->location, ifcolorMode);
+		renderer.sleep(80);
+		for (int i = 0; i < 4; i++) // CLEANS 'BOOM' from screen
+		{
+			char originalCh = board.GetCurrentChar(location.x + i, location.y);
+			Point tmp = location;
+			tmp.x += i;
+			renderer.draw(originalCh, tmp, ifcolorMode);
+		}
 		
 		if (marioCloseToExplosion(board, mario) && mario.state != MarioState::killing)
-			mario.collide(game,renderer,board, flag, mariowin,ifcolorMode, results, steps,saveMode);
+		{
+			if (saveMode)
+			{
+				results.addResult(counter, results.hitBarrel, mario.getScore());
+			}
+
+			GameActions::hitByBarrel = true;
+			mario.collide(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, saveMode);
+		}
 	}
 	deactivate();
 }
@@ -149,7 +165,7 @@ bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos) const//checks 
 		return false;
 }
 
-void Barrel::barrelsMovement(GameActions& game, GameRenderer& renderer, std::vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) //moves each barrel
+void Barrel::barrelsMovement(GameActions& game, GameRenderer& renderer, size_t& counter, std::vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) //moves each barrel
 {
 	Point p(0, 0);
 	if (board.getDonkeyKongPos() == p) //in case there isn't a donkey kong char
@@ -177,7 +193,7 @@ void Barrel::barrelsMovement(GameActions& game, GameRenderer& renderer, std::vec
 			//Remove barrel from array if reached screen boundaries or became inactive
 			if (barrels[i].getLocation().x >= MAX_X - 2 || barrels[i].getLocation().x <= MIN_X || !barrels[i].isBarrelActive())
 			{
-				barrels[i].clearFromScreen(game,renderer,board, mario, flag, mariowin, marioKilled, ifcolorMode, steps, results,saveMode); //Print EXPLOSION
+				barrels[i].clearFromScreen(game, renderer, counter, board, mario, flag, mariowin, marioKilled, ifcolorMode, steps, results, saveMode); //Print EXPLOSION
 				barrels.erase(barrels.begin() + i);
 			}
 			else

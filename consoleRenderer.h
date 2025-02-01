@@ -14,7 +14,7 @@ public:
    virtual void drawNumber(int num, Point pos, bool& ifcolorMode) const override;
    virtual void drawString(const std::string& str, char ch, Point pos, bool& ifcolorMode) const override;
    virtual void clearScreen() override { clrscr(); }
-   virtual void sleep(int ms) override { Sleep(ms);}
+   virtual void sleep(int ms) override { Sleep(ms-20);}
    virtual void printScreen(const char** print) const override;
 };
 #endif

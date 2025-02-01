@@ -17,12 +17,18 @@ void Mario::move(GameActions& game, GameRenderer& renderer, GameConfig::eKeys ke
 	{
 		if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH)
 		{
-			results.addResult(counter, results.hitBarrel, curr_score);
+			if (saveMode)
+				results.addResult(counter, results.hitBarrel, curr_score);
+
+			GameActions::hitByBarrel = true;
 			collide(game,renderer,currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
 		}
 		else if(currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH)
 		{
-			results.addResult(counter, results.hitGhost, curr_score);
+			if (saveMode)
+				results.addResult(counter, results.hitGhost, curr_score);
+
+			GameActions::hitByGhost = true;
 			collide(game,renderer,currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
 		}
 	}
@@ -35,13 +41,13 @@ void Mario::move(GameActions& game, GameRenderer& renderer, GameConfig::eKeys ke
 	case GameConfig::eKeys::LEFT2:
 		state = MarioState::moving;
 		if(flag)
-			left(renderer,currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter);
+			left(renderer,currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter, saveMode);
 		break;
 	case GameConfig::eKeys::RIGHT:
 	case GameConfig::eKeys::RIGHT2:
 		state = MarioState::moving;
 		if (flag)
-			right(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter);
+			right(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter, saveMode);
 		break;
 	case GameConfig::eKeys::UP:
 	case GameConfig::eKeys::UP2:
@@ -69,7 +75,7 @@ void Mario::move(GameActions& game, GameRenderer& renderer, GameConfig::eKeys ke
 	case GameConfig::eKeys::KILL2:
 		state = MarioState::killing;
 		if (flag)
-			killEnemy(renderer, game,currBoard, *this, ghosts, barrels, flag, mariowin,ifcolorMode, results, steps,saveMode);
+			killEnemy(renderer, game, counter, currBoard, *this, ghosts, barrels, flag, mariowin, ifcolorMode, results, steps, saveMode);
 		break;
 	}
 	
@@ -80,13 +86,19 @@ void Mario::move(GameActions& game, GameRenderer& renderer, GameConfig::eKeys ke
 		
 		if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH)
 		{
-			results.addResult(counter, results.hitBarrel, curr_score);
+			if (saveMode)
+				results.addResult(counter, results.hitBarrel, curr_score);
+
+			GameActions::hitByBarrel = true;
 			collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
 		}
 		else if (currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH)
 		{
-			results.addResult(counter, results.hitGhost, curr_score);
+			if (saveMode)
+				results.addResult(counter, results.hitGhost, curr_score);
+			
 			collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
+			GameActions::hitByGhost = true;
 		}
 
 	    if (flag)
@@ -109,7 +121,7 @@ bool Mario::isMarioOnLadder(GameConfig& currBoard)  //checks if mario is on a la
 	return currBoard.GetCurrentChar(this->location.x, this->location.y) == LADDER_CH;
 }
 
-void Mario::left(GameRenderer& renderer, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, size_t& counter)  //moves mario to the left
+void Mario::left(GameRenderer& renderer, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, size_t& counter, bool& saveMode)  //moves mario to the left
 {
 	bool isH = false;
 	Point p(this->location);
@@ -135,7 +147,7 @@ void Mario::left(GameRenderer& renderer, GameConfig& currBoard, int& moveCounter
 		if (isInBoard(currBoard, p.x + this->location.diff_x))
 			this->location.x += this->location.diff_x;
 
-		didMarioWin(renderer,currBoard, flag, mariowin,ifcolorMode, results, counter);
+		didMarioWin(renderer,currBoard, flag, mariowin,ifcolorMode, results, counter, saveMode);
 		if (flag)
 		{
 			renderer.draw(MARIO_CH,this->location, ifcolorMode);
@@ -148,7 +160,7 @@ void Mario::left(GameRenderer& renderer, GameConfig& currBoard, int& moveCounter
 	moveCounter = 0;
 }
 
-void Mario::right(GameRenderer& renderer, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, size_t& counter)   //moves mario to the right
+void Mario::right(GameRenderer& renderer, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, size_t& counter, bool& saveMode)   //moves mario to the right
 {
 	Point p(this->location);
 	bool isH = false;
@@ -178,7 +190,7 @@ void Mario::right(GameRenderer& renderer, GameConfig& currBoard, int& moveCounte
 		if (isInBoard(currBoard, p.y + this->location.diff_y))
 			this->location.y += this->location.diff_y;
 
-		didMarioWin(renderer,currBoard, flag, mariowin,ifcolorMode, results, counter);
+		didMarioWin(renderer,currBoard, flag, mariowin,ifcolorMode, results, counter, saveMode);
 		if (flag)
 		{
 			renderer.draw(MARIO_CH,this->location, ifcolorMode);
@@ -271,7 +283,7 @@ void Mario::falling(GameRenderer& renderer,GameActions& game, int& moveCounter, 
 		renderer.sleep(80);
 		moveCounter++;
 	}
-	didMarioWin(renderer,currBoard, flag, mariowin, ifcolorMode, results, counter);
+	didMarioWin(renderer,currBoard, flag, mariowin, ifcolorMode, results, counter, saveMode);
 
 	if (isMarioOnFloor(currBoard))
 	{
@@ -283,14 +295,17 @@ void Mario::falling(GameRenderer& renderer,GameActions& game, int& moveCounter, 
 		}
 		if (moveCounter > 4)
 		{
-			results.addResult(counter, results.falling, curr_score);
+			if (saveMode)
+				results.addResult(counter, results.falling, curr_score);
+
+			GameActions::fellToDeath = true;
 			collide(game,renderer,currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
 		}
 		sideJump = false;
 		moveCounter = ENDJUMP;
 	}
   
-	didMarioWin(renderer,currBoard, flag, mariowin,ifcolorMode, results, counter);
+	didMarioWin(renderer,currBoard, flag, mariowin,ifcolorMode, results, counter, saveMode);
 }
 
 void Mario::climbUpAladder(GameRenderer& renderer, int& moveCounter, GameConfig& currBoard,bool& ifcolorMode) //this func makes mario climb up on a ladder
@@ -380,9 +395,9 @@ void Mario::down(GameRenderer& renderer, GameActions& game, GameConfig& currBoar
 			moveCounter = 0;
 		}
 		else if (key == (char)GameConfig::eKeys::LEFT || key == (char)GameConfig::eKeys::LEFT2)
-			left(renderer,currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter);
+			left(renderer,currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter, saveMode);
 		else if (key == (char)GameConfig::eKeys::RIGHT || key == (char)GameConfig::eKeys::RIGHT2)
-			right(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter);
+			right(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter, saveMode);
 	}
 }
 
@@ -396,7 +411,7 @@ void Mario::stay(GameRenderer& renderer, GameConfig& currBoard,bool&ifcolorMode)
 	this->state = MarioState::standing;
 }
 
-void Mario::killEnemy(GameRenderer& renderer, GameActions& game, GameConfig& currBoard, Mario& mario, vector<Ghost*>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode) //this func makes mario kill barrel or ghost
+void Mario::killEnemy(GameRenderer& renderer, GameActions& game, size_t& counter, GameConfig& currBoard, Mario& mario, vector<Ghost*>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode) //this func makes mario kill barrel or ghost
 {
 	if (hammer)
 	{
@@ -419,20 +434,20 @@ void Mario::killEnemy(GameRenderer& renderer, GameActions& game, GameConfig& cur
 		{
 			curr_score += 1000;
 			currBoard.printScore(renderer,mario,ifcolorMode);
-			deleteKilledEnemy(game,renderer,currBoard, hammerUsePos, ghosts, barrels, flag, mariowin,ifcolorMode, results, steps,saveMode); // Delete killed enemy
+			deleteKilledEnemy(game, renderer, counter, currBoard, hammerUsePos, ghosts, barrels, flag, mariowin, ifcolorMode, results, steps, saveMode); // Delete killed enemy
 		}
 
 	}
 }
 
-void Mario::deleteKilledEnemy(GameActions& game, GameRenderer& renderer, GameConfig& currBoard, Point killPos, vector<Ghost*>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, Steps& steps,bool& saveMode) //delets a barrel or ghost that mario killed
+void Mario::deleteKilledEnemy(GameActions& game, GameRenderer& renderer, size_t& counter, GameConfig& currBoard, Point killPos, vector<Ghost*>& ghosts, vector<Barrel>& barrels, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, Steps& steps,bool& saveMode) //delets a barrel or ghost that mario killed
 {
 	bool marioKilled = true;
 	for (size_t i = 0; i < barrels.size();)
 	{
 		if (barrels[i].getLocation() == killPos)
 		{
-			barrels[i].clearFromScreen(game,renderer,currBoard, *this, flag, mariowin, marioKilled,ifcolorMode, steps, results, saveMode);
+			barrels[i].clearFromScreen(game,renderer, counter ,currBoard, *this, flag, mariowin, marioKilled,ifcolorMode, steps, results, saveMode);
 			break;
 		}
 		else
@@ -511,12 +526,12 @@ void Mario::jumpToSide(GameRenderer& renderer, GameActions& game,GameConfig::eKe
 		{
 			if (moveCounter == 2)
 			{
-				left(renderer,currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter);
+				left(renderer,currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter, saveMode);
 				moveCounter = 2;
 			}
 			else
 			{
-				left(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter);
+				left(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter, saveMode);
 				moveCounter = 3;
 			}
 		}
@@ -524,12 +539,12 @@ void Mario::jumpToSide(GameRenderer& renderer, GameActions& game,GameConfig::eKe
 		{
 			if (moveCounter == 2)
 			{
-				right(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter);
+				right(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter, saveMode);
 				moveCounter = 2;
 			}
 			else
 			{
-				right(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter);
+				right(renderer, currBoard, moveCounter, flag, mariowin, ifcolorMode, results, counter, saveMode);
 				moveCounter = 3;
 			}
 		}
@@ -576,14 +591,14 @@ void Mario::collide(GameActions& game, GameRenderer& renderer, GameConfig& currB
 	}
 }
 
-void Mario::didMarioLose(GameRenderer& renderer, GameConfig& currBoard, bool& flag,bool&ifcolorMode)  //checks if mario lost and if so returns to main menu
+void Mario::didMarioLose(GameRenderer& renderer, GameConfig& currBoard, bool& flag, bool& ifcolorMode)  //checks if mario lost and if so returns to main menu
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	if (num_of_hearts == 0)
 	{
 		curr_score = ZERO;
-		stay(renderer,currBoard,ifcolorMode);
+		stay(renderer, currBoard, ifcolorMode);
 		renderer.clearScreen();
 		if (ifcolorMode)
 		{
@@ -593,13 +608,12 @@ void Mario::didMarioLose(GameRenderer& renderer, GameConfig& currBoard, bool& fl
 		{
 			SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		}
-		Menu::displayEnd_Game(renderer,*this);
+		Menu::displayEnd_Game(renderer, *this);
 		flag = false;
 	}
-	
 }
 
-void Mario::didMarioWin(GameRenderer& renderer, GameConfig& currBoard, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, size_t& counter) //checks if mario won and if so returns to main menu
+void Mario::didMarioWin(GameRenderer& renderer, GameConfig& currBoard, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, size_t& counter, bool& saveMode) //checks if mario won and if so returns to main menu
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	Point p(this->location);
@@ -622,7 +636,10 @@ void Mario::didMarioWin(GameRenderer& renderer, GameConfig& currBoard, bool& fla
 		renderer.sleep(3000);
 		flag = false;
 		mariowin = true;
-		results.addResult(counter, Results::finished, curr_score);
+
+		if (saveMode)
+			results.addResult(counter, Results::finished, curr_score);
+		GameActions::MarioFinished = true;
 		this->setLastScore();
 	}
 }

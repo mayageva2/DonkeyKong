@@ -21,6 +21,7 @@ void GameConfig::load(const std::string& filename, bool& error) //this func load
 	int curr_col = 0;
 	char c;
 	GhostsPos.clear();
+	GhostsType.clear();
 	GhostsPos.shrink_to_fit();
 	initBoard();
 	ghostPosError = false;
