@@ -114,7 +114,7 @@ void Ghost::clearGhostFromScreen(GameActions& game, GameRenderer& renderer, Game
     game.setCharCheck(game,renderer,location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results, saveMode);
 }
 
-bool Ghost::isGhostOnFloor(GameConfig& board)
+bool Ghost::isGhostOnFloor(GameConfig& board) const
 {
     if (board.GetCurrentChar(location.x, location.y + 1) == '=' || board.GetCurrentChar(location.x, location.y + 1) == '<' || board.GetCurrentChar(location.x, location.y + 1) == '>' || board.GetCurrentChar(location.x, location.y + 1) == 'Q')
         return true;
@@ -122,7 +122,7 @@ bool Ghost::isGhostOnFloor(GameConfig& board)
         return false;
 }
 
-bool Ghost::isGhostReachingCliff(GameConfig& board)
+bool Ghost::isGhostReachingCliff(GameConfig& board) const
 {
     if (board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == '=' || board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == '<' || board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == '>' || board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == 'Q')
         return true;

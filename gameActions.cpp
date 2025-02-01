@@ -18,8 +18,8 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	int moveCounter = 0;
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
-	vector<Ghost*> ghosts;
-	vector<Barrel> barrels;
+	std::vector<Ghost*> ghosts;
+	std::vector<Barrel> barrels;
 	ghosts.reserve(board.getGhostsAmount());
 	createGhosts(ghosts, board);
 	this->currentIteration = 0;
@@ -39,7 +39,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 
 		Barrel::barrelsMovement(game, renderer, barrels, board, interval, mario, flag, mariowin, ifcolorMode, steps, results, saveMode); // Move Barrels
 
-		if (moveCounter == 0) //Move Mario
+		if (moveCounter == 0 && mario.state != MarioState::falling) //Move Mario
 		{
 			char inputKey = game.getNextMove(renderer, currentIteration, steps, flag, lastKey);
 			if (!flag) // no more steps for mario
@@ -48,6 +48,9 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 			}
 			if (board.isValidKey(inputKey))
 			{
+				if (((GameConfig::eKeys)inputKey == GameConfig::eKeys::DOWN || (GameConfig::eKeys)inputKey == GameConfig::eKeys::DOWN2) && mario.isMarioOnFloor(board))
+					inputKey = (char)GameConfig::eKeys::STAY;
+
 				if ((GameConfig::eKeys)inputKey == GameConfig::eKeys::ESC)
 				{
 					if (ifcolorMode)
@@ -61,7 +64,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 					key = inputKey;
 					if ((GameConfig::eKeys)key == lastKey && lastKey == GameConfig::eKeys::UP)
 						lastKey = GameConfig::eKeys::STAY;
-					marioMovement(game, renderer, mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps,saveMode);
+					marioMovement(game, renderer, mario, board, lastKey, key, moveCounter, sideJump, flag, mariowin, barrels, ghosts, ifcolorMode, results, steps, saveMode);
 				}
 			}
 			else if (mario.state != MarioState::standing)
@@ -84,7 +87,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	cleanUp(ghosts, barrels, hConsole);
 }
 
-void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)   //makes sure mario goes as he should 
+void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, std::vector<Barrel>& barrels, std::vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)   //makes sure mario goes as he should 
 {
 	if (sideJump == true)
 	{
@@ -142,8 +145,6 @@ void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario&
 		else //mario is jumping
 		{
 			mario.move(game, renderer, (GameConfig::eKeys)key, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, currentIteration, saveMode);
-			if (mario.state == MarioState::standing)
-				lastKey = GameConfig::eKeys::STAY;
 		}
 	}
 	else if (mario.state != MarioState::jumping)
@@ -156,10 +157,9 @@ void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario&
 		else //incase mario is falling
 			mario.move(game, renderer, GameConfig::eKeys::DOWN, board, moveCounter, flag, mariowin, ghosts, barrels, ifcolorMode, results, steps, currentIteration, saveMode);
 	}
-
 }
 
-void GameActions::cleanUp(vector<Ghost*>& ghosts, vector<Barrel>& barrels, HANDLE hConsole) 
+void GameActions::cleanUp(std::vector<Ghost*>& ghosts, std::vector<Barrel>& barrels, HANDLE hConsole) 
 {
 	ghosts.clear();
 	ghosts.shrink_to_fit();
@@ -167,7 +167,7 @@ void GameActions::cleanUp(vector<Ghost*>& ghosts, vector<Barrel>& barrels, HANDL
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 
-void GameActions::pauseGame(GameRenderer& renderer,GameConfig& board, Mario& mario, bool& ifcolorMode)  //pause the game
+void GameActions::pauseGame(GameRenderer& renderer,GameConfig& board, Mario& mario, bool& ifcolorMode) //pause the game
 {
 	renderer.clearScreen();
 	renderer.printScreen(Menu::pause);
@@ -210,7 +210,7 @@ void GameActions::checkCollisions(GameActions& game,GameRenderer& renderer, Mari
 	}
 }
 
-void GameActions::createGhosts(vector<Ghost*>& ghosts, GameConfig& board) //this func creates insert all ghosts into a vector
+void GameActions::createGhosts(std::vector<Ghost*>& ghosts, GameConfig& board) //this func creates insert all ghosts into a vector
 {
 	int amountOfGhosts = board.getGhostsAmount();
 	for (int i = 0; i < amountOfGhosts; i++)

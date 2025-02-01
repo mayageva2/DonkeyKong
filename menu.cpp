@@ -19,6 +19,10 @@ constexpr char START_GAME = '1';
 constexpr char CHOOSE_SCREEN = '2';
 constexpr char INSTRUCTIONS = '8';
 constexpr char EXIT = '9';
+constexpr char WITH_COLOR = 'C';
+constexpr char WITH_COLOR2 = 'c';
+constexpr char WITHOUT_COLOR = 'R';
+constexpr char WITHOUT_COLOR2 = 'r';
 constexpr size_t FIRST_SCREEN = 1;
 constexpr size_t SECOND_SCREEN = 2;
 
@@ -288,18 +292,18 @@ void Menu::displayMenu(GameRenderer& renderer, Mario& mario, bool& save, Results
 void Menu::chooseColorScreen(GameRenderer& renderer, char& colorModeKey, bool& ifcolorM)
 {
 	colorModeKey = printCModeScreen(renderer);
-	while (colorModeKey != 'c' && colorModeKey != 'C' && colorModeKey != 'R' && colorModeKey != 'r')
+	while (colorModeKey != WITH_COLOR && colorModeKey != WITH_COLOR2 && colorModeKey != WITHOUT_COLOR && colorModeKey != WITHOUT_COLOR2)
 	{
 		switch (colorModeKey)
 		{
-		case 'c':
-		case 'C':
+		case WITH_COLOR:
+		case WITH_COLOR2:
 		{
 			ifcolorM = true;
 			break;
 		}
-		case 'r':
-		case 'R':
+		case WITHOUT_COLOR:
+		case WITHOUT_COLOR2:
 		{
 			ifcolorM = false;
 			break;
@@ -423,7 +427,7 @@ void Menu::loadScreens(GameRenderer& renderer, size_t i, std::vector<std::string
 			{
 				mariowin = false;
 				mario.resetMarioPos();
-				if (colorMode == 'c' || colorMode == 'C')
+				if (colorMode == WITH_COLOR || colorMode == WITH_COLOR2)
 				{
 					ifcolorMode = true;
 					steps.setColorMode(colorMode);

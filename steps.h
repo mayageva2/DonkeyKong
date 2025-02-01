@@ -31,9 +31,9 @@ public:
 		return step;
 	}
 	void setSeed() { randomSeed = static_cast<int>(time(0));}
-	char getColorMode() {return colorModeGame;}
+	char getColorMode() const {return colorModeGame;}
 	void setColorMode(char colorMode) { colorModeGame=colorMode; }
-	bool isEmpty() {return steps.empty();}
+	bool isEmpty() const {return steps.empty();}
 	void clear() { steps.clear(); }
 };
 #endif

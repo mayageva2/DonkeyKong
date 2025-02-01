@@ -8,8 +8,6 @@
 #include <iostream>
 #include <string> 
 
-using namespace std;
-
 class GameRenderer;
 class GameActions;
 class Mario;
@@ -30,9 +28,9 @@ public:
 	void deactivate() { isActive = false; } //Deactivate barrel
 	void activate() { isActive = true; } //Activate Barrel
 	bool isBarrelActive() const { return isActive; }  //checks if a barrel is active
-	bool marioCloseToExplosion(GameConfig& board, Mario& mario); //checks if mario is in the barrel explosion area
-	bool isInExplosionArea(Point& barrelPos, Point& marioPos);   //helper func to checks if mario is in the barrel explosion area
-	static void barrelsMovement(GameActions& game, GameRenderer& renderer, vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results, bool& saveMode); //moves each barrel
+	bool marioCloseToExplosion (GameConfig& board, Mario& mario); //checks if mario is in the barrel explosion area
+	bool isInExplosionArea(Point& barrelPos, Point& marioPos) const;   //helper func to checks if mario is in the barrel explosion area
+	static void barrelsMovement(GameActions& game, GameRenderer& renderer, std::vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results, bool& saveMode); //moves each barrel
 };
 
 #endif

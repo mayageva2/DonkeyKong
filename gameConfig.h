@@ -46,18 +46,18 @@ public:
 	void PrintBoard(GameRenderer& renderer, bool& ifcolorMode) const; //prints board on screen
 	void resetBoard();  //reset current board to original board
 	static Point getMarioPos() { return marioPos; }  //returns mario's position
-	static Point getDonkeyKongPos() { return donkeyPos; } //returns donkeyKong's position
-	static Point getLegendPos() { return legendPos; } //returns legend's start position
-	static Point getHammerPos() { return hammerPos; } //returns hammer's start position
+	static Point getDonkeyKongPos() { return donkeyPos; }  //returns donkeyKong's position
+	static Point getLegendPos() { return legendPos; }  //returns legend's start position
+	static Point getHammerPos() { return hammerPos; }  //returns hammer's start position
 	Point getGhostPos();  //returns all ghosts positions
-	char getGhostType();
-	int getGhostsAmount() const { return ghostCounter; } //returns amount of ghosts
+	char getGhostType();  //return ghost type
+	int getGhostsAmount() { return ghostCounter; } //returns amount of ghosts
 	bool insertLegend(); //inserts legend to board
 	void init(); //initiallizes all counters
 	void printHearts(GameRenderer& renderer, Mario& mario, bool& ifcolorMode); //print amount of hearts
 	bool isDkongScreenFile(const std::string& filename); //checks if files is a screen file
 	std::vector<std::string> getDkongScreens(const std::string& directoryPath); //get screens from file
-	void printErrors() ;  //prints errors in screen
+	void printErrors() const;  //prints errors in screen
 	void printHammer(GameRenderer& renderer,bool& ifcolorMode);  //prints V in legend when mario has a hammer
 	void printScore(GameRenderer& renderer, Mario& mario, bool& ifcolorMode) const; //prints score
 	void addFrame(); //add Q frame to screen
@@ -91,7 +91,7 @@ public:
 		return currentBoard[y][x];
 	}
 
-	char GetOriginalChar(int x, int y)// returns a char that is placed on given point on board
+	char GetOriginalChar(int x, int y) const// returns a char that is placed on given point on board
 	{
 		return originalBoard[y][x];
 	}

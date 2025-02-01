@@ -34,8 +34,8 @@ public:
 	void randomDirection(long seed);//changing direction randomly
 	void moveGhosts(); //moving ghosts according to direction
 	void clearGhostFromScreen(GameActions& game, GameRenderer& renderer, GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results, bool& saveMode); //clear ghosts from screen
-	bool isGhostOnFloor(GameConfig& board);
-	bool isGhostReachingCliff(GameConfig& board);
+	bool isGhostOnFloor(GameConfig& board) const;
+	bool isGhostReachingCliff(GameConfig& board) const;
 
 protected:
 	char ch;

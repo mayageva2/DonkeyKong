@@ -12,12 +12,12 @@ protected:
 	static size_t currentIteration;
 	GameRenderer* renderer;
 public:
-	virtual char getNextMove(GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) = 0;
+	virtual char getNextMove(GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const = 0;
     void startGame(GameActions& game, GameRenderer& renderer, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode) ;
-	void marioMovement(GameActions& game, GameRenderer& renderer, Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode);  //makes sure mario goes as he should 
+	void marioMovement(GameActions& game, GameRenderer& renderer, Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, std::vector<Barrel>& barrels, std::vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode);  //makes sure mario goes as he should 
 	virtual ~GameActions() = default;
-	virtual void createGhosts(vector<Ghost*>& ghosts, GameConfig& board);
-	void cleanUp(vector<Ghost*>& ghosts, vector<Barrel>& barrels, HANDLE hConsole);
+	virtual void createGhosts(std::vector<Ghost*>& ghosts, GameConfig& board);
+	void cleanUp(std::vector<Ghost*>& ghosts, std::vector<Barrel>& barrels, HANDLE hConsole);
 	static void pauseGame(GameRenderer& renderer,GameConfig& board, Mario& mario, bool& ifcolorMode);  //pause the game
 	void checkCollisions(GameActions& game, GameRenderer& renderer, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps,bool& saveMode);
 	void setCharCheck(GameActions& game, GameRenderer& renderer, Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results, bool& saveMode); // checks if theres a ladder or floor and then goes to set char on board

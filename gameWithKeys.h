@@ -6,14 +6,13 @@
 #include "gameActions.h"
 #include <vector>
 #include <iostream>
-using namespace std;
 
 class GameWithKeys: public GameActions
 {
 	GameWithKeys(const GameWithKeys&) = delete;
 public:
 	GameWithKeys() = default;
-	virtual char getNextMove(GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) override;
+	virtual char getNextMove(GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const override;
 };
 
 #endif

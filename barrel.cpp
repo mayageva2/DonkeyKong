@@ -136,7 +136,7 @@ bool Barrel::marioCloseToExplosion(GameConfig& board, Mario& mario) //checks if 
 		return false;
 }
 
-bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos) //checks if mario is in an explosion area
+bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos) const//checks if mario is in an explosion area
 {
 	int min_x = barrelPos.x - 2;
 	int max_x = barrelPos.x + 2;
@@ -149,7 +149,7 @@ bool Barrel::isInExplosionArea(Point& barrelPos, Point& marioPos) //checks if ma
 		return false;
 }
 
-void Barrel::barrelsMovement(GameActions& game, GameRenderer& renderer, vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) //moves each barrel
+void Barrel::barrelsMovement(GameActions& game, GameRenderer& renderer, std::vector<Barrel>& barrels, GameConfig& board, int& interval, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) //moves each barrel
 {
 	Point p(0, 0);
 	if (board.getDonkeyKongPos() == p) //in case there isn't a donkey kong char

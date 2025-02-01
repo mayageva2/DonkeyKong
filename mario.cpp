@@ -60,7 +60,10 @@ void Mario::move(GameActions& game, GameRenderer& renderer, GameConfig::eKeys ke
 	case GameConfig::eKeys::STAY2:
 		state = MarioState::standing;
 		if (flag)
-			stay(renderer, currBoard,ifcolorMode);
+		{
+			stay(renderer, currBoard, ifcolorMode);
+			moveCounter = 0;
+		}
 		break;
 	case GameConfig::eKeys::KILL:
 	case GameConfig::eKeys::KILL2:
@@ -284,7 +287,7 @@ void Mario::falling(GameRenderer& renderer,GameActions& game, int& moveCounter, 
 			collide(game,renderer,currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
 		}
 		sideJump = false;
-		moveCounter = 0;
+		moveCounter = ENDJUMP;
 	}
   
 	didMarioWin(renderer,currBoard, flag, mariowin,ifcolorMode, results, counter);
@@ -388,11 +391,8 @@ void Mario::stay(GameRenderer& renderer, GameConfig& currBoard,bool&ifcolorMode)
 	Point p(this->location);
 	this->location.diff_x = 0;
 	this->location.diff_y = 0;
-
 	
 	renderer.draw(MARIO_CH, this->location, ifcolorMode);
-	
-	
 	this->state = MarioState::standing;
 }
 
@@ -550,7 +550,7 @@ bool Mario::isMarioOnFloor(GameConfig& currBoard) //checks if mario stands on a 
 		return false;
 }
 
-Point Mario::findMarioLocation() //this func returns mario's location
+Point Mario::findMarioLocation() const //this func returns mario's location
 {
 	return (this->location);
 }

@@ -145,7 +145,7 @@ void GameConfig::addFrame() //add Q frame to screen
 	}
 }
 
-bool GameConfig::isGhostsOnFloor()  //checks if ghosts are in the air
+bool GameConfig::isGhostsOnFloor() //checks if ghosts are in the air
 {
 	size_t size = GhostsPos.size();
 	for (size_t i = 0; i < size; i++)
@@ -161,7 +161,7 @@ bool GameConfig::isGhostsOnFloor()  //checks if ghosts are in the air
 
 }
 
-void GameConfig::printErrors() //prints errors on screens
+void GameConfig::printErrors() const //prints errors on screens
 {
 	clrscr();
 	if (oversizeScreen)
@@ -248,14 +248,14 @@ void GameConfig::resetBoard() //resets to original board
 	}
 }
 
-Point GameConfig::getGhostPos() //return ghosts positions
+Point GameConfig::getGhostPos()  //return ghosts positions
 {
 	Point ghostPos = GhostsPos[currentGhostIndex];
 	currentGhostIndex = (currentGhostIndex + 1) % GhostsPos.size();
 	return ghostPos;
 }
 
-char GameConfig::getGhostType()
+char GameConfig::getGhostType() 
 {
 	char type = GhostsType[currentTypeIndex];
 	currentTypeIndex = (currentTypeIndex + 1) % GhostsType.size();

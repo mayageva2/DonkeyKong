@@ -5,7 +5,7 @@
 #include "barrel.h"
 
 
-char loadGame::getNextMove(GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey)
+char loadGame::getNextMove(GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const
 {
 	if (!steps.isEmpty() && steps.isNextStepOnIteration(currentIteration)) 
 	{
@@ -19,7 +19,7 @@ char loadGame::getNextMove(GameRenderer& renderer, int currentIteration, Steps& 
 }
 
 
-void loadGame::getAllBoardFileNames(std::vector<std::string>& vec_to_fill)
+void loadGame::getAllBoardFileNames(std::vector<std::string>& vec_to_fill) 
 {
 	namespace fs = std::filesystem;
 	for (const auto& entry : fs::directory_iterator(fs::current_path())) {
