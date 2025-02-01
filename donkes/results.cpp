@@ -2,6 +2,8 @@
 #include <limits>
 #include <iostream> 
 #include <fstream>
+#include <conio.h>
+
 
 void Results::saveResults(const std::string& filename) const 
 {
@@ -25,4 +27,12 @@ void Results::loadResults(const std::string& filename)
 		results_file >> iteration >> result >> score;
 		addResult( iteration, static_cast<ResultValue>(result), score);
 	}
+}
+
+void Results::reportResultError(const std::string& message, const std::string& filename, size_t iteration) {
+	system("cls");
+	std::cout << "Screen " << filename << " - " << message << '\n';
+	std::cout << "Iteration: " << iteration << '\n';
+	std::cout << "Press any key to continue to next screens (if any)" << std::endl;
+	_getch();
 }

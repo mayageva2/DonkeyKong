@@ -1,6 +1,7 @@
 #ifndef _RESULTS_H
 #define _RESULTS_H
 #include <list>
+
 #include <string>
 #include <tuple>
 
@@ -13,6 +14,7 @@ private:
 public:
 	void loadResults(const std::string& filename);
 	void saveResults(const std::string& filename) const;
+	void reportResultError(const std::string& message, const std::string& filename, size_t iteration);
 	void addResult(size_t iteration, ResultValue result, size_t score) {
 		results.push_back({ iteration, result, score });
 	}
