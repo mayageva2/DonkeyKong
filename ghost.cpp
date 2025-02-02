@@ -110,7 +110,10 @@ void Ghost::randomDirection(long seed) //gives a random direction
 void Ghost::clearGhostFromScreen(GameActions& game, GameRenderer& renderer, GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) //this func clears ghosts from screen
 {
     char originalChar = board.GetOriginalChar(location.x, location.y);
-    renderer.draw(originalChar, location,ifcolorMode);
+    if(originalChar == CLIMBING_GHOST_CH || originalChar == NON_CLIMBING_GHOST_CH)
+        renderer.draw(DELETE_CH, location, ifcolorMode);
+    else
+        renderer.draw(originalChar, location,ifcolorMode);
     game.setCharCheck(game,renderer,location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results, saveMode);
 }
 
