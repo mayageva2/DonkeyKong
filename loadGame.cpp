@@ -69,6 +69,11 @@ void loadGame::load_game(GameActions& game, bool& _silent, Mario& mario, Results
 		}
 		
 		this->startGame(game,*renderer,mario, board, flag, mariowin, colorMode, results, steps,saveMode);//start recorded game
+		if (!error_unmatch && isSilent)
+		{
+			gotoxy(0, 0);
+			std::cout << "Game run succsesfully" << std::endl;
+		}
 	}
 }
 
