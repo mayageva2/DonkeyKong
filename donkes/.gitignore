@@ -1,0 +1,11 @@
+*.vcxproj
+*.vsidx
+*.ipch
+*.obj
+*.tlog
+*.pdb
+*.vcxproj.filters
+*.vcxproj.user
+/dk_updated/
+x64/
+.vs/
