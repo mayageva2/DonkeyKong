@@ -12,15 +12,24 @@ using namespace std;
 
 void Mario::hitObject(GameActions& game, GameRenderer& renderer, GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, size_t& counter, bool& saveMode, int& whoHit)
 {
-	if (saveMode)
-		results.addResult(counter, results.hitBarrel, curr_score);
-
 	if (whoHit == BARREL_HIT)
+	{
 		GameActions::hitByBarrel = true;
+		if (saveMode)
+			results.addResult(counter, results.hitBarrel, curr_score);
+	}
 	else if (whoHit == GHOST_HIT)
+	{
 		GameActions::hitByGhost = true;
+		if (saveMode)
+			results.addResult(counter, results.hitGhost, curr_score);
+	}
 	else if (whoHit == FALL_HIT)
+	{
 		GameActions::fellToDeath = true;
+		if (saveMode)
+			results.addResult(counter, results.falling, curr_score);
+	}
 
 	collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, saveMode);
 }

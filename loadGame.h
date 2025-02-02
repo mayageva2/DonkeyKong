@@ -7,8 +7,6 @@
 
 class loadGame:public GameActions
 {
-	bool isSilent = false;
-	
 public:
 	virtual char getNextMove(Mario& mario, GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const override;
 	static void getAllBoardFileNames(std::vector<std::string>& vec_to_fill);
