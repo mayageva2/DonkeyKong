@@ -49,7 +49,6 @@ void loadGame::load_game(GameActions& game, bool& _silent, Mario& mario, Results
 	for (const auto& filename : fileNames) //load files
 	{
 		GameConfig board;
-		game.currentIteration = 0;
 		board.load(filename, screenError);
 		mario.resetMario();
 		std::string filename_prefix = filename.substr(0, filename.find_last_of('.'));

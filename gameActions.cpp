@@ -28,7 +28,6 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	std::vector<Barrel> barrels;
 	ghosts.reserve(board.getGhostsAmount());
 	createGhosts(ghosts, board);
-	this->currentIteration = 0;
 
 	renderer.draw(MARIO_CH, mario.findMarioLocation(), ifcolorMode);
 	if (!mario.isMarioOnFloor(board))  //incase mario is positioned in the air
