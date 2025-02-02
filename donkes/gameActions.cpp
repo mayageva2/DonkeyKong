@@ -8,6 +8,7 @@ bool GameActions::hitByBarrel=false;
 bool GameActions::hitByGhost = false;
 bool GameActions::fellToDeath = false;
 bool GameActions::MarioFinished = false;
+bool GameActions::error_unmatch = false;
 
 void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)   //starts game
 {
@@ -20,7 +21,6 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	board.printScore(renderer, mario, ifcolorMode);
 	int interval = 0;
 	int moveCounter = 0;
-	bool unmatched_result = false;
 	char key = (char)GameConfig::eKeys::STAY;
 	bool sideJump = false;
 	vector<Ghost*> ghosts;
@@ -38,7 +38,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 
 	while (flag)
 	{
-		currentIteration++;
+		
 		
 		for (int i = 0; i < ghosts.size(); i++)  //Move ghosts
 			ghosts[i]->checkMove(game, renderer, board, mario, flag, ghosts, mariowin, ifcolorMode, steps, results,saveMode);
@@ -77,7 +77,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 		
 		if (isSilent && !results.isEmpty())
 		{
-			checkErrors(mario,results,flag);
+			checkErrors(mario,results);
 		}
 		
 		if (mario.state == MarioState::falling)
@@ -87,6 +87,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 		}
 
 		++interval;
+		++currentIteration;
 		hitByBarrel = false;
 		hitByGhost = false;
 		fellToDeath = false;
@@ -94,16 +95,16 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	}
 	if (isSilent)
 	{
-		cout << results.getSize();
-		checkErrorsEndOfGame(mario, results, steps);
+		checkErrorsEndOfGame(mario, results);
 		gotoxy(0, 0);
 	}
+
 	this->currentIteration = 0;
 	gotoxy(0, MAX_Y + 2);
 	cleanUp(ghosts, barrels, hConsole, hitByBarrel, hitByGhost, fellToDeath, MarioFinished);
 }
 
-void GameActions::checkErrors(Mario& mario,Results& results,bool& flag)
+void GameActions::checkErrors(Mario& mario,Results& results)
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
@@ -117,6 +118,7 @@ void GameActions::checkErrors(Mario& mario,Results& results,bool& flag)
 	if (results.isFinishedBy(currentIteration))
 	{
 		results.reportResultError("Results file reached finish while game hadn't!", results.filename, this->currentIteration);
+		error_unmatch = true;
 	}
 
 	if (nextResultIteration == currentIteration)
@@ -124,31 +126,49 @@ void GameActions::checkErrors(Mario& mario,Results& results,bool& flag)
 		if (expectedEvent == Results::hitBarrel && !hitByBarrel)
 		{
 			results.reportResultError("Error: Expected Mario to be hit by barrel, but he was not!", results.filename, currentIteration);
+			error_unmatch = true;
 		}
+		
 		if (expectedEvent == Results::hitGhost && !hitByGhost)
 		{
 			results.reportResultError("Error: Expected Mario to be hit by ghost, but he was not!", results.filename, currentIteration);
+			error_unmatch = true;
 		}
+		
 		if (expectedEvent == Results::falling && !fellToDeath)
 		{
 			results.reportResultError("Error: Expected Mario to fall to death, but he did not!", results.filename, currentIteration);	
+			error_unmatch = true;
 		}
+		
+		
+		if (expectedEvent == Results::finished && !MarioFinished)
+		{
+			results.reportResultError("Error: Expected Mario to win, but he did not!", results.filename, currentIteration);
+			error_unmatch = true;
+		}
+		
 		if (expectedScore != mario.getScore())
 		{
 			results.reportResultError("Error: Marios score didn't match!", results.filename, currentIteration);
+			error_unmatch = true;
 		}
+	
+	
 		expectedResult = results.popResult();
 	}
 	
-	
 }
 
-void GameActions::checkErrorsEndOfGame(Mario& mario,Results& results,Steps& steps)
+void GameActions::checkErrorsEndOfGame(Mario& mario,Results& results)
 {
 	if (!results.isEmpty())
 	{
 		results.reportResultError("Results file has additional events after finish event!", results.filename, currentIteration);
+		error_unmatch = true;
 	}
+	
+	
 }
 void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, vector<Barrel>& barrels, vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)   //makes sure mario goes as he should 
 {

@@ -12,6 +12,7 @@ protected:
 	static size_t currentIteration;
 	GameRenderer* renderer;
 	static bool isSilent;
+	static bool error_unmatch;
 public:
 	virtual char getNextMove(Mario& mario,GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) = 0;
     void startGame(GameActions& game, GameRenderer& renderer, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode) ;
@@ -27,7 +28,7 @@ public:
 	static bool hitByGhost;
 	static bool fellToDeath;
 	static bool MarioFinished;
-	void checkErrors(Mario& mario, Results& results, bool& flag);
-	void checkErrorsEndOfGame(Mario& mario, Results& results, Steps& steps);
+	void checkErrors(Mario& mario, Results& results);
+	void checkErrorsEndOfGame(Mario& mario, Results& results);
 };
 
