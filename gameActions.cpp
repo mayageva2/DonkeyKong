@@ -287,6 +287,7 @@ void GameActions::pauseGame(GameRenderer& renderer,GameConfig& board, Mario& mar
 
 void GameActions::checkCollisions(GameActions& game, GameRenderer& renderer, size_t& counter, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)
 {
+	int whoHit;
 	if (mario.state == MarioState::standing && flag)
 	{
 		Point p1 = mario.findMarioLocation();
@@ -295,19 +296,14 @@ void GameActions::checkCollisions(GameActions& game, GameRenderer& renderer, siz
 		{
 			if (currentChar == BARREL_CH)
 			{
-				if (saveMode)
-					results.addResult(counter, results.hitBarrel, mario.getScore());
-
-				GameActions::hitByBarrel = true;
+				whoHit = BARREL_HIT;
+				mario.hitObject(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, counter, saveMode, whoHit);
 			}
 			else
 			{
-				if (saveMode)
-					results.addResult(counter, results.hitGhost, mario.getScore());
-
-				GameActions::hitByGhost = true;
+				whoHit = GHOST_HIT;
+				mario.hitObject(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, counter, saveMode, whoHit);
 			}
-			mario.collide(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, saveMode);
 		}
 		renderer.sleep(100);
 	}
@@ -346,6 +342,7 @@ bool GameActions::isInLegend(Point& p, GameConfig& currBoard) //checks if mario 
 
 void GameActions::setCharCheck(GameActions& game, GameRenderer& renderer, Point& p, GameConfig& currBoard, char object, Mario& mario, bool& flag, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) // checks if theres a ladder or floor and then goes to set char on board
 {
+	int whoHit;
 	char ch = currBoard.GetCurrentChar(p.x, p.y);
 	bool returnCh = isInLegend(p, currBoard);
 	if (ch == LADDER_CH || ch == '<' || ch == '>' || ch == '=' || ch == 'Q' || ch == PAULINE_CH || ch == DONKEY_KONG_CH || returnCh)
@@ -354,17 +351,13 @@ void GameActions::setCharCheck(GameActions& game, GameRenderer& renderer, Point&
 		Point p1 = mario.findMarioLocation();
 		if (currBoard.GetCurrentChar(p1.x, p1.y) == BARREL_CH)
 		{
-			if (saveMode)
-				results.addResult(currentIteration, results.hitBarrel, mario.getScore());
-			GameActions::hitByBarrel = true;
-			mario.collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
+			whoHit = BARREL_HIT;
+			mario.hitObject(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, currentIteration, saveMode, whoHit);
 		}
 		else if (currBoard.GetCurrentChar(p1.x, p1.y) == NON_CLIMBING_GHOST_CH || currBoard.GetCurrentChar(p1.x, p1.y) == CLIMBING_GHOST_CH)
 		{
-			if (saveMode)
-				results.addResult(currentIteration, results.hitGhost, mario.getScore());
-			GameActions::hitByGhost = true;
-			mario.collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, saveMode);
+			whoHit = GHOST_HIT;
+			mario.hitObject(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, currentIteration, saveMode, whoHit);
 		}
 		currBoard.SetChar(p.x, p.y, ch);
 	}

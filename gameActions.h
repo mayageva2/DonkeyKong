@@ -6,6 +6,9 @@
 #include "ghost.h"
 
 static constexpr int ENDJUMP = -1;
+static constexpr int BARREL_HIT = 0;
+static constexpr int GHOST_HIT = 1;
+static constexpr int FALL_HIT = 2;
 
 class GameActions
 {
@@ -15,6 +18,7 @@ protected:
 	static bool isSilent;
 	static bool error_unmatch;
 public:
+	GameActions() : renderer(nullptr) {}  // Constructor 
 	virtual char getNextMove(Mario& mario, GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const = 0;
     void startGame(GameActions& game, GameRenderer& renderer, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode) ;
 	void marioMovement(GameActions& game, GameRenderer& renderer, Mario& mario, GameConfig& board, GameConfig::eKeys& lastKey, char& key, int& moveCounter, bool& sideJump, bool& flag, bool& mariowin, std::vector<Barrel>& barrels, std::vector<Ghost*>& ghosts, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode);  //makes sure mario goes as he should 

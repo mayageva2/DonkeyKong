@@ -35,7 +35,7 @@ void Results::reportResultError(const std::string& message, const std::string& f
 	std::cout << "Screen " << filename << " - " << message << '\n';
 	std::cout << "Iteration: " << iteration << '\n';
 	std::cout << "Press any key to continue to next screens (if any)" << std::endl;
-	_getch();
+	(void)_getch();
 }
 
 

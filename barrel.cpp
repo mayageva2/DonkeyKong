@@ -8,16 +8,12 @@ void Barrel::clearFromScreen(GameActions& game, GameRenderer& renderer, size_t& 
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	game.setCharCheck(game,renderer,location, board, DELETE_CH, mario, flag, mariowin,ifcolorMode, steps, results,saveMode); //resets barrel's previous location
+	int whoHit;
 
 	if (mario.findMarioLocation().x == this->location.x && mario.findMarioLocation().y == this->location.y)
 	{
-		if (saveMode)
-		{
-			results.addResult(counter, results.hitBarrel, mario.getScore());
-		}
-
-		GameActions::hitByBarrel = true;
-		mario.collide(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, saveMode);
+		whoHit = BARREL_HIT;
+		mario.hitObject(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, counter, saveMode, whoHit);
 	}
 	else
 	{
@@ -46,13 +42,8 @@ void Barrel::clearFromScreen(GameActions& game, GameRenderer& renderer, size_t& 
 		
 		if (marioCloseToExplosion(board, mario) && mario.state != MarioState::killing)
 		{
-			if (saveMode)
-			{
-				results.addResult(counter, results.hitBarrel, mario.getScore());
-			}
-
-			GameActions::hitByBarrel = true;
-			mario.collide(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, saveMode);
+			whoHit = BARREL_HIT;
+			mario.hitObject(game, renderer, board, flag, mariowin, ifcolorMode, results, steps, counter, saveMode, whoHit);
 		}
 	}
 	deactivate();

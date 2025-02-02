@@ -1,0 +1,23 @@
+Steps File:
+Seed Number: The seed used for generating random numbers.
+Amount of Steps: The total number of steps taken.
+Color Mode: Whether the process is in color mode (true/false).
+
+For each step, the following is recorded:
+Iteration Number: The step number (iteration).
+Char: The character that was pressed during that iteration (e.g., 'a' for left).
+
+Results File:
+Amount of Results: The total number of results recorded.
+
+For each result, the following is recorded:
+Iteration Number: The step number (iteration) at which the result was generated.
+Result: An integer representing the outcome of that iteration.
+Score: The score achieved at that iteration.
+
+Result Codes:
+0: Hit Ghost
+1: Hit Barrel
+2: Finished
+3: Falling
+4: No Result

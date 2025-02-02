@@ -57,6 +57,7 @@ public:
 	void setLastScore() { last_score = curr_score; } //sets new score
 	void resetMarioPos();  //brings mario back to starting position
 	bool isAlive() const { return num_of_hearts > 0; } 
+	void hitObject(GameActions& game, GameRenderer& renderer, GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, size_t& counter, bool& saveMode, int& whoHit);
 
 	bool hasHammer() const //check if mario has a hammer
 	{

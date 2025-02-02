@@ -7,7 +7,7 @@
 
 class loadGame:public GameActions
 {
-	bool isSilent;
+	bool isSilent = false;
 	
 public:
 	virtual char getNextMove(Mario& mario, GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const override;

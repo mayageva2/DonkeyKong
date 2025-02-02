@@ -32,7 +32,7 @@ public:
 	size_t getNextEnemyIteration() const;
 	bool isEmpty() const { return results.empty(); }
 	std::tuple<size_t, Results::ResultValue, int> getFirstResult() const {return results.front();}
-	int getLastResultIteration() { return std::get<0>(results.back()); }
-	int getSize() const { return results.size(); }
+	size_t getLastResultIteration() { return std::get<0>(results.back()); }
+	size_t getSize() const { return results.size(); }
 };
 #endif

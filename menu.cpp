@@ -248,7 +248,6 @@ void Menu::displayMenu(GameRenderer& renderer, Mario& mario, bool& save, Results
 	bool ifcolorM = false;
 	std::string path = ".";
 	std::vector<std::string> screens = board.getDkongScreens(path);
-	long random_seed;
 
 	while (!exitMenu)
 	{
@@ -327,7 +326,7 @@ char Menu::printCModeScreen(GameRenderer& renderer) //prints screen in color mod
 char Menu::printChooseScreen(GameRenderer& renderer,std::vector<std::string> screens,bool& ifcolorMode) //prints chosen screen 
 {
 	size_t size = screens.size();
-	int origin_size = screens.size();
+	size_t origin_size = screens.size();
 	if (size == 0)
 	{
 		renderer.clearScreen();
@@ -381,6 +380,8 @@ char Menu::printChooseScreen(GameRenderer& renderer,std::vector<std::string> scr
 		
 		return key;
 	}
+
+	return '0'; // Default return value if no selection is made.
 }
 
 void Menu::addNames(GameRenderer& renderer, int size, char& counter, Point* namePoints, Point* counterPoints, std::vector<std::string>& screens,bool& ifcolorMode) //add file names to choosing screen 

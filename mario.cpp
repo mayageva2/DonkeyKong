@@ -10,26 +10,36 @@
 #include <conio.h>
 using namespace std;
 
+void Mario::hitObject(GameActions& game, GameRenderer& renderer, GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, size_t& counter, bool& saveMode, int& whoHit)
+{
+	if (saveMode)
+		results.addResult(counter, results.hitBarrel, curr_score);
+
+	if (whoHit == BARREL_HIT)
+		GameActions::hitByBarrel = true;
+	else if (whoHit == GHOST_HIT)
+		GameActions::hitByGhost = true;
+	else if (whoHit == FALL_HIT)
+		GameActions::fellToDeath = true;
+
+	collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, saveMode);
+}
+
 void Mario::move(GameActions& game, GameRenderer& renderer, GameConfig::eKeys key, GameConfig& currBoard, int& moveCounter, bool& flag, bool& mariowin, vector<Ghost*>& ghosts, vector<Barrel>& barrels,bool& ifcolorMode, Results& results, Steps& steps, size_t& counter,bool& saveMode) //this func moves mario according to user's key
 {
 	bool sideJump = false;
+	int whoHit;
 	if (key != GameConfig::eKeys::KILL && key != GameConfig::eKeys::KILL2)
 	{
 		if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH)
 		{
-			if (saveMode)
-				results.addResult(counter, results.hitBarrel, curr_score);
-
-			GameActions::hitByBarrel = true;
-			collide(game,renderer,currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
+			whoHit = BARREL_HIT;
+			hitObject(game,renderer,currBoard, flag, mariowin, ifcolorMode, results, steps, counter, saveMode, whoHit);
 		}
 		else if(currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH)
 		{
-			if (saveMode)
-				results.addResult(counter, results.hitGhost, curr_score);
-
-			GameActions::hitByGhost = true;
-			collide(game,renderer,currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
+			whoHit = GHOST_HIT;
+			hitObject(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, counter, saveMode, whoHit);
 		}
 	}
 	if(flag)
@@ -86,19 +96,13 @@ void Mario::move(GameActions& game, GameRenderer& renderer, GameConfig::eKeys ke
 		
 		if (currBoard.GetCurrentChar(this->location.x, this->location.y) == BARREL_CH)
 		{
-			if (saveMode)
-				results.addResult(counter, results.hitBarrel, curr_score);
-
-			GameActions::hitByBarrel = true;
-			collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
+			whoHit = true;
+			hitObject(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, counter, saveMode, whoHit);
 		}
 		else if (currBoard.GetCurrentChar(this->location.x, this->location.y) == CLIMBING_GHOST_CH || currBoard.GetCurrentChar(this->location.x, this->location.y) == NON_CLIMBING_GHOST_CH)
 		{
-			if (saveMode)
-				results.addResult(counter, results.hitGhost, curr_score);
-			
-			collide(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
-			GameActions::hitByGhost = true;
+			whoHit = false;
+			hitObject(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, counter, saveMode, whoHit);
 		}
 
 	    if (flag)
@@ -270,6 +274,7 @@ void Mario::jumpUp(GameRenderer& renderer, GameActions& game, int& moveCounter, 
 void Mario::falling(GameRenderer& renderer,GameActions& game, int& moveCounter, GameConfig& currBoard, bool& sideJump, bool& flag, bool& mariowin,bool& ifcolorMode, Results& results, Steps& steps, size_t& counter,bool& saveMode) //this func makes mario fall down
 {
 	Point p(this->location);
+	int whoHit;
 
 	if (!isMarioOnFloor(currBoard))
 	{
@@ -295,11 +300,8 @@ void Mario::falling(GameRenderer& renderer,GameActions& game, int& moveCounter, 
 		}
 		if (moveCounter > 4)
 		{
-			if (saveMode)
-				results.addResult(counter, results.falling, curr_score);
-
-			GameActions::fellToDeath = true;
-			collide(game,renderer,currBoard, flag, mariowin, ifcolorMode, results, steps,saveMode);
+			whoHit = FALL_HIT;
+			hitObject(game, renderer, currBoard, flag, mariowin, ifcolorMode, results, steps, counter, saveMode, whoHit);
 		}
 		sideJump = false;
 		moveCounter = ENDJUMP;
@@ -561,8 +563,7 @@ bool Mario::isMarioOnFloor(GameConfig& currBoard) //checks if mario stands on a 
 {
 	Point p(this->location);
 
-	if (currBoard.GetCurrentChar(p.x, p.y + 1) != '<' && currBoard.GetCurrentChar(p.x, p.y + 1) != '>' && currBoard.GetCurrentChar(p.x, p.y + 1) != 'Q' && currBoard.GetCurrentChar(p.x, p.y + 1) != '=')
-		return false;
+	return (currBoard.GetCurrentChar(p.x, p.y + 1) == '<' || currBoard.GetCurrentChar(p.x, p.y + 1) == '>' || currBoard.GetCurrentChar(p.x, p.y + 1) == 'Q' || currBoard.GetCurrentChar(p.x, p.y + 1) == '=');
 }
 
 Point Mario::findMarioLocation() const //this func returns mario's location
