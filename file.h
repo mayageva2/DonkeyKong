@@ -4,15 +4,16 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+
 class File
 {
-	std::string filePath;
+	std::string filePath; //file adress
 public:
-	explicit File(const std::string& path) : filePath(path) {}
-	const std::string& getPath() const { return filePath; }
-	virtual ~File() = default;
+	explicit File(const std::string& path) : filePath(path) {} //constructor
+	const std::string& getPath() const { return filePath; } //returns adress of file
+	virtual ~File() = default;  //destructor
 
-	File operator+(const File& other) const 
+	File operator+(const File& other) const  //+ operator
 	{
 		std::string combinedPath = filePath + "/" + other.filePath;
 		return File(combinedPath);

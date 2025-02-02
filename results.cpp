@@ -4,7 +4,7 @@
 #include <fstream>
 #include <conio.h>
 
-void Results::saveResults(const std::string& filename) const 
+void Results::saveResults(const std::string& filename) const  //saves result to file
 {
 	std::ofstream results_file(filename);
 	results_file << results.size();
@@ -14,7 +14,7 @@ void Results::saveResults(const std::string& filename) const
 	results_file.close();
 }
 
-void Results::loadResults(const std::string& filename)
+void Results::loadResults(const std::string& filename) //loads result from file
 {
 	std::ifstream results_file(filename);
 	size_t size;
@@ -29,7 +29,7 @@ void Results::loadResults(const std::string& filename)
 	}
 }
 
-void Results::reportResultError(const std::string& message, const std::string& filename, size_t iteration) const
+void Results::reportResultError(const std::string& message, const std::string& filename, size_t iteration) const //reports errors
 {
 	system("cls");
 	std::cout << "Screen " << filename << " - " << message << '\n';
@@ -39,7 +39,7 @@ void Results::reportResultError(const std::string& message, const std::string& f
 }
 
 
-size_t Results::getNextEnemyIteration() const
+size_t Results::getNextEnemyIteration() const //get next enemyws iteration
 {
 	if (!results.empty() && ((std::get<1>(results.front()) == hitGhost) || (std::get<1>(results.front()) == hitBarrel)))
 		return (std::get<0>(results.front())); // number of iteration

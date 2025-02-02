@@ -31,7 +31,7 @@ void Ghost::checkMove(GameActions& game, GameRenderer& renderer, GameConfig& boa
     renderer.draw(this->ch, location, ifcolorMode);
 }
 
-void Ghost::handleMovement(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts, Steps& steps)
+void Ghost::handleMovement(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts, Steps& steps) //handles all ghost types movement
 {
     if (isGhostReachingCliff(board) && board.GetCurrentChar(p.x + location.diff_x, p.y) != '=' &&
         board.GetCurrentChar(p.x + location.diff_x, p.y) != '<' && board.GetCurrentChar(p.x + location.diff_x, p.y) != '>')
@@ -110,14 +110,17 @@ void Ghost::randomDirection(long seed) //gives a random direction
 void Ghost::clearGhostFromScreen(GameActions& game, GameRenderer& renderer, GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) //this func clears ghosts from screen
 {
     char originalChar = board.GetOriginalChar(location.x, location.y);
-    if(originalChar == CLIMBING_GHOST_CH || originalChar == NON_CLIMBING_GHOST_CH)
+    if (originalChar == CLIMBING_GHOST_CH || originalChar == NON_CLIMBING_GHOST_CH)
+    {
+        game.setCharCheck(game, renderer, this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode, steps, results, saveMode);
         renderer.draw(DELETE_CH, location, ifcolorMode);
+    }
     else
         renderer.draw(originalChar, location,ifcolorMode);
     game.setCharCheck(game,renderer,location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results, saveMode);
 }
 
-bool Ghost::isGhostOnFloor(GameConfig& board) const
+bool Ghost::isGhostOnFloor(GameConfig& board) const //checks if ghost is on floor
 {
     if (board.GetCurrentChar(location.x, location.y + 1) == '=' || board.GetCurrentChar(location.x, location.y + 1) == '<' || board.GetCurrentChar(location.x, location.y + 1) == '>' || board.GetCurrentChar(location.x, location.y + 1) == 'Q')
         return true;
@@ -125,7 +128,7 @@ bool Ghost::isGhostOnFloor(GameConfig& board) const
         return false;
 }
 
-bool Ghost::isGhostReachingCliff(GameConfig& board) const
+bool Ghost::isGhostReachingCliff(GameConfig& board) const //check if ghost is about to reach the end of floor
 {
     if (board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == '=' || board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == '<' || board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == '>' || board.GetCurrentChar(location.x + location.diff_x, location.y + 1) == 'Q')
         return true;

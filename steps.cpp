@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-void Steps::saveSteps(const std::string& filename) const 
+void Steps::saveSteps(const std::string& filename) const  //saves steps to file
 {
 	std::ofstream steps_file(filename);
 	steps_file << randomSeed << '\n' << steps.size() << '\n' << colorModeGame;
@@ -12,7 +12,7 @@ void Steps::saveSteps(const std::string& filename) const
 	steps_file.close();
 }
 
-bool Steps::checkSaveMode(int argc, char** argv)
+bool Steps::checkSaveMode(int argc, char** argv) //checks if should save data
 {
 	for (int i = 1; i < argc; ++i)
 	{
@@ -22,7 +22,7 @@ bool Steps::checkSaveMode(int argc, char** argv)
 	return false;
 }
 
-void Steps::loadSteps(const std::string& filename)
+void Steps::loadSteps(const std::string& filename) //loads steps from file
 {
 	std::ifstream steps_file(filename);
 	steps_file >> randomSeed; //read randomSeed

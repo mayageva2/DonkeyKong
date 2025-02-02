@@ -9,9 +9,9 @@
 
 class GameWithKeys: public GameActions
 {
-	GameWithKeys(const GameWithKeys&) = delete;
+	GameWithKeys(const GameWithKeys&) = delete; 
 public:
-	GameWithKeys() = default;
-	virtual char getNextMove(Mario& mario, GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const override;
+	GameWithKeys() = default; //constructor
+	virtual char getNextMove(Mario& mario, GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const override; //get Mario's next move
 };
 #endif

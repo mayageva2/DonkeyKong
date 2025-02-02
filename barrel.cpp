@@ -37,6 +37,8 @@ void Barrel::clearFromScreen(GameActions& game, GameRenderer& renderer, size_t& 
 			char originalCh = board.GetCurrentChar(location.x + i, location.y);
 			Point tmp = location;
 			tmp.x += i;
+			if(originalCh == MARIO_CH)
+				originalCh = board.GetOriginalChar(location.x + i, location.y);
 			renderer.draw(originalCh, tmp, ifcolorMode);
 		}
 		

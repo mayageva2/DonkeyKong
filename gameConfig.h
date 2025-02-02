@@ -18,7 +18,7 @@ class GameRenderer;
 class GameConfig
 {
 	std::vector<Point> GhostsPos;         //a vector containing all of ghosts positions
-	std::vector<char> GhostsType;
+	std::vector<char> GhostsType;         //a vector containing all of ghosts types
 	std::vector<std::string> screenFiles; //a vector containing all the screen files names
 	size_t currentGhostIndex = 0;         //ghosts pos vector index
 	size_t currentTypeIndex = 0;          //ghosts type vector index
@@ -63,7 +63,7 @@ public:
 	void addFrame(); //add Q frame to screen
 	bool isGhostsOnFloor();  //checks if ghosts are in the air
 
-	static bool isValidKey(char& key) 
+	static bool isValidKey(char& key)  //checks validation of keys
 	{
 		switch (static_cast<eKeys>(key)) 
 		{

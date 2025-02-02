@@ -286,7 +286,7 @@ void Menu::displayMenu(GameRenderer& renderer, Mario& mario, bool& save, Results
 	}
 }
 
-void Menu::chooseColorScreen(GameRenderer& renderer, char& colorModeKey, bool& ifcolorM)
+void Menu::chooseColorScreen(GameRenderer& renderer, char& colorModeKey, bool& ifcolorM) //choose color mode
 {
 	colorModeKey = printCModeScreen(renderer);
 	while (colorModeKey != WITH_COLOR && colorModeKey != WITH_COLOR2 && colorModeKey != WITHOUT_COLOR && colorModeKey != WITHOUT_COLOR2)

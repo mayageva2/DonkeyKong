@@ -1,7 +1,7 @@
 #include "climbingGhost.h"
 #include "gameWithKeys.h"
 
-void ClimbingGhost::handleClimbing(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts, Steps& steps)
+void ClimbingGhost::handleClimbing(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts, Steps& steps) // Handles the climbing behavior of the ghost
 {
     if (climbingState == NONE)
     {
@@ -26,7 +26,7 @@ void ClimbingGhost::handleClimbing(GameConfig& board, Point& p, std::vector<Ghos
     }
 }
 
-void ClimbingGhost::climbUp(GameConfig& board) 
+void ClimbingGhost::climbUp(GameConfig& board) //makes ghost climb up
 {
     this->location.y--;
     this->location.diff_x = 0;
@@ -35,7 +35,7 @@ void ClimbingGhost::climbUp(GameConfig& board)
         climbingState = FINISHED_CLIMBING;
 }
 
-void ClimbingGhost::climbDown(GameConfig& board)
+void ClimbingGhost::climbDown(GameConfig& board)  //makes ghost climb down
 {
     this->location.y++;
     this->location.diff_x = 0;

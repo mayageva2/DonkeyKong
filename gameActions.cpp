@@ -108,7 +108,7 @@ void GameActions::startGame(GameActions& game, GameRenderer& renderer, Mario& ma
 	cleanUp(ghosts, barrels, hConsole, hitByBarrel, hitByGhost, fellToDeath, MarioFinished);
 }
 
-void GameActions::checkErrors(Mario& mario, Results& results)
+void GameActions::checkErrors(Mario& mario, Results& results) //checks errors of game result in silent mode
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
@@ -151,7 +151,7 @@ void GameActions::checkErrors(Mario& mario, Results& results)
 			error_unmatch = true;
 		}
 
-		if (expectedScore != mario.getScore())
+		if (expectedScore != mario.getLastScoreBeforeDeath())
 		{
 			results.reportResultError("Error: Marios score didn't match!", results.filename, currentIteration);
 			error_unmatch = true;
@@ -161,7 +161,7 @@ void GameActions::checkErrors(Mario& mario, Results& results)
 	}
 }
 
-void GameActions::checkErrorsEndOfGame(Mario& mario, Results& results)
+void GameActions::checkErrorsEndOfGame(Mario& mario, Results& results) //checks errors in end of game
 {
 	if (!results.isEmpty())
 	{
@@ -242,7 +242,7 @@ void GameActions::marioMovement(GameActions& game, GameRenderer& renderer,Mario&
 	}
 }
 
-void GameActions::cleanUp(std::vector<Ghost*>& ghosts, std::vector<Barrel>& barrels, HANDLE hConsole, bool& fellToDeath, bool& hitByBarrel, bool& hitByGhost, bool& marioFinished)
+void GameActions::cleanUp(std::vector<Ghost*>& ghosts, std::vector<Barrel>& barrels, HANDLE hConsole, bool& fellToDeath, bool& hitByBarrel, bool& hitByGhost, bool& marioFinished) //clears data for next game
 {
 	ghosts.clear();
 	ghosts.shrink_to_fit();
@@ -284,7 +284,7 @@ void GameActions::pauseGame(GameRenderer& renderer,GameConfig& board, Mario& mar
 	renderer.draw(DELETE_CH, GameConfig::getMarioPos(), ifcolorMode);
 }
 
-void GameActions::checkCollisions(GameActions& game, GameRenderer& renderer, size_t& counter, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode)
+void GameActions::checkCollisions(GameActions& game, GameRenderer& renderer, size_t& counter, Mario& mario, GameConfig& board, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode) //Handles collision
 {
 	int whoHit;
 	if (mario.state == MarioState::standing && flag)

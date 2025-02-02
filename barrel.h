@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string> 
 
+//Declarations//
 class GameRenderer;
 class GameActions;
 class Mario;

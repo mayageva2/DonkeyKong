@@ -1,7 +1,7 @@
 #include "consoleRenderer.h"
 
 
-void ConsoleRenderer::draw(char ch, Point pos, bool& iscolorMode) const
+void ConsoleRenderer::draw(char ch, Point pos, bool& iscolorMode) const //draws given char
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(pos.x, pos.y);
@@ -57,7 +57,7 @@ void ConsoleRenderer::draw(char ch, Point pos, bool& iscolorMode) const
 	std::cout << ch;
 }
 
-void ConsoleRenderer::drawString(const std::string& str, char ch, Point pos, bool& ifcolorMode) const
+void ConsoleRenderer::drawString(const std::string& str, char ch, Point pos, bool& ifcolorMode) const //draws string
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(pos.x, pos.y);
@@ -92,7 +92,7 @@ void ConsoleRenderer::printScreen(const char** print) const //prints screen
 	}
 }
 
-void ConsoleRenderer::drawNumber(int num, Point pos, bool& ifcolorMode) const
+void ConsoleRenderer::drawNumber(int num, Point pos, bool& ifcolorMode) const //draws number 
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(pos.x, pos.y);

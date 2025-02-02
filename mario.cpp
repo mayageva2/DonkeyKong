@@ -10,7 +10,7 @@
 #include <conio.h>
 using namespace std;
 
-void Mario::hitObject(GameActions& game, GameRenderer& renderer, GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, size_t& counter, bool& saveMode, int& whoHit)
+void Mario::hitObject(GameActions& game, GameRenderer& renderer, GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, size_t& counter, bool& saveMode, int& whoHit) //handles marios collision
 {
 	if (whoHit == BARREL_HIT)
 	{
@@ -284,6 +284,9 @@ void Mario::falling(GameRenderer& renderer,GameActions& game, int& moveCounter, 
 {
 	Point p(this->location);
 	int whoHit;
+
+	if (currBoard.GetCurrentChar(p.x, p.y) == DONKEY_KONG_CH)
+		renderer.draw(DONKEY_KONG_CH, this->location, ifcolorMode);
 
 	if (!isMarioOnFloor(currBoard))
 	{
@@ -589,6 +592,7 @@ void Mario::collide(GameActions& game, GameRenderer& renderer, GameConfig& currB
 	}
 	renderer.drawString(EXPLOSION, MARIO_CH, this->location, ifcolorMode);
 	this->num_of_hearts--;
+	last_score_before_death = curr_score;
 	renderer.sleep(2000);
 
 	didMarioLose(renderer,currBoard, flag,ifcolorMode);
@@ -658,6 +662,7 @@ void Mario::resetMario()  //this func initiallize mario's data members
 {
 	this->num_of_hearts = FULL_LIFE;
 	this->hammer = false;
+	this->last_score_before_death = ZERO;
 	this->location = GameConfig::getMarioPos();
 }
 

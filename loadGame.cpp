@@ -6,7 +6,7 @@
 
 bool GameActions::isSilent;
 
-char loadGame::getNextMove(Mario& mario, GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const
+char loadGame::getNextMove(Mario& mario, GameRenderer& renderer, int currentIteration, Steps& steps, bool& flag, GameConfig::eKeys lastKey) const //get next move data
 {
 	if (!steps.isEmpty() && steps.isNextStepOnIteration(currentIteration)) 
 	{
@@ -20,7 +20,7 @@ char loadGame::getNextMove(Mario& mario, GameRenderer& renderer, int currentIter
 }
 
 
-void loadGame::getAllBoardFileNames(std::vector<std::string>& vec_to_fill) 
+void loadGame::getAllBoardFileNames(std::vector<std::string>& vec_to_fill)  //get all boards file name
 {
 	namespace fs = std::filesystem;
 	for (const auto& entry : fs::directory_iterator(fs::current_path())) {
@@ -34,7 +34,7 @@ void loadGame::getAllBoardFileNames(std::vector<std::string>& vec_to_fill)
 }
 
 
-void loadGame::load_game(GameActions& game, bool& _silent, Mario& mario, Results& results, Steps& steps,bool& saveMode)
+void loadGame::load_game(GameActions& game, bool& _silent, Mario& mario, Results& results, Steps& steps,bool& saveMode) //loads game from file
 {
 	GameRenderer* renderer = _silent ? static_cast<GameRenderer*>(new SilentRenderer()) : static_cast<GameRenderer*>(new ConsoleRenderer());
 	if (_silent)
