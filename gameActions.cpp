@@ -151,8 +151,15 @@ void GameActions::checkErrors(Mario& mario, Results& results) //checks errors of
 			error_unmatch = true;
 		}
 
+		if (MarioFinished && expectedScore != mario.getScore())
+		{
+			std::cout << "FINISHED with score" << mario.getScore() << std::endl;
+			results.reportResultError("Error: Marios score didn't match!", results.filename, currentIteration);
+			error_unmatch = true;
+		}
 		if (expectedScore != mario.getLastScoreBeforeDeath())
 		{
+			std::cout << "DIED with score" << mario.getScore() << std::endl;
 			results.reportResultError("Error: Marios score didn't match!", results.filename, currentIteration);
 			error_unmatch = true;
 		}

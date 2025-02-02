@@ -662,6 +662,7 @@ void Mario::resetMario()  //this func initiallize mario's data members
 {
 	this->num_of_hearts = FULL_LIFE;
 	this->hammer = false;
+	this->curr_score = ZERO;
 	this->last_score_before_death = ZERO;
 	this->location = GameConfig::getMarioPos();
 }

@@ -46,7 +46,7 @@ public:
 	bool isMarioOnFloor(GameConfig& currBoard);   //checks if mario stands on a floor
 	Point findMarioLocation() const;   //return mario's position
 	int getNumOfHearts() const { return num_of_hearts; }  //returns amount of lives left
-	int getLastScoreBeforeDeath() const { return last_score_before_death; }
+	int getLastScoreBeforeDeath() const { return last_score_before_death; } //return score before death
 	int getScore() const { return curr_score; }  //returns amount of lives left
 	void collide(GameActions& game, GameRenderer& renderer, GameConfig& currBoard, bool& flag, bool& mariowin, bool& ifcolorMode, Results& results, Steps& steps, bool& saveMode); //makes mario explode and restarts game
 	void didMarioLose(GameRenderer& renderer, GameConfig& currBoard, bool& flag,  bool& ifcolorMode); //checks if mario lost all hearts
