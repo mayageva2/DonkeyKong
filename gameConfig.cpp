@@ -218,55 +218,25 @@ bool GameConfig::insertLegend() //insert legend to screen
 
 }
 
-void GameConfig::printHearts(Mario& mario, bool& ifcolorMode) //this func print hearts on screen
+void GameConfig::printHearts(GameRenderer& renderer, Mario& mario, bool& ifcolorMode) //this func print hearts on screen
 {
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	gotoxy(legendPos.x + 15, legendPos.y);
-	if (ifcolorMode)
-	{
-		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-	}
-	std::cout << mario.getNumOfHearts();
+	Point heartsNumPos = { legendPos.x + 15, legendPos.y };
+	renderer.drawNumber(mario.getNumOfHearts(), heartsNumPos, ifcolorMode);
 }
 
-void GameConfig::PrintBoard(bool& ifcolorMode) const //prints board
+void GameConfig::PrintBoard(GameRenderer& renderer, bool& ifcolorMode) const //prints board
 {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	gotoxy(0, 0);
 
-
-	for (int i = 0; i < MAX_Y; i++) {
-		for (int j = 0; originalBoard[i][j] != '\0'; j++) {
-			if (ifcolorMode) 
-			{
-				if (originalBoard[i][j] == LADDER_CH) {
-					SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY); // Yellow 
-				}
-				else if (originalBoard[i][j] == '>' || originalBoard[i][j] == '=' || originalBoard[i][j] == '<') {
-					SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN ); // Brown 
-				}
-				else if (originalBoard[i][j] == DONKEY_KONG_CH) {
-					SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN); // Green
-				}
-				else if (originalBoard[i][j] == PAULINE_CH) {
-					SetConsoleTextAttribute(hConsole, FOREGROUND_RED| FOREGROUND_BLUE | FOREGROUND_INTENSITY); // Purple
-				}
-				else if (originalBoard[i][j] == HAMMER) {
-					SetConsoleTextAttribute(hConsole, FOREGROUND_RED ); // Purple
-				}
-				else if(originalBoard[i][j] !=DELETE_CH){
-					SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY); 
-				}
-				
-			}
-
-			std::cout << originalBoard[i][j];
+	for (int i = 0; i < MAX_Y; i++) 
+	{
+		for (int j = 0; originalBoard[i][j] != '\0'; j++) 
+		{
+			Point pos(j, i);
+			renderer.draw(originalBoard[i][j], pos, ifcolorMode);
 		}
 		std::cout << '\n';
-	}
-
-	if (ifcolorMode) {
-		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Reset to default color
 	}
 }
 
@@ -292,26 +262,16 @@ char GameConfig::getGhostType()
 	return type;
 }
 
-void GameConfig::printHammer(bool& ifcolorMode) //prints hammer on screen 
+void GameConfig::printHammer(GameRenderer& renderer,bool& ifcolorMode) //prints hammer on screen 
 {
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	gotoxy(legendPos.x + 15, legendPos.y + 2);
-	if (ifcolorMode)
-	{
-		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-	}
-	std::cout << "V";
+	Point hammerPickedPos = { legendPos.x + 15,legendPos.y + 2 };
+	renderer.draw('V', hammerPickedPos, ifcolorMode);
 }
 
-void GameConfig::printScore(Mario& mario, bool& ifcolorMode) const//prints score on screen
+void GameConfig::printScore(GameRenderer& renderer, Mario& mario, bool& ifcolorMode) const//prints score on screen
 {
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	gotoxy(legendPos.x + 15, legendPos.y + 1);
-	if (ifcolorMode)
-	{
-		SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-	}
-	std::cout << mario.getScore();
+	Point scorePos = { legendPos.x + 15, legendPos.y + 1 };
+	renderer.drawNumber(mario.getScore(), scorePos, ifcolorMode);
 }
 
 

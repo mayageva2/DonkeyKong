@@ -2,14 +2,14 @@
 #include "mario.h"
 #include "gameWithKeys.h"
 
-void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results)  //move ghost according to conditions
+
+void Ghost::checkMove(GameActions& game, GameRenderer& renderer, GameConfig& board, Mario& mario, bool& flag, std::vector<Ghost*>& ghosts, bool& mariowin, bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode)  //move ghost according to conditions
 {
-    GameWithKeys game;
     Point p(location.x, location.y);
-    game.setCharCheck(this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode, steps, results);
+    game.setCharCheck(game,renderer,this->location, board, DELETE_CH, mario, flag, mariowin, ifcolorMode, steps, results,saveMode);
     char originalChar = board.GetCurrentChar(location.x, location.y);
-    game.setCharCheck(location, board, originalChar, mario, flag, mariowin, ifcolorMode, steps, results);
-    p.draw(originalChar, location, ifcolorMode);
+    game.setCharCheck(game,renderer,location, board, originalChar, mario, flag, mariowin, ifcolorMode, steps, results, saveMode);
+    renderer.draw(originalChar, location, ifcolorMode);
 
     location.diff_x = direction ? RIGHT : LEFT;
 
@@ -25,8 +25,8 @@ void Ghost::checkMove(GameConfig& board, Mario& mario, bool& flag, std::vector<G
     }
 
     moveGhosts();
-    game.setCharCheck(location, board, this->ch, mario, flag, mariowin, ifcolorMode, steps, results);
-    p.draw(this->ch, location, ifcolorMode);
+    game.setCharCheck(game,renderer,location, board, this->ch, mario, flag, mariowin, ifcolorMode, steps, results, saveMode);
+    renderer.draw(this->ch, location, ifcolorMode);
 }
 
 void Ghost::handleMovement(GameConfig& board, Point& p, std::vector<Ghost*>& ghosts)
@@ -104,11 +104,11 @@ void Ghost::randomDirection() //gives a random direction
         direction = !direction;
 }
 
-void Ghost::clearGhostFromScreen(GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results) //this func clears ghosts from screen
+void Ghost::clearGhostFromScreen(GameActions& game, GameRenderer& renderer, GameConfig& board, Mario& mario, bool& flag, bool& marioKilled, bool& mariowin,bool& ifcolorMode, Steps& steps, Results& results,bool& saveMode) //this func clears ghosts from screen
 {
     char originalChar = board.GetOriginalChar(location.x, location.y);
-    Point::draw(originalChar, location,ifcolorMode);
-    GameWithKeys::setCharCheck(location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results);
+    renderer.draw(originalChar, location,ifcolorMode);
+    game.setCharCheck(game,renderer,location, board, originalChar, mario, flag, mariowin,ifcolorMode, steps, results, saveMode);
 }
 
 bool Ghost::isGhostOnFloor(GameConfig& board)

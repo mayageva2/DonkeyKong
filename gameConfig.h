@@ -9,9 +9,11 @@ static constexpr int MAX_X = 80;  //screen size
 static constexpr int MAX_Y = 25;  //screen size
 static constexpr int MIN_X = 1;  //screen size
 static constexpr int MIN_Y = 1;  //screen size
+static constexpr char INVALID_KEY = '!';
 
 
 class Mario;
+class GameRenderer;
 
 class GameConfig
 {
@@ -41,7 +43,7 @@ public:
 	enum class eKeys { LEFT = 'a', LEFT2 = 'A', RIGHT = 'd', RIGHT2 = 'D', UP = 'w', UP2 = 'W', DOWN = 'x', DOWN2 = 'X', STAY = 's', STAY2 = 'S', ESC = 27, KILL = 'p', KILL2 = 'P' }; //user's keys
 	void initBoard(); //initialize board
     void load(const std::string& filename, bool& error); //load board
-	void PrintBoard(bool& ifcolorMode) const; //prints board on screen
+	void PrintBoard(GameRenderer& renderer, bool& ifcolorMode) const; //prints board on screen
 	void resetBoard();  //reset current board to original board
 	static Point getMarioPos() { return marioPos; }  //returns mario's position
 	static Point getDonkeyKongPos() { return donkeyPos; } //returns donkeyKong's position
@@ -52,16 +54,16 @@ public:
 	int getGhostsAmount() const { return ghostCounter; } //returns amount of ghosts
 	bool insertLegend(); //inserts legend to board
 	void init(); //initiallizes all counters
-	void printHearts(Mario& mario, bool& ifcolorMode); //print amount of hearts
+	void printHearts(GameRenderer& renderer, Mario& mario, bool& ifcolorMode); //print amount of hearts
 	bool isDkongScreenFile(const std::string& filename); //checks if files is a screen file
 	std::vector<std::string> getDkongScreens(const std::string& directoryPath); //get screens from file
 	void printErrors() ;  //prints errors in screen
-	void printHammer(bool& ifcolorMode);  //prints V in legend when mario has a hammer
-	void printScore(Mario& mario, bool& ifcolorMode) const; //prints score
+	void printHammer(GameRenderer& renderer,bool& ifcolorMode);  //prints V in legend when mario has a hammer
+	void printScore(GameRenderer& renderer, Mario& mario, bool& ifcolorMode) const; //prints score
 	void addFrame(); //add Q frame to screen
 	bool isGhostsOnFloor();  //checks if ghosts are in the air
 
-	bool isValidKey(char& key) 
+	static bool isValidKey(char& key) 
 	{
 		switch (static_cast<eKeys>(key)) 
 		{

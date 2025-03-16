@@ -30,7 +30,7 @@ public:
 		return step;
 	}
 	char getColorMode() {return colorModeGame;}
-	void setColorMode(char c) { colorModeGame = c; }
+	void setColorMode(char colorMode) { colorModeGame=colorMode; }
 	bool isEmpty() {return steps.empty();}
 	void clear() { steps.clear(); }
 };
